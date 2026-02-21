@@ -1,0 +1,50 @@
+<div class="confirmacion-container">
+    <div class="confirmacion-icono">✓</div>
+    
+    <h1>¡Reserva confirmada!</h1>
+    
+    <div class="confirmacion-detalles">
+        <h2>Detalles de la tutoría</h2>
+        
+        <div class="detalle-item">
+            <span class="detalle-label">Profesor:</span>
+            <span class="detalle-valor"><%= reserva.profesorNombre %></span>
+        </div>
+        
+        <div class="detalle-item">
+            <span class="detalle-label">Fecha:</span>
+            <span class="detalle-valor"><%= new Date(reserva.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+        </div>
+        
+        <div class="detalle-item">
+            <span class="detalle-label">Hora:</span>
+            <span class="detalle-valor"><%= reserva.hora %></span>
+        </div>
+        
+        <div class="detalle-item">
+            <span class="detalle-label">ID Reserva:</span>
+            <span class="detalle-valor"><%= reserva.id.substring(0, 8).toUpperCase() %></span>
+        </div>
+    </div>
+    
+    <div class="confirmacion-acciones">
+        <p>Hemos enviado un email de confirmación a <strong><%= reserva.emailPadre %></strong> con un PDF adjunto.</p>
+        
+        <div class="botones-accion">
+            <button onclick="window.print()" class="btn btn-secondary">
+                🖨️ Imprimir confirmación
+            </button>
+            <a href="/" class="btn btn-primary">
+                Volver al inicio
+            </a>
+        </div>
+    </div>
+    
+    <div class="info-rgpd">
+        <p>
+            <strong>Importante (RGPD):</strong> Sus datos serán eliminados automáticamente de nuestro sistema 
+            tras 24 horas después de la tutoría. Si desea cancelar la reserva, puede hacerlo desde el enlace 
+            incluido en el email de confirmación.
+        </p>
+    </div>
+</div>

@@ -1,0 +1,165 @@
+<div class="dashboard-header">
+    <h1>Gestionar Horarios - <%= usuario.nombre %></h1>
+    <div>
+        <a href="/profesor/dashboard" class="btn btn-secondary">Volver al panel</a>
+        <a href="/logout" class="btn btn-secondary">Cerrar sesión</a>
+    </div>
+</div>
+
+<% if (success && success.length > 0) { %>
+    <div class="alerta success"><%= success %></div>
+<% } %>
+
+<% if (error && error.length > 0) { %>
+    <div class="alerta error"><%= error %></div>
+<% } %>
+
+<div class="horarios-grid">
+    <div class="horarios-card">
+        <h2>Agregar nuevo horario</h2>
+        
+        <form action="/profesor/horarios/agregar" method="POST" class="horario-form">
+            <div class="form-group">
+                <label for="dia_semana">Día de la semana</label>
+                <select id="dia_semana" name="dia_semana" required>
+                    <option value="1">Lunes</option>
+                    <option value="2">Martes</option>
+                    <option value="3">Miércoles</option>
+                    <option value="4">Jueves</option>
+                    <option value="5">Viernes</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="hora">Hora</label>
+                <select id="hora" name="hora" required>
+                    <option value="16:00">16:00</option>
+                    <option value="16:30">16:30</option>
+                    <option value="17:00">17:00</option>
+                    <option value="17:30">17:30</option>
+                    <option value="18:00">18:00</option>
+                    <option value="18:30">18:30</option>
+                    <option value="19:00">19:00</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Agregar horario</button>
+        </form>
+    </div>
+    
+    <div class="horarios-card">
+        <h2>Mis horarios actuales</h2>
+        
+        <% if (horarios.length === 0) { %>
+            <p class="text-center">No tienes horarios configurados</p>
+        <% } else { %>
+            <table class="horarios-tabla">
+                <thead>
+                    <tr>
+                        <th>Día</th>
+                        <th>Hora</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% 
+                        const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+                        horarios.forEach(horario => { 
+                    %>
+                        <tr>
+                            <td><%= dias[horario.diaSemana - 1] %></td>
+                            <td><%= horario.hora %></td>
+                            <td>
+                                <form action="/profesor/horarios/eliminar/<%= horario.id %>" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('¿Eliminar este horario?')">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } %>
+    </div>
+</div>
+
+<style>
+.horarios-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.horarios-card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.horarios-card h2 {
+    color: #4a90e2;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.horario-form .form-group {
+    margin-bottom: 20px;
+}
+
+.horario-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.horario-form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.horarios-tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.horarios-tabla th,
+.horarios-tabla td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.horarios-tabla th {
+    background: #f5f5f5;
+    font-weight: 600;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-small {
+    padding: 5px 10px;
+    font-size: 0.875rem;
+}
+
+.text-center {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+}
+</style>

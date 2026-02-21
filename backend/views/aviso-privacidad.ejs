@@ -1,0 +1,94 @@
+<div class="aviso-privacidad">
+    <h1>Aviso de Privacidad - RGPD</h1>
+    
+    <div class="fecha-actualizacion">
+        Última actualización: <%= new Date().toLocaleDateString('es-ES') %>
+    </div>
+    
+    <section class="seccion">
+        <h2>1. Responsable del tratamiento</h2>
+        <p>
+            El responsable del tratamiento de sus datos es el Colegio Público, con domicilio en 
+            [dirección del centro], y correo electrónico de contacto: privacidad@colegio.edu.
+        </p>
+    </section>
+    
+    <section class="seccion">
+        <h2>2. Finalidad del tratamiento</h2>
+        <p>Sus datos personales serán tratados únicamente con las siguientes finalidades:</p>
+        <ul>
+            <li>Gestionar la reserva de tutorías con los profesores del centro.</li>
+            <li>Enviar confirmaciones y recordatorios de las tutorías reservadas.</li>
+            <li>Generar documentación necesaria para la tutoría (solo durante la vigencia de la misma).</li>
+        </ul>
+    </section>
+    
+    <section class="seccion">
+        <h2>3. Base legal del tratamiento</h2>
+        <p>
+            La base legal para el tratamiento de sus datos es su consentimiento explícito, 
+            manifestado mediante la aceptación de este aviso de privacidad y la cumplimentación 
+            del formulario de reserva.
+        </p>
+    </section>
+    
+    <section class="seccion">
+        <h2>4. Datos tratados</h2>
+        <p>Únicamente tratamos los datos estrictamente necesarios para la reserva:</p>
+        <ul>
+            <li>Nombre del padre/madre/tutor</li>
+            <li>Dirección de correo electrónico</li>
+            <li>Teléfono de contacto (opcional)</li>
+            <li>Comentarios sobre la tutoría (opcional)</li>
+        </ul>
+    </section>
+    
+    <section class="seccion">
+        <h2>5. Plazo de conservación</h2>
+        <p>
+            Sus datos serán conservados únicamente durante el tiempo necesario para la gestión 
+            de la tutoría. Serán eliminados automáticamente de nuestros sistemas transcurridas 
+            24 horas después de la fecha de la tutoría reservada.
+        </p>
+    </section>
+    
+    <section class="seccion">
+        <h2>6. Destinatarios de los datos</h2>
+        <p>
+            Sus datos no serán comunicados a terceros, salvo obligación legal. Únicamente 
+            tendrán acceso a los mismos el profesor con el que reserva la tutoría y el 
+            personal administrativo del centro estrictamente necesario para la gestión.
+        </p>
+    </section>
+    
+    <section class="seccion">
+        <h2>7. Derechos de los interesados</h2>
+        <p>Puede ejercer sus derechos de:</p>
+        <ul>
+            <li><strong>Acceso:</strong> Saber qué datos tenemos suyos.</li>
+            <li><strong>Rectificación:</strong> Modificar datos inexactos.</li>
+            <li><strong>Supresión:</strong> Solicitar la eliminación de sus datos.</li>
+            <li><strong>Oposición:</strong> Oponerse al tratamiento.</li>
+            <li><strong>Limitación:</strong> Solicitar la limitación del tratamiento.</li>
+            <li><strong>Portabilidad:</strong> Recibir sus datos en formato estructurado.</li>
+        </ul>
+        <p>
+            Para ejercer estos derechos, puede contactar con nosotros en privacidad@colegio.edu 
+            o mediante escrito dirigido al centro educativo.
+        </p>
+    </section>
+    
+    <section class="seccion">
+        <h2>8. Consentimiento</h2>
+        <p>
+            Al utilizar nuestro sistema de reservas, usted consiente explícitamente el tratamiento 
+            de sus datos personales para las finalidades descritas en este aviso.
+        </p>
+    </section>
+    
+    <form action="/consentimiento" method="POST" class="consentimiento-form">
+        <button type="submit" name="aceptar" value="true" class="btn btn-primary">
+            Aceptar y continuar
+        </button>
+    </form>
+</div>

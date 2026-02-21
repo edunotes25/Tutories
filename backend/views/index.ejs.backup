@@ -1,0 +1,29 @@
+<% layout('layout') -%>
+
+<section class="hero">
+    <h1>Sistema de Reservas de Tutorías</h1>
+    <p class="subtitle">Seleccione un profesor para reservar una tutoría</p>
+</section>
+
+<section class="profesores-grid">
+    <% profesores.forEach(profesor => { %>
+    <div class="profesor-card">
+        <div class="profesor-header">
+            <h2><%= profesor.nombre %></h2>
+            <span class="badge"><%= profesor.asignaturas.length %> asignaturas</span>
+        </div>
+        <div class="profesor-body">
+            <p><strong>Asignaturas:</strong> <%= profesor.asignaturas.join(', ') %></p>
+            <button class="btn btn-primary" onclick="window.location.href='/reservas/<%= profesor.id %>'">
+                Ver horarios disponibles
+            </button>
+        </div>
+    </div>
+    <% }) %>
+</section>
+
+<section class="info-rgpd">
+    <h3>Protección de Datos (RGPD)</h3>
+    <p>Sus datos serán utilizados únicamente para gestionar esta tutoría y serán eliminados automáticamente tras 24 horas.</p>
+    <a href="/aviso-privacidad" class="link">Ver aviso de privacidad completo</a>
+</section>

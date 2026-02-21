@@ -1,0 +1,105 @@
+<div class="hero">
+    <h1>Sistema de Reservas de Tutorías</h1>
+    <p class="subtitle">Bienvenido al sistema de reservas</p>
+</div>
+
+<div class="perfiles-grid">
+    <div class="perfil-card">
+        <div class="perfil-icon">👪</div>
+        <h2>Soy Padre/Madre</h2>
+        <p>Accede para reservar tutorías con los profesores</p>
+        <a href="/login?tipo=padre" class="btn btn-primary">Iniciar sesión</a>
+        <a href="/registro-padre" class="btn btn-secondary">Registrarme</a>
+    </div>
+    
+    <div class="perfil-card">
+        <div class="perfil-icon">👨‍🏫</div>
+        <h2>Soy Profesor</h2>
+        <p>Accede para gestionar tus horarios y reservas</p>
+        <a href="/login?tipo=profesor" class="btn btn-primary">Iniciar sesión</a>
+        <a href="/registro" class="btn btn-secondary">Registrarme</a>
+    </div>
+</div>
+
+<style>
+.hero {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hero .subtitle {
+    font-size: 1.2rem;
+    color: white;
+    opacity: 0.9;
+}
+
+.perfiles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin: 40px 0;
+}
+
+.perfil-card {
+    background: white;
+    border-radius: 10px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.perfil-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.perfil-card h2 {
+    color: #4a90e2;
+    margin-bottom: 15px;
+}
+
+.perfil-card p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: #4a90e2;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #357abd;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+</style>

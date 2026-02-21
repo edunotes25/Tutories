@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Tutorías - Colegio Público</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Estilos específicos para la splash page */
+        .splash-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .splash-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,170.7C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+            background-size: cover;
+            opacity: 0.6;
+        }
+
+        .splash-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 900px;
+            padding: 40px;
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .splash-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .splash-header i {
+            font-size: 5rem;
+            color: #4a90e2;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .splash-header h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .splash-header p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .splash-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .splash-option {
+            background: white;
+            border-radius: 15px;
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .splash-option:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .splash-option.padres:hover {
+            border-color: #4a90e2;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecf5 100%);
+        }
+
+        .splash-option.profesores:hover {
+            border-color: #764ba2;
+            background: linear-gradient(135deg, #f5f0ff 0%, #e9e0ff 100%);
+        }
+
+        .splash-option i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .splash-option.padres i {
+            color: #4a90e2;
+        }
+
+        .splash-option.profesores i {
+            color: #764ba2;
+        }
+
+        .splash-option h2 {
+            font-size: 2rem;
+            margin: 15px 0;
+            color: #333;
+        }
+
+        .splash-option p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .splash-option .btn-option {
+            display: inline-block;
+            padding: 12px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .splash-option.padres .btn-option {
+            color: #4a90e2;
+            border-color: #4a90e2;
+        }
+
+        .splash-option.padres:hover .btn-option {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .splash-option.profesores .btn-option {
+            color: #764ba2;
+            border-color: #764ba2;
+        }
+
+        .splash-option.profesores:hover .btn-option {
+            background: #764ba2;
+            color: white;
+        }
+
+        .splash-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .splash-footer a {
+            color: #666;
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+
+        .splash-footer a:hover {
+            color: #4a90e2;
+        }
+
+        .splash-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .splash-badge i {
+            margin-right: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .splash-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .splash-card {
+                padding: 20px;
+            }
+            
+            .splash-header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Animación de fondo */
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s infinite;
+        }
+
+        .shape1 {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape2 {
+            width: 150px;
+            height: 150px;
+            bottom: 10%;
+            right: 5%;
+            animation-delay: 1s;
+        }
+
+        .shape3 {
+            width: 60px;
+            height: 60px;
+            top: 60%;
+            left: 20%;
+            animation-delay: 2s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="splash-container">
+        <!-- Formas flotantes decorativas -->
+        <div class="floating-shapes">
+            <div class="shape shape1"></div>
+            <div class="shape shape2"></div>
+            <div class="shape shape3"></div>
+        </div>
+
+        <div class="splash-card">
+            <div class="splash-badge">
+                <i class="fas fa-shield-alt"></i> Cumple RGPD
+            </div>
+
+            <div class="splash-header">
+                <i class="fas fa-calendar-alt"></i>
+                <h1>Sistema de Tutorías</h1>
+                <p>Selecciona tu perfil para continuar</p>
+            </div>
+
+            <div class="splash-options">
+                <!-- Opción Padres -->
+                <div class="splash-option padres" onclick="window.location.href='/padres'">
+                    <i class="fas fa-users"></i>
+                    <h2>Padres/Madres</h2>
+                    <p>Accede para reservar tutorías con los profesores, consultar tus citas y recibir confirmaciones por email.</p>
+                    <button class="btn-option">
+                        <i class="fas fa-calendar-plus"></i> Reservar tutoría
+                    </button>
+                    <div style="margin-top: 20px; font-size: 0.9rem; color: #999;">
+                        <i class="fas fa-check-circle" style="color: #4a90e2;"></i> Sin registro necesario
+                    </div>
+                </div>
+
+                <!-- Opción Profesores -->
+                <div class="splash-option profesores" onclick="window.location.href='/login'">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <h2>Profesores</h2>
+                    <p>Accede a tu panel personal para gestionar tus tutorías, ver el calendario y consultar tus citas.</p>
+                    <button class="btn-option">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                    </button>
+                    <div style="margin-top: 20px; font-size: 0.9rem; color: #999;">
+                        <i class="fas fa-lock" style="color: #764ba2;"></i> Acceso privado
+                    </div>
+                </div>
+            </div>
+
+            <div class="splash-footer">
+                <a href="#" onclick="alert('Política de privacidad disponible en el centro educativo')">
+                    <i class="fas fa-shield-alt"></i> Privacidad
+                </a>
+                <a href="#" onclick="alert('Contacto: tutorias@colegio.es - Tel: 912 345 678')">
+                    <i class="fas fa-envelope"></i> Contacto
+                </a>
+                <a href="#" onclick="alert('Para ayuda, contacte con el centro educativo')">
+                    <i class="fas fa-question-circle"></i> Ayuda
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Guardar la selección del usuario en localStorage (opcional)
+        function guardarPreferencia(tipo) {
+            localStorage.setItem('ultimoAcceso', tipo);
+            localStorage.setItem('ultimaVisita', new Date().toISOString());
+        }
+
+        // Añadir evento a las opciones
+        document.querySelector('.splash-option.padres').addEventListener('click', () => {
+            guardarPreferencia('padres');
+        });
+
+        document.querySelector('.splash-option.profesores').addEventListener('click', () => {
+            guardarPreferencia('profesores');
+        });
+
+        // Comprobar si ya había seleccionado antes (últimas 24h)
+        const ultimoAcceso = localStorage.getItem('ultimoAcceso');
+        const ultimaVisita = localStorage.getItem('ultimaVisita');
+
+        if (ultimoAcceso && ultimaVisita) {
+            const horasPasadas = (new Date() - new Date(ultimaVisita)) / (1000 * 60 * 60);
+            
+            if (horasPasadas < 24) { // Si pasaron menos de 24 horas
+                if (ultimoAcceso === 'padres' && confirm('¿Quieres ir directamente a la sección de padres?')) {
+                    window.location.href = '/padres';
+                } else if (ultimoAcceso === 'profesores' && confirm('¿Quieres ir directamente al login de profesores?')) {
+                    window.location.href = '/login';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

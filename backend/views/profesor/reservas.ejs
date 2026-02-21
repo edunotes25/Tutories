@@ -1,0 +1,295 @@
+<div class="dashboard-header">
+    <h1>Mis Reservas</h1>
+    <div>
+        <a href="/profesor/dashboard" class="btn btn-secondary">Volver al panel</a>
+        <a href="/logout" class="btn btn-secondary">Cerrar sesión</a>
+    </div>
+</div>
+
+<% if (error && error.length > 0) { %>
+    <div class="alerta error"><%= error %></div>
+<% } %>
+
+<% if (success && success.length > 0) { %>
+    <div class="alerta success"><%= success %></div>
+<% } %>
+
+<div class="reservas-tabs">
+    <button class="tab-btn active" onclick="mostrarTab('pendientes')">Pendientes (<%= reservasPendientes.length %>)</button>
+    <button class="tab-btn" onclick="mostrarTab('historial')">Historial (<%= reservasHistorial.length %>)</button>
+</div>
+
+<div id="pendientes" class="tab-content active">
+    <h2>Reservas Pendientes</h2>
+    
+    <% if (reservasPendientes.length === 0) { %>
+        <p class="text-center">No tienes reservas pendientes</p>
+    <% } else { %>
+        <div class="reservas-grid">
+            <% reservasPendientes.forEach(reserva => { %>
+                <div class="reserva-card">
+                    <div class="reserva-header">
+                        <span class="fecha"><%= new Date(reserva.fecha).toLocaleDateString('es-ES') %></span>
+                        <span class="hora"><%= reserva.hora %></span>
+                        <span class="estado <%= reserva.estado %>"><%= reserva.estado %></span>
+                    </div>
+                    <div class="reserva-body">
+                        <p><strong>Padre/Madre:</strong> <%= reserva.padreNombre %></p>
+                        <p><strong>Email:</strong> <%= reserva.padreEmail %></p>
+                        <% if (reserva.padreTelefono) { %>
+                            <p><strong>Teléfono:</strong> <%= reserva.padreTelefono %></p>
+                        <% } %>
+                        <% if (reserva.comentarios) { %>
+                            <p><strong>Comentarios:</strong> <%= reserva.comentarios %></p>
+                        <% } %>
+                    </div>
+                    <div class="reserva-acciones">
+                        <form action="/profesor/reservas/estado/<%= reserva.reservaId %>" method="POST" style="display: inline;">
+                            <input type="hidden" name="estado" value="completada">
+                            <button type="submit" class="btn btn-success btn-small" onclick="return confirm('¿Marcar esta reserva como completada?')">✓ Completada</button>
+                        </form>
+                        <form action="/profesor/reservas/estado/<%= reserva.reservaId %>" method="POST" style="display: inline;">
+                            <input type="hidden" name="estado" value="cancelada">
+                            <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('¿Cancelar esta reserva?')">✗ Cancelar</button>
+                        </form>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+</div>
+
+<div id="historial" class="tab-content">
+    <h2>Historial de Reservas</h2>
+    
+    <% if (reservasHistorial.length === 0) { %>
+        <p class="text-center">No hay reservas en el historial</p>
+    <% } else { %>
+        <div class="reservas-grid">
+            <% reservasHistorial.forEach(reserva => { %>
+                <div class="reserva-card historial">
+                    <div class="reserva-header">
+                        <span class="fecha"><%= new Date(reserva.fecha).toLocaleDateString('es-ES') %></span>
+                        <span class="hora"><%= reserva.hora %></span>
+                        <span class="estado <%= reserva.estado %>"><%= reserva.estado %></span>
+                    </div>
+                    <div class="reserva-body">
+                        <p><strong>Padre/Madre:</strong> <%= reserva.padreNombre %></p>
+                        <p><strong>Email:</strong> <%= reserva.padreEmail %></p>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+</div>
+
+<style>
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.reservas-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    background: #f0f0f0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    background: #4a90e2;
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.reservas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.reserva-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.reserva-card.historial {
+    opacity: 0.8;
+}
+
+.reserva-header {
+    background: #4a90e2;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reserva-header .fecha {
+    font-weight: 600;
+}
+
+.reserva-header .hora {
+    background: rgba(255,255,255,0.2);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+}
+
+.reserva-header .estado {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.reserva-header .estado.pendiente {
+    background: #ffc107;
+    color: #333;
+}
+
+.reserva-header .estado.confirmada {
+    background: #28a745;
+    color: white;
+}
+
+.reserva-header .estado.cancelada {
+    background: #dc3545;
+    color: white;
+}
+
+.reserva-header .estado.completada {
+    background: #6c757d;
+    color: white;
+}
+
+.reserva-body {
+    padding: 15px;
+}
+
+.reserva-body p {
+    margin: 8px 0;
+    font-size: 0.95rem;
+}
+
+.reserva-acciones {
+    padding: 15px;
+    background: #f8f9fa;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-small {
+    padding: 5px 10px;
+    font-size: 0.85rem;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.text-center {
+    text-align: center;
+    color: #666;
+    padding: 40px;
+    background: white;
+    border-radius: 10px;
+}
+
+.alerta {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.alerta.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alerta.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+</style>
+
+<script>
+function mostrarTab(tab) {
+    // Ocultar todos los tabs
+    document.querySelectorAll('.tab-content').forEach(el => {
+        el.classList.remove('active');
+    });
+    
+    // Desactivar todos los botones
+    document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('active');
+    });
+    
+    // Mostrar el tab seleccionado
+    document.getElementById(tab).classList.add('active');
+    
+    // Activar el botón correspondiente
+    event.target.classList.add('active');
+}
+</script>

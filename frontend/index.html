@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Tutorías - Colegio Público</title>
+    
+    <!-- Meta tags de seguridad y privacidad -->
+    <meta name="description" content="Sistema seguro de reserva de tutorías para colegios públicos - Cumple RGPD">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Flatpickr para calendario -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+    <!-- Barra de privacidad RGPD -->
+    <div class="rgpd-banner" id="rgpdBanner">
+        <div class="rgpd-content">
+            <i class="fas fa-shield-alt"></i>
+            <p>Este sitio web cumple con el RGPD. Solo almacenamos los datos necesarios para gestionar tu reserva durante 24 horas.</p>
+            <button class="btn-rgpd" onclick="aceptarRGPD()">Entendido</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Encabezado -->
+        <header class="header">
+            <h1><i class="fas fa-calendar-alt"></i> Sistema de Tutorías</h1>
+            <p class="subtitle">Reserva tu cita con los profesores de forma segura</p>
+        </header>
+
+        <!-- Formulario principal -->
+        <div class="form-container">
+            <form id="reservaForm">
+                <!-- Paso 1: Datos del padre -->
+                <section class="form-section">
+                    <h2><i class="fas fa-user"></i> Tus datos</h2>
+                    <p class="info-text">Estos datos se usarán solo para confirmar la reserva y serán eliminados tras 24h</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nombre">Nombre completo *</label>
+                            <input type="text" id="nombre" name="nombre" required 
+                                   placeholder="Ej: María González"
+                                   minlength="2" maxlength="50">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required 
+                                   placeholder="ejemplo@email.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefono">Teléfono (opcional)</label>
+                            <input type="tel" id="telefono" name="telefono" 
+                                   placeholder="612 345 678"
+                                   pattern="[0-9]{9}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nombreAlumno">Nombre del alumno *</label>
+                            <input type="text" id="nombreAlumno" name="nombreAlumno" required 
+                                   placeholder="Nombre del estudiante"
+                                   minlength="2" maxlength="50">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Paso 2: Selección de profesor -->
+                <section class="form-section">
+                    <h2><i class="fas fa-chalkboard-teacher"></i> Selecciona el profesor</h2>
+                    
+                    <div class="form-group">
+                        <label for="profesor">Profesor *</label>
+                        <select id="profesor" name="profesor" required>
+                            <option value="">Selecciona un profesor</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- Paso 3: Selección de fecha y hora -->
+                <section class="form-section" id="horarioSection" style="display: none;">
+                    <h2><i class="fas fa-clock"></i> Selecciona fecha y hora</h2>
+                    
+                    <div class="form-group">
+                        <label for="fecha">Fecha *</label>
+                        <input type="text" id="fecha" name="fecha" placeholder="Selecciona una fecha">
+                    </div>
+
+                    <div class="horas-disponibles" id="horasContainer">
+                        <p class="info-text">Selecciona primero una fecha para ver las horas disponibles</p>
+                    </div>
+                </section>
+
+                <!-- Paso 4: Consentimiento RGPD -->
+                <section class="form-section">
+                    <h2><i class="fas fa-lock"></i> Privacidad y protección de datos</h2>
+                    
+                    <div class="consentimiento-box">
+                        <p><strong>INFORMACIÓN BÁSICA SOBRE PROTECCIÓN DE DATOS</strong></p>
+                        <p><strong>Responsable:</strong> Colegio Público</p>
+                        <p><strong>Finalidad:</strong> Gestionar la reserva de tutorías</p>
+                        <p><strong>Legitimación:</strong> Consentimiento del interesado</p>
+                        <p><strong>Destinatarios:</strong> No se cederán datos a terceros</p>
+                        <p><strong>Plazo de conservación:</strong> Los datos se conservarán únicamente durante 24 horas para gestionar la reserva</p>
+                        <p><strong>Derechos:</strong> Acceso, rectificación, supresión, limitación, oposición y portabilidad</p>
+                        
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="consentimiento" name="consentimiento" required>
+                                <span>He leído y acepto el tratamiento de mis datos personales para gestionar esta reserva *</span>
+                            </label>
+                        </div>
+                        
+                        <p class="small-text">Puede consultar la información adicional y detallada sobre protección de datos en el centro educativo.</p>
+                    </div>
+                </section>
+
+                <!-- Botones de acción -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary" id="btnReservar" disabled>
+                        <i class="fas fa-check"></i> Confirmar reserva
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="limpiarFormulario()">
+                        <i class="fas fa-undo"></i> Limpiar formulario
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Modal de confirmación -->
+        <div id="confirmacionModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-check-circle"></i> Reserva confirmada</h2>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <!-- Contenido dinámico -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="cerrarModal()">
+                        <i class="fas fa-check"></i> Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer con info legal -->
+        <footer class="footer">
+            <div class="legal-links">
+                <a href="#" onclick="mostrarAvisoLegal()">Aviso Legal</a>
+                <a href="#" onclick="mostrarPrivacidad()">Política de Privacidad</a>
+                <a href="#" onclick="mostrarCookies()">Cookies</a>
+            </div>
+            <p class="copyright">© 2024 Colegio Público - Sistema de Tutorías. Cumple con RGPD.</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="script.js"></script>
+</body>
+</html>

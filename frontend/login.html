@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Profesores - Sistema de Tutorías</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header i {
+            font-size: 4rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .login-header h2 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .login-header p {
+            color: #666;
+        }
+
+        .login-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-radius: 10px;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab-btn i {
+            margin-right: 8px;
+        }
+
+        .login-form {
+            display: none;
+        }
+
+        .login-form.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group label i {
+            color: #667eea;
+            margin-right: 5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group.checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group.checkbox input {
+            width: auto;
+        }
+
+        .password-hint {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-login i {
+            margin-right: 8px;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .login-footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .login-back {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .login-back a {
+            color: #666;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+
+        .login-back a:hover {
+            color: #667eea;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+            display: block;
+        }
+
+        .alert.success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+            display: block;
+        }
+
+        .badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 20px;
+            }
+            
+            .login-header h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="badge">
+                <i class="fas fa-shield-alt"></i> Acceso Privado
+            </div>
+
+            <div class="login-header">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <h2>Profesores</h2>
+                <p>Accede a tu panel de tutorías</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="login-tabs">
+                <button class="tab-btn active" onclick="cambiarTab('login')">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+                <button class="tab-btn" onclick="cambiarTab('registro')">
+                    <i class="fas fa-user-plus"></i> Registrarse
+                </button>
+            </div>
+
+            <!-- Alert container -->
+            <div id="alertContainer" class="alert"></div>
+
+            <!-- Formulario Login -->
+            <form id="loginForm" class="login-form active" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="loginEmail" required placeholder="tu.email@colegio.es">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Contraseña</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Acceder
+                </button>
+
+                <div class="login-footer">
+                    <a href="#" onclick="recuperarPassword()">¿Olvidaste tu contraseña?</a>
+                </div>
+            </form>
+
+            <!-- Formulario Registro -->
+            <form id="registroForm" class="login-form" onsubmit="handleRegistro(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Nombre completo</label>
+                    <input type="text" id="regNombre" required placeholder="María García">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="regEmail" required placeholder="maria@colegio.es">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-book"></i> Asignatura</label>
+                    <select id="regAsignatura" required>
+                        <option value="">Selecciona tu asignatura</option>
+                        <option value="Matemáticas">Matemáticas</option>
+                        <option value="Lengua">Lengua</option>
+                        <option value="Inglés">Inglés</option>
+                        <option value="Ciencias">Ciencias</option>
+                        <option value="Historia">Historia</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Contraseña</label>
+                    <input type="password" id="regPassword" required placeholder="Mínimo 8 caracteres">
+                    <div class="password-hint">
+                        <i class="fas fa-info-circle"></i> Mínimo 8 caracteres
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> Código de registro</label>
+                    <input type="password" id="regCodigo" required placeholder="Código del centro">
+                </div>
+
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="regAcepto" required>
+                    <label>Acepto los términos y condiciones</label>
+                </div>
+
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-user-plus"></i> Registrarse
+                </button>
+            </form>
+
+            <div class="login-back">
+                <a href="/">
+                    <i class="fas fa-arrow-left"></i> Volver al inicio
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function cambiarTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.login-form').forEach(form => form.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('registroForm').classList.add('active');
+            }
+        }
+
+        function mostrarAlerta(mensaje, tipo) {
+            const alert = document.getElementById('alertContainer');
+            alert.className = `alert ${tipo}`;
+            alert.innerHTML = `<i class="fas fa-${tipo === 'error' ? 'exclamation-circle' : 'check-circle'}"></i> ${mensaje}`;
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('token', data.token);
+                    window.location.href = '/dashboard';
+                } else {
+                    mostrarAlerta(data.error || 'Error al iniciar sesión', 'error');
+                }
+            } catch (error) {
+                mostrarAlerta('Error de conexión', 'error');
+            }
+        }
+
+        async function handleRegistro(e) {
+            e.preventDefault();
+            
+            if (!document.getElementById('regAcepto').checked) {
+                mostrarAlerta('Debes aceptar los términos', 'error');
+                return;
+            }
+            
+            const userData = {
+                nombre: document.getElementById('regNombre').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                asignatura: document.getElementById('regAsignatura').value,
+                codigoRegistro: document.getElementById('regCodigo').value
+            };
+            
+            try {
+                const response = await fetch('/api/auth/registro-profesor', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    mostrarAlerta('Registro exitoso. Ya puedes iniciar sesión.', 'success');
+                    setTimeout(() => cambiarTab('login'), 2000);
+                } else {
+                    mostrarAlerta(data.error || 'Error en el registro', 'error');
+                }
+            } catch (error) {
+                mostrarAlerta('Error de conexión', 'error');
+            }
+        }
+
+        function recuperarPassword() {
+            const email = prompt('Introduce tu email:');
+            if (email) {
+                mostrarAlerta('Email de recuperación enviado', 'success');
+            }
+        }
+    </script>
+</body>
+</html>

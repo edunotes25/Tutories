@@ -1,0 +1,172 @@
+<div class="confirmacion-container">
+    <div class="confirmacion-icono">✓</div>
+    
+    <h1>¡Reserva confirmada!</h1>
+    
+    <div class="confirmacion-detalles">
+        <h2>Detalles de la tutoría</h2>
+        
+        <div class="detalle-item">
+            <span class="detalle-label">Profesor:</span>
+            <span class="detalle-valor"><%= reserva.profesorNombre %></span>
+        </div>
+        
+        <div class="detalle-item">
+            <span class="detalle-label">Alumno:</span>
+            <span class="detalle-valor"><%= reserva.nombreAlumno || 'No especificado' %></span>
+        </div>
+
+        
+        <div class="detalle-item">
+            <span class="detalle-label">Fecha:</span>
+            <span class="detalle-valor"><%= new Date(reserva.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+        </div>
+        
+        <div class="detalle-item">
+            <span class="detalle-label">Hora:</span>
+            <span class="detalle-valor"><%= reserva.hora %></span>
+        </div>
+        
+        <div class="detalle-item">
+            <span class="detalle-label">ID Reserva:</span>
+            <span class="detalle-valor"><%= reserva.reservaId.substring(0, 8).toUpperCase() %></span>
+        </div>
+    </div>
+    
+    <div class="confirmacion-acciones">
+        <p>Hemos registrado tu reserva correctamente.</p>
+        <p>Se ha enviado una confirmación a <strong><%= reserva.padreEmail %></strong></p>
+        
+        <div class="botones-accion">
+            <button onclick="window.print()" class="btn btn-secondary">
+                🖨️ Imprimir
+            </button>
+            <a href="/padre/profesores" class="btn btn-primary">
+                Volver a profesores
+            </a>
+        </div>
+    </div>
+    
+    <div class="info-rgpd">
+        <p>
+            <strong>Importante (RGPD):</strong> Tus datos serán eliminados automáticamente 
+            24 horas después de la tutoría. Puedes cancelar la reserva desde el enlace 
+            incluido en el email de confirmación.
+        </p>
+    </div>
+</div>
+
+<style>
+.confirmacion-container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.confirmacion-icono {
+    width: 80px;
+    height: 80px;
+    background: #28a745;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    margin: 0 auto 30px;
+}
+
+.confirmacion-detalles {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.confirmacion-detalles h2 {
+    color: #4a90e2;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.detalle-item {
+    display: flex;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.detalle-item:last-child {
+    border-bottom: none;
+}
+
+.detalle-label {
+    flex: 0 0 120px;
+    font-weight: 600;
+    color: #6c757d;
+}
+
+.detalle-valor {
+    flex: 1;
+    color: #333;
+}
+
+.confirmacion-acciones {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.confirmacion-acciones p {
+    margin: 10px 0;
+    color: #666;
+}
+
+.botones-accion {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.info-rgpd {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: #4a90e2;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #357abd;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+</style>

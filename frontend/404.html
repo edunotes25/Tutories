@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página no encontrada - Sistema de Tutorías</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h1>404</h1>
+            <h2>Página no encontrada</h2>
+            <p>Lo sentimos, la página que buscas no existe o ha sido movida.</p>
+            <div class="error-actions">
+                <a href="/" class="btn-primary">
+                    <i class="fas fa-home"></i> Volver al inicio
+                </a>
+                <a href="/login" class="btn-secondary">
+                    <i class="fas fa-sign-in-alt"></i> Acceso profesores
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .error-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+        }
+        
+        .error-content {
+            text-align: center;
+            background: white;
+            padding: 50px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+        }
+        
+        .error-content i {
+            font-size: 5rem;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+        }
+        
+        .error-content h1 {
+            font-size: 6rem;
+            margin: 0;
+            color: #333;
+            line-height: 1;
+        }
+        
+        .error-content h2 {
+            font-size: 2rem;
+            color: #666;
+            margin: 10px 0 20px;
+        }
+        
+        .error-content p {
+            color: #888;
+            margin-bottom: 30px;
+        }
+        
+        .error-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .btn-primary, .btn-secondary {
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .error-content {
+                padding: 30px;
+            }
+            
+            .error-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</body>
+</html>
