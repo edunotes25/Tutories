@@ -42,18 +42,36 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-// Configuración de sesiones
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'clave-secreta-temporal',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { 
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 1000 * 60 * 60 * 24, // 24 horas
-        httpOnly: true,
-        sameSite: 'strict'
-    }
-}));
+// Configuración de sesiones - ADAPTADA PARA VERCEL
+if (process.env.NODE_ENV === 'production') {
+    // Para producción en Vercel, usamos sesiones sin almacenamiento persistente
+    console.log('🔧 Configurando sesiones para producción (Vercel)');
+    
+    app.use(session({
+        secret: process.env.SESSION_SECRET || 'clave-secreta-temporal',
+        resave: false,
+        saveUninitialized: false,
+        cookie: { 
+            secure: true, // HTTPS obligatorio en Vercel
+            maxAge: 1000 * 60 * 60 * 24, // 24 horas
+            httpOnly: true,
+            sameSite: 'strict'
+        }
+    }));
+} else {
+    // Desarrollo local - sesiones en memoria
+    app.use(session({
+        secret: process.env.SESSION_SECRET || 'clave-secreta-temporal',
+        resave: false,
+        saveUninitialized: true,
+        cookie: { 
+            secure: false,
+            maxAge: 1000 * 60 * 60 * 24,
+            httpOnly: true,
+            sameSite: 'strict'
+        }
+    }));
+}
 
 app.use(flash());
 
@@ -163,9 +181,7 @@ app.post('/api/login', async (req, res) => {
         const userDoc = userSnapshot.docs[0];
         const userData = userDoc.data();
         
-        // NOTA: En producción, deberías verificar la contraseña usando Firebase Auth
-        // Por simplicidad, asumimos que si el usuario existe en Firestore, es válido
-        
+        // Guardar usuario en sesión
         req.session.usuario = {
             uid: userData.uid,
             nombre: userData.nombre,
@@ -175,6 +191,13 @@ app.post('/api/login', async (req, res) => {
             telefono: userData.telefono,
             curso: userData.curso
         };
+        
+        // Guardar sesión explícitamente (importante para Vercel)
+        req.session.save((err) => {
+            if (err) {
+                console.error('❌ Error guardando sesión:', err);
+            }
+        });
         
         console.log('✅ Login exitoso:', userData.nombre);
         console.log('👤 Tipo de usuario:', userData.tipo);
@@ -306,8 +329,12 @@ app.post('/api/registro-padre', async (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/');
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('❌ Error al destruir sesión:', err);
+        }
+        res.redirect('/');
+    });
 });
 
 // ============ RUTAS DE PROFESOR ============
@@ -956,10 +983,13 @@ app.post('/cancelar/:token', async (req, res) => {
     }
 });
 
-// ============ INICIAR SERVIDOR ============
-
-app.listen(PORT, () => {
+// ============ EXPORTAR PARA VERCEL ============
+if (process.env.NODE_ENV === 'production') {
+  module.exports = app;
+} else {
+  app.listen(PORT, () => {
     console.log(`✅ Servidor funcionando en http://localhost:${PORT}`);
     console.log(`🔥 Conectado a Firebase Project: ${process.env.FIREBASE_PROJECT_ID || 'no configurado'}`);
     console.log(`🔑 Código de registro de profesores configurado: ${process.env.REGISTRO_PROFESOR_CODE ? 'SÍ' : 'NO'}`);
-});
+  });
+}
