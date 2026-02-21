@@ -341,8 +341,7 @@ app.get('/logout', (req, res) => {
 
 app.get('/profesor/dashboard', authMiddleware, profesorMiddleware, async (req, res) => {
     try {
-        const profesorId = req.session.usuario.uid;
-        
+const profesorId = req.usuario.uid;        
         console.log('📊 Cargando dashboard para profesor:', profesorId);
         
         // Obtener reservas del profesor
@@ -386,8 +385,7 @@ app.get('/profesor/dashboard', authMiddleware, profesorMiddleware, async (req, r
 
 app.get('/profesor/horarios', authMiddleware, profesorMiddleware, async (req, res) => {
     try {
-        const profesorId = req.session.usuario.uid;
-        
+const profesorId = req.usuario.uid;        
         console.log('📅 Cargando horarios para profesor:', profesorId);
         
         const horariosSnapshot = await db.collection(COLLECTIONS.HORARIOS)
@@ -415,8 +413,7 @@ app.get('/profesor/horarios', authMiddleware, profesorMiddleware, async (req, re
 
 app.post('/profesor/horarios/agregar', authMiddleware, profesorMiddleware, async (req, res) => {
     const { dia_semana, hora } = req.body;
-    const profesorId = req.session.usuario.uid;
-    
+const profesorId = req.usuario.uid;    
     try {
         await db.collection(COLLECTIONS.HORARIOS).add({
             profesorId: profesorId,
@@ -438,8 +435,7 @@ app.post('/profesor/horarios/agregar', authMiddleware, profesorMiddleware, async
 
 app.post('/profesor/horarios/eliminar/:id', authMiddleware, profesorMiddleware, async (req, res) => {
     const horarioId = req.params.id;
-    const profesorId = req.session.usuario.uid;
-    
+const profesorId = req.usuario.uid;    
     try {
         // Verificar que el horario pertenece al profesor
         const horarioDoc = await db.collection(COLLECTIONS.HORARIOS).doc(horarioId).get();
@@ -463,8 +459,7 @@ app.post('/profesor/horarios/eliminar/:id', authMiddleware, profesorMiddleware, 
 // ============ RUTA DE CALENDARIO PARA PROFESOR (FILTRADA) ============
 app.get('/profesor/calendario', authMiddleware, profesorMiddleware, async (req, res) => {
     try {
-        const profesorId = req.session.usuario.uid;
-        
+const profesorId = req.usuario.uid;        
         console.log('📅 Cargando calendario para profesor:', profesorId);
         
         // Obtener TODAS las reservas del profesor
@@ -504,8 +499,7 @@ app.get('/profesor/calendario', authMiddleware, profesorMiddleware, async (req, 
  */
 app.get('/profesor/reservas', authMiddleware, profesorMiddleware, async (req, res) => {
     try {
-        const profesorId = req.session.usuario.uid;
-        
+const profesorId = req.usuario.uid;        
         console.log('📋 Cargando todas las reservas para profesor:', profesorId);
         
         // Obtener todas las reservas del profesor (no solo pendientes)
@@ -546,8 +540,7 @@ app.get('/profesor/reservas', authMiddleware, profesorMiddleware, async (req, re
 app.post('/profesor/reservas/estado/:reservaId', authMiddleware, profesorMiddleware, async (req, res) => {
     const reservaId = req.params.reservaId;
     const { estado } = req.body;
-    const profesorId = req.session.usuario.uid;
-    
+const profesorId = req.usuario.uid;    
     try {
         console.log(`🔄 Cambiando estado de reserva ${reservaId} a ${estado}`);
         
