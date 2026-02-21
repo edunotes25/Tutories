@@ -1,2 +1,10 @@
 .vercel
 .env*.local
+node_modules/
+.env
+.env.local
+.env.production
+.DS_Store
+*.log
+backend/data/*.db
+backend/config/firebase-service-account.json
