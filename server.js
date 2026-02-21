@@ -1,3 +1,10 @@
+// PON ESTO AL PRINCIPIO DE server.js, DESPUÉS DE REQUIRE('dotenv').config()
+console.log('=== DEBUG ENV VARS ===');
+console.log('FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID ? '✓ presente' : '✗ faltante');
+console.log('FIREBASE_CLIENT_EMAIL:', process.env.FIREBASE_CLIENT_EMAIL ? '✓ presente' : '✗ faltante');
+console.log('FIREBASE_PRIVATE_KEY:', process.env.FIREBASE_PRIVATE_KEY ? '✓ presente' : '✗ faltante');
+console.log('REGISTRO_PROFESOR_CODE:', process.env.REGISTRO_PROFESOR_CODE ? '✓ presente' : '✗ faltante');
+console.log('SESSION_SECRET:', process.env.SESSION_SECRET ? '✓ presente' : '✗ faltante');
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
