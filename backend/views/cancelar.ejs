@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="<%= locale %>">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= __('cancelar_reserva_titulo') %> - <%= __('titulo') %></title>
+    <title>Cancelar Reserva - Sistema de Tutorías</title>
     <style>
         * {
             margin: 0;
@@ -200,7 +200,7 @@
         <div class="cancelar-card">
             <div class="cancelar-header">
                 <div class="cancelar-icono">❓</div>
-                <h1><%= __('cancelar_reserva') %></h1>
+                <h1>Cancelar reserva</h1>
             </div>
             
             <div class="cancelar-body">
@@ -208,49 +208,49 @@
                     <div class="error-mensaje"><%= error %></div>
                 <% } %>
                 
-                <p class="cancelar-intro"><%= __('cancelar_confirmacion') %></p>
+                <p class="cancelar-intro">¿Estás seguro de que quieres cancelar esta tutoría?</p>
                 
                 <div class="detalle-reserva">
-                    <h2><%= __('detalles_reserva') %></h2>
+                    <h2>Detalles de la reserva</h2>
                     
                     <div class="detalle-item">
-                        <span class="detalle-label"><%= __('profesor') %>:</span>
-                        <span class="detalle-valor"><%= reserva.profesorNombre || __('no_especificado') %></span>
+                        <span class="detalle-label">Profesor:</span>
+                        <span class="detalle-valor"><%= reserva.profesorNombre || 'No especificado' %></span>
                     </div>
                     
                     <div class="detalle-item">
-                        <span class="detalle-label"><%= __('alumno') %>:</span>
-                        <span class="detalle-valor"><%= reserva.nombreAlumno || __('no_especificado') %></span>
+                        <span class="detalle-label">Alumno:</span>
+                        <span class="detalle-valor"><%= reserva.nombreAlumno || 'No especificado' %></span>
                     </div>
                     
                     <div class="detalle-item">
-                        <span class="detalle-label"><%= __('fecha') %>:</span>
-                        <span class="detalle-valor"><%= new Date(reserva.fecha).toLocaleDateString(__('locale_date'), { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+                        <span class="detalle-label">Fecha:</span>
+                        <span class="detalle-valor"><%= new Date(reserva.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
                     </div>
                     
                     <div class="detalle-item">
-                        <span class="detalle-label"><%= __('hora') %>:</span>
+                        <span class="detalle-label">Hora:</span>
                         <span class="detalle-valor"><%= reserva.hora %></span>
                     </div>
                     
                     <div class="detalle-item">
-                        <span class="detalle-label"><%= __('id_reserva') %>:</span>
+                        <span class="detalle-label">ID Reserva:</span>
                         <span class="detalle-valor"><%= reserva.reservaId.substring(0, 8).toUpperCase() %></span>
                     </div>
                 </div>
                 
                 <div class="cancelar-acciones">
                     <form action="/cancelar/<%= token %>" method="POST" id="formCancelar">
-                        <button type="submit" class="btn btn-danger btn-block" onclick="return confirm('<%= __('confirmar_cancelacion') %>')">
-                            <%= __('si_cancelar') %>
+                        <button type="submit" class="btn btn-danger btn-block" onclick="return confirm('¿Confirmas que quieres cancelar esta tutoría?')">
+                            Sí, cancelar reserva
                         </button>
                     </form>
                     
-                    <a href="/" class="btn btn-secondary btn-block"><%= __('no_volver_inicio') %></a>
+                    <a href="/" class="btn btn-secondary btn-block">No, volver al inicio</a>
                 </div>
                 
                 <div class="cancelar-info">
-                    <p><strong><%= __('importante') %>:</strong> <%= __('info_cancelacion') %></p>
+                    <p><strong>Importante:</strong> Una vez cancelada, no podrás recuperar esta reserva. Si necesitas otra fecha, deberás realizar una nueva reserva.</p>
                 </div>
             </div>
         </div>
@@ -263,7 +263,7 @@
             form.addEventListener('submit', function() {
                 const btn = this.querySelector('button');
                 btn.disabled = true;
-                btn.textContent = '<%= __('cancelando') %>';
+                btn.textContent = 'Cancelando...';
             });
         }
     </script>

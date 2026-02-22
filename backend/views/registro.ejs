@@ -1,5 +1,5 @@
 <div class="auth-container">
-    <h1><%= __('registro_profesor') %></h1>
+    <h1>Registro de Profesor</h1>
     
     <% if (error && error.length > 0) { %>
         <div class="alerta error"><%= error %></div>
@@ -7,58 +7,58 @@
     
     <form action="/api/registro" method="POST" class="auth-form">
         <div class="form-group">
-            <label for="nombre"><%= __('nombre_completo') %> *</label>
-            <input type="text" id="nombre" name="nombre" required placeholder="<%= __('ejemplo_nombre_profesor') %>">
+            <label for="nombre">Nombre completo *</label>
+            <input type="text" id="nombre" name="nombre" required placeholder="Ej: Ana García López">
         </div>
         
         <div class="form-group">
-            <label for="email"><%= __('email') %> *</label>
-            <input type="email" id="email" name="email" required placeholder="<%= __('ejemplo_email_profesor') %>">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" required placeholder="profesor@colegio.edu">
         </div>
         
         <div class="form-group">
-            <label for="password"><%= __('contraseña') %> *</label>
+            <label for="password">Contraseña *</label>
             <input type="password" id="password" name="password" required minlength="6">
-            <small><%= __('minimo_caracteres') %></small>
+            <small>Mínimo 6 caracteres</small>
         </div>
         
         <div class="form-group">
-            <label for="codigoRegistro"><%= __('codigo_registro') %> *</label>
+            <label for="codigoRegistro">Código de registro *</label>
             <input type="text" id="codigoRegistro" name="codigoRegistro" required 
-                   placeholder="<%= __('placeholder_codigo') %>">
-            <small><%= __('info_codigo') %> PROF25</small>
+                   placeholder="Introduce el código proporcionado por el centro">
+            <small>Código necesario para registrar profesores: PROF25</small>
         </div>
         
         <div class="form-group">
-            <label for="telefono"><%= __('telefono_opcional') %></label>
-            <input type="tel" id="telefono" name="telefono" placeholder="<%= __('ejemplo_telefono') %>">
+            <label for="telefono">Teléfono (opcional)</label>
+            <input type="tel" id="telefono" name="telefono" placeholder="600 123 456">
         </div>
         
         <div class="form-group">
-            <label for="curso"><%= __('curso_tutoria') %> *</label>
+            <label for="curso">Curso/Tutoría que impartes *</label>
             <input type="text" id="curso" name="curso" required 
-                   placeholder="<%= __('ejemplo_curso') %>">
-            <small><%= __('info_curso') %></small>
+                   placeholder="Ej: 1ºA, 2ºB, 3ºC, 4ºA, etc.">
+            <small>Escribe el curso del que eres tutor (ej: 1ºA, 2ºB, 3ºC...)</small>
         </div>
         
         <div class="form-group">
-            <label for="descripcion"><%= __('descripcion_opcional') %></label>
-            <textarea id="descripcion" name="descripcion" rows="3" placeholder="<%= __('placeholder_descripcion') %>"></textarea>
+            <label for="descripcion">Breve descripción (opcional)</label>
+            <textarea id="descripcion" name="descripcion" rows="3" placeholder="Cuéntales a los padres sobre ti..."></textarea>
         </div>
         
         <div class="form-group consentimiento">
             <input type="checkbox" id="aceptaCondiciones" name="aceptaCondiciones" required>
             <label for="aceptaCondiciones">
-                <%= __('acepto_privacidad') %> <a href="/aviso-privacidad" target="_blank"><%= __('aviso_privacidad') %></a>
+                He leído y acepto el <a href="/aviso-privacidad" target="_blank">aviso de privacidad</a>
             </label>
         </div>
         
-        <button type="submit" class="btn btn-primary btn-block"><%= __('registrarse') %></button>
+        <button type="submit" class="btn btn-primary btn-block">Registrarse</button>
     </form>
     
     <div class="auth-links">
-        <p><%= __('ya_tienes_cuenta') %> <a href="/login"><%= __('iniciar_sesion') %></a></p>
-        <p><a href="/"><%= __('volver_inicio') %></a></p>
+        <p>¿Ya tienes cuenta? <a href="/login">Inicia sesión</a></p>
+        <p><a href="/">Volver al inicio</a></p>
     </div>
 </div>
 

@@ -1,55 +1,57 @@
 <div class="confirmacion-container">
     <div class="confirmacion-icono">✓</div>
     
-    <h1><%= __('reserva_confirmada') %></h1>
+    <h1>¡Reserva confirmada!</h1>
     
     <div class="confirmacion-detalles">
-        <h2><%= __('detalles_reserva') %></h2>
+        <h2>Detalles de la tutoría</h2>
         
         <div class="detalle-item">
-            <span class="detalle-label"><%= __('profesor') %>:</span>
+            <span class="detalle-label">Profesor:</span>
             <span class="detalle-valor"><%= reserva.profesorNombre %></span>
         </div>
         
         <div class="detalle-item">
-            <span class="detalle-label"><%= __('alumno') %>:</span>
-            <span class="detalle-valor"><%= reserva.nombreAlumno || __('no_especificado') %></span>
+            <span class="detalle-label">Alumno:</span>
+            <span class="detalle-valor"><%= reserva.nombreAlumno || 'No especificado' %></span>
         </div>
 
+        
         <div class="detalle-item">
-            <span class="detalle-label"><%= __('fecha') %>:</span>
-            <span class="detalle-valor"><%= new Date(reserva.fecha).toLocaleDateString(__('locale_date'), { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+            <span class="detalle-label">Fecha:</span>
+            <span class="detalle-valor"><%= new Date(reserva.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
         </div>
         
         <div class="detalle-item">
-            <span class="detalle-label"><%= __('hora') %>:</span>
+            <span class="detalle-label">Hora:</span>
             <span class="detalle-valor"><%= reserva.hora %></span>
         </div>
         
         <div class="detalle-item">
-            <span class="detalle-label"><%= __('id_reserva') %>:</span>
+            <span class="detalle-label">ID Reserva:</span>
             <span class="detalle-valor"><%= reserva.reservaId.substring(0, 8).toUpperCase() %></span>
         </div>
     </div>
     
     <div class="confirmacion-acciones">
-        <p><%= __('reserva_registrada') %></p>
-        <p><%= __('enviado_confirmacion') %> <strong><%= reserva.padreEmail %></strong></p>
+        <p>Hemos registrado tu reserva correctamente.</p>
+        <p>Se ha enviado una confirmación a <strong><%= reserva.padreEmail %></strong></p>
         
         <div class="botones-accion">
             <button onclick="window.print()" class="btn btn-secondary">
-                🖨️ <%= __('imprimir') %>
+                🖨️ Imprimir
             </button>
             <a href="/padre/profesores" class="btn btn-primary">
-                <%= __('volver_profesores') %>
+                Volver a profesores
             </a>
         </div>
     </div>
     
     <div class="info-rgpd">
         <p>
-            <strong><%= __('importante_rgpd') %>:</strong> 
-            <%= __('texto_rgpd') %>
+            <strong>Importante (RGPD):</strong> Tus datos serán eliminados automáticamente 
+            24 horas después de la tutoría. Puedes cancelar la reserva desde el enlace 
+            incluido en el email de confirmación.
         </p>
     </div>
 </div>

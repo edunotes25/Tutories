@@ -1,16 +1,16 @@
 <div class="reserva-header">
-    <h1><%= __('reservar_con') %> <%= profesor.nombre %></h1>
-    <a href="/" class="btn btn-secondary">← <%= __('volver') %></a>
+    <h1>Reservar tutoría con <%= profesor.nombre %></h1>
+    <a href="/" class="btn btn-secondary">← Volver</a>
 </div>
 
 <div class="reserva-container">
     <div class="calendario-section">
-        <h2><%= __('seleccionar_fecha') %></h2>
+        <h2>Seleccionar fecha</h2>
         
         <div class="calendario-navegacion">
-            <button class="btn-nav" onclick="cambiarSemana(-1)">← <%= __('semana_anterior') %></button>
+            <button class="btn-nav" onclick="cambiarSemana(-1)">← Semana anterior</button>
             <span class="semana-actual" id="semanaActual"></span>
-            <button class="btn-nav" onclick="cambiarSemana(1)"><%= __('semana_siguiente') %> →</button>
+            <button class="btn-nav" onclick="cambiarSemana(1)">Semana siguiente →</button>
         </div>
         
         <div class="calendario-grid" id="calendario">
@@ -19,12 +19,12 @@
     </div>
     
     <div class="formulario-section">
-        <h2><%= __('datos_reserva') %></h2>
+        <h2>Datos de la reserva</h2>
         
         <div class="reserva-info" id="reservaInfo" style="display: none;">
-            <p><strong><%= __('profesor') %>:</strong> <%= profesor.nombre %></p>
-            <p><strong><%= __('fecha') %>:</strong> <span id="fechaSeleccionada"></span></p>
-            <p><strong><%= __('hora') %>:</strong> <span id="horaSeleccionada"></span></p>
+            <p><strong>Profesor:</strong> <%= profesor.nombre %></p>
+            <p><strong>Fecha:</strong> <span id="fechaSeleccionada"></span></p>
+            <p><strong>Hora:</strong> <span id="horaSeleccionada"></span></p>
         </div>
         
         <form id="formularioReserva" class="formulario-reserva" style="display: none;">
@@ -33,39 +33,39 @@
             <input type="hidden" name="hora" id="horaInput">
             
             <div class="form-group">
-                <label for="nombrePadre"><%= __('nombre_padre_requerido') %> *</label>
+                <label for="nombrePadre">Nombre del padre/madre/tutor *</label>
                 <input type="text" id="nombrePadre" name="nombrePadre" required 
-                       placeholder="<%= __('ejemplo_nombre') %>">
+                       placeholder="Ej: María García López">
             </div>
             
             <div class="form-group">
-                <label for="emailPadre"><%= __('email') %> *</label>
+                <label for="emailPadre">Email *</label>
                 <input type="email" id="emailPadre" name="emailPadre" required 
                        placeholder="ejemplo@correo.com">
-                <small><%= __('email_confirmacion_info') %></small>
+                <small>Le enviaremos la confirmación a esta dirección</small>
             </div>
             
             <div class="form-group">
-                <label for="telefono"><%= __('telefono_opcional') %></label>
+                <label for="telefono">Teléfono (opcional)</label>
                 <input type="tel" id="telefono" name="telefono" 
-                       placeholder="<%= __('ejemplo_telefono') %>">
+                       placeholder="600 123 456">
             </div>
             
             <div class="form-group">
-                <label for="comentarios"><%= __('comentarios_opcional') %></label>
+                <label for="comentarios">Comentarios (opcional)</label>
                 <textarea id="comentarios" name="comentarios" rows="3" 
-                          placeholder="<%= __('placeholder_comentarios') %>"></textarea>
+                          placeholder="¿Alguna observación para el profesor?"></textarea>
             </div>
             
             <div class="form-group consentimiento">
                 <input type="checkbox" id="aceptaCondiciones" name="aceptaCondiciones" required>
                 <label for="aceptaCondiciones">
-                    <%= __('acepto_privacidad') %> <a href="/aviso-privacidad" target="_blank"><%= __('aviso_privacidad') %></a> 
-                    <%= __('y_consiento_datos') %> *
+                    He leído y acepto el <a href="/aviso-privacidad" target="_blank">aviso de privacidad</a> 
+                    y consiento el tratamiento de mis datos para esta reserva *
                 </label>
             </div>
             
-            <button type="submit" class="btn btn-primary btn-block"><%= __('confirmar_reserva') %></button>
+            <button type="submit" class="btn btn-primary btn-block">Confirmar reserva</button>
         </form>
         
         <div id="mensajeAlerta" class="alerta" style="display: none;"></div>
@@ -77,193 +77,4 @@
     const horariosProfesor = <%- JSON.stringify(horarios) %>;
     const reservasExistentes = <%- JSON.stringify(reservas) %>;
     const profesorId = '<%= profesor.id %>';
-    
-    // Días de la semana traducidos
-    const diasSemana = [
-        '<%= __("lunes") %>',
-        '<%= __("martes") %>',
-        '<%= __("miercoles") %>',
-        '<%= __("jueves") %>',
-        '<%= __("viernes") %>',
-        '<%= __("sabado") %>',
-        '<%= __("domingo") %>'
-    ];
-    
-    // Variables globales
-    let fechaActual = new Date();
-    let fechaSeleccionada = null;
-    let horaSeleccionada = null;
-    
-    console.log('Horarios del profesor:', horariosProfesor);
-    console.log('Reservas existentes:', reservasExistentes);
-    
-    // Inicializar calendario
-    document.addEventListener('DOMContentLoaded', function() {
-        renderizarCalendario(fechaActual);
-        
-        // Event listeners para los botones de navegación
-        // Nota: ya están definidos con onclick en los botones
-    });
-    
-    // Cambiar semana
-    function cambiarSemana(direccion) {
-        fechaActual.setDate(fechaActual.getDate() + (direccion * 7));
-        renderizarCalendario(fechaActual);
-    }
-    
-    // Renderizar calendario
-    function renderizarCalendario(fecha) {
-        const calendario = document.getElementById('calendario');
-        if (!calendario) return;
-        
-        const inicioSemana = new Date(fecha);
-        inicioSemana.setDate(fecha.getDate() - fecha.getDay() + 1); // Empezar en lunes
-        
-        let html = '';
-        
-        // Días de la semana
-        diasSemana.forEach(dia => {
-            html += `<div class="dia-header">${dia}</div>`;
-        });
-        
-        // Generar días
-        for (let i = 0; i < 7; i++) {
-            const dia = new Date(inicioSemana);
-            dia.setDate(inicioSemana.getDate() + i);
-            
-            const fechaStr = dia.toISOString().split('T')[0];
-            const diaSemana = dia.getDate();
-            const diaSemanaIdx = dia.getDay(); // 0 = domingo, 1 = lunes, ...
-            
-            // Ajustar para que lunes sea 1, martes 2, etc.
-            let diaSemanaAjustado = diaSemanaIdx === 0 ? 7 : diaSemanaIdx;
-            
-            html += `<div class="dia-celda" data-fecha="${fechaStr}">`;
-            html += `<div class="dia-numero">${diaSemana}</div>`;
-            
-            // Filtrar horarios para este día de la semana
-            const horariosDia = horariosProfesor.filter(h => h.diaSemana === diaSemanaAjustado);
-            
-            // Ordenar horas
-            const horasOrdenadas = horariosDia.map(h => h.hora).sort();
-            
-            if (horasOrdenadas.length === 0) {
-                html += `<div class="sin-horarios">-</div>`;
-            } else {
-                horasOrdenadas.forEach(hora => {
-                    // Verificar si esta hora ya está reservada
-                    const reservada = reservasExistentes.some(r => 
-                        r.fecha === fechaStr && r.hora === hora
-                    );
-                    
-                    // Aplicar clase reservada si corresponde
-                    const clase = `hora-item ${reservada ? 'reservada' : ''}`;
-                    
-                    // Si está reservada, no se puede seleccionar
-                    const onclick = reservada ? '' : `seleccionarHorario('${fechaStr}', '${hora}')`;
-                    
-                    html += `<div class="${clase}" onclick="${onclick}">${hora}</div>`;
-                });
-            }
-            
-            html += '</div>';
-        }
-        
-        calendario.innerHTML = html;
-        
-        // Actualizar texto de semana
-        const semanaActualEl = document.getElementById('semanaActual');
-        if (semanaActualEl) {
-            const finSemana = new Date(inicioSemana);
-            finSemana.setDate(inicioSemana.getDate() + 6);
-            
-            semanaActualEl.textContent = `${inicioSemana.toLocaleDateString()} - ${finSemana.toLocaleDateString()}`;
-        }
-    }
-    
-    // Seleccionar horario
-    function seleccionarHorario(fecha, hora) {
-        fechaSeleccionada = fecha;
-        horaSeleccionada = hora;
-        
-        // Actualizar UI - quitar selección anterior
-        document.querySelectorAll('.hora-item').forEach(el => {
-            el.classList.remove('seleccionada');
-        });
-        
-        // Marcar la hora seleccionada
-        event.target.classList.add('seleccionada');
-        
-        // Mostrar formulario y reserva seleccionada
-        document.getElementById('reservaInfo').style.display = 'block';
-        document.getElementById('formularioReserva').style.display = 'block';
-        
-        // Formatear fecha para mostrar
-        const fechaObj = new Date(fecha);
-        const fechaFormateada = fechaObj.toLocaleDateString('<%= __("locale_date") %>', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-        
-        document.getElementById('fechaSeleccionada').textContent = fechaFormateada;
-        document.getElementById('horaSeleccionada').textContent = hora;
-        
-        // Actualizar campos ocultos
-        document.getElementById('fechaInput').value = fecha;
-        document.getElementById('horaInput').value = hora;
-    }
-    
-    // Manejar envío del formulario
-    document.getElementById('formularioReserva').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        // Validar consentimiento
-        if (!document.getElementById('aceptaCondiciones').checked) {
-            mostrarAlerta('<%= __("error_aceptar_privacidad") %>', 'error');
-            return;
-        }
-        
-        const formData = new FormData(this);
-        const data = Object.fromEntries(formData.entries());
-        
-        mostrarAlerta('<%= __("procesando_reserva") %>', 'info');
-        
-        try {
-            const response = await fetch('/api/reservas', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                mostrarAlerta('<%= __("reserva_creada_exito") %>', 'success');
-                setTimeout(() => {
-                    window.location.href = `/confirmacion/${result.reservaId}`;
-                }, 2000);
-            } else {
-                mostrarAlerta(result.error || '<%= __("error_reserva") %>', 'error');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            mostrarAlerta('<%= __("error_procesar_reserva") %>', 'error');
-        }
-    });
-    
-    // Función para mostrar alertas
-    function mostrarAlerta(mensaje, tipo) {
-        const alerta = document.getElementById('mensajeAlerta');
-        alerta.textContent = mensaje;
-        alerta.className = `alerta ${tipo}`;
-        alerta.style.display = 'block';
-        
-        setTimeout(() => {
-            alerta.style.display = 'none';
-        }, 5000);
-    }
 </script>
