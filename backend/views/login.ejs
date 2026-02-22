@@ -71,10 +71,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar Firebase
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
+        console.log('✅ Firebase inicializado por primera vez');
+    } else {
+        console.log('✅ Firebase ya estaba inicializado');
     }
     
     const auth = firebase.auth();
-    console.log('✅ Firebase inicializado');
+    console.log('✅ Objeto auth obtenido');
     
     // Elementos del DOM
     const urlParams = new URLSearchParams(window.location.search);
@@ -88,6 +91,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingSpinner = document.getElementById('loading-spinner');
     const submitBtn = document.getElementById('submit-btn');
     
+    // Verificar que todos los elementos existen
+    console.log('📋 Elementos del DOM:', {
+        titulo: !!titulo,
+        registroLink: !!registroLink,
+        tipoInput: !!tipoInput,
+        loginForm: !!loginForm,
+        firebaseError: !!firebaseError,
+        firebaseSuccess: !!firebaseSuccess,
+        loadingSpinner: !!loadingSpinner,
+        submitBtn: !!submitBtn
+    });
+    
     // Configurar según tipo
     tipoInput.value = tipo;
     
@@ -100,11 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function showMessage(element, message, isSuccess = false) {
+        // Ocultar ambos mensajes primero
         firebaseError.style.display = 'none';
         firebaseSuccess.style.display = 'none';
+        
+        // Mostrar el mensaje correspondiente
         element.textContent = message;
         element.style.display = 'block';
-        setTimeout(() => element.style.display = 'none', 5000);
+        
+        // Auto-ocultar después de 5 segundos
+        setTimeout(() => {
+            element.style.display = 'none';
+        }, 5000);
     }
     
     function setLoading(isLoading) {
@@ -123,12 +145,17 @@ document.addEventListener('DOMContentLoaded', () => {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         console.log('🚀 Submit capturado!');
+        console.log('📝 Tipo de usuario:', tipoInput.value);
         
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         const tipo = tipoInput.value;
         
+        console.log('📧 Email:', email);
+        console.log('🔑 Password length:', password.length);
+        
         if (!email || !password) {
+            console.log('❌ Campos vacíos');
             showMessage(firebaseError, 'Completa todos los campos');
             return;
         }
@@ -136,48 +163,106 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoading(true);
         
         try {
-            console.log('Intentando login con:', email);
+            console.log('🔄 Intentando login con Firebase Auth...');
             const userCredential = await auth.signInWithEmailAndPassword(email, password);
-            console.log('✅ Login exitoso:', userCredential.user.uid);
+            console.log('✅ Login Firebase exitoso!');
+            console.log('🆔 UID:', userCredential.user.uid);
+            console.log('📧 Email verificado:', userCredential.user.emailVerified);
             
+            console.log('🔄 Obteniendo token de ID...');
             const idToken = await userCredential.user.getIdToken();
+            console.log('✅ Token obtenido (primeros 20 chars):', idToken.substring(0, 20) + '...');
             
+            console.log('🔄 Enviando a /auth/verify-login...');
             const response = await fetch('/auth/verify-login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify({ idToken, tipo })
             });
             
-            const data = await response.json();
+            console.log('📥 Respuesta recibida. Status:', response.status);
+            
+            let data;
+            try {
+                data = await response.json();
+                console.log('📦 Datos de respuesta:', data);
+            } catch (parseError) {
+                console.error('❌ Error parseando JSON:', parseError);
+                const textResponse = await response.text();
+                console.error('📄 Respuesta raw:', textResponse.substring(0, 200));
+                throw new Error('Respuesta del servidor no válida');
+            }
             
             if (data.success) {
+                console.log('✅ Verificación exitosa!');
+                console.log('➡️ Redirigiendo a:', data.redirect);
+                
                 showMessage(firebaseSuccess, '¡Login exitoso! Redirigiendo...', true);
-                setTimeout(() => window.location.href = data.redirect, 1000);
+                
+                // Redirigir después de 1 segundo
+                setTimeout(() => {
+                    console.log('🔄 Ejecutando redirección a:', data.redirect);
+                    window.location.href = data.redirect;
+                }, 1000);
             } else {
+                console.log('❌ Verificación falló:', data.error);
                 await auth.signOut();
                 showMessage(firebaseError, data.error || 'Error de verificación');
                 setLoading(false);
             }
         } catch (error) {
+            console.error('❌ ERROR DETALLADO:');
+            console.error('Código:', error.code);
+            console.error('Mensaje:', error.message);
+            
+            if (error.stack) {
+                console.error('Stack:', error.stack);
+            }
+            
             setLoading(false);
-            console.error('Error:', error);
             
             let mensaje = 'Error al iniciar sesión';
-            if (error.code === 'auth/user-not-found') mensaje = 'Usuario no encontrado';
-            else if (error.code === 'auth/wrong-password') mensaje = 'Contraseña incorrecta';
-            else if (error.code === 'auth/invalid-email') mensaje = 'Email inválido';
-            else if (error.code === 'auth/too-many-requests') mensaje = 'Demasiados intentos';
-            else if (error.code === 'auth/invalid-credential') mensaje = 'Credenciales inválidas';
+            
+            // Manejo específico de errores de Firebase
+            if (error.code === 'auth/user-not-found') {
+                mensaje = 'Usuario no encontrado';
+            } else if (error.code === 'auth/wrong-password') {
+                mensaje = 'Contraseña incorrecta';
+            } else if (error.code === 'auth/invalid-email') {
+                mensaje = 'Email inválido';
+            } else if (error.code === 'auth/too-many-requests') {
+                mensaje = 'Demasiados intentos fallidos. Intenta más tarde';
+            } else if (error.code === 'auth/invalid-credential') {
+                mensaje = 'Credenciales inválidas. Verifica tu email y contraseña';
+            } else if (error.code === 'auth/network-request-failed') {
+                mensaje = 'Error de red. Verifica tu conexión';
+            } else if (error.message.includes('Failed to fetch')) {
+                mensaje = 'Error de conexión con el servidor';
+            }
             
             showMessage(firebaseError, mensaje);
         }
     });
     
-    console.log('✅ Evento submit asignado');
+    console.log('✅ Evento submit asignado correctamente');
+    
+    // Verificar si hay sesión activa al cargar
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            console.log('👤 Usuario ya autenticado:', user.uid);
+            // No hacemos nada, el usuario hará login explícitamente
+        } else {
+            console.log('👤 No hay sesión activa');
+        }
+    });
 });
 </script>
 
 <style>
+/* Tus estilos existentes - sin cambios */
 .auth-container {
     max-width: 400px;
     margin: 40px auto;
