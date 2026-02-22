@@ -1,4 +1,48 @@
-<!-- Script principal - SIN type="module" para evitar problemas -->
+<div class="auth-container">
+    <h1 id="tituloLogin">Iniciar Sesión</h1>
+    
+    <% if (error && error.length > 0) { %>
+        <div class="alerta error"><%= error %></div>
+    <% } %>
+    
+    <% if (success && success.length > 0) { %>
+        <div class="alerta success"><%= success %></div>
+    <% } %>
+    
+    <div id="firebase-error" class="alerta error" style="display: none;"></div>
+    <div id="firebase-success" class="alerta success" style="display: none;"></div>
+    
+    <div id="loading-spinner" style="display: none; text-align: center; margin: 20px 0;">
+        <div class="spinner"></div>
+        <p>Iniciando sesión...</p>
+    </div>
+    
+    <form id="login-form" class="auth-form">
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required placeholder="tu@email.com">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <input type="hidden" name="tipo" id="tipoInput" value="padre">
+        
+        <button type="submit" class="btn btn-primary btn-block" id="submit-btn">Iniciar Sesión</button>
+    </form>
+    
+    <div class="auth-links">
+        <p id="registroLink">¿No tienes cuenta? <a href="/registro-padre">Regístrate aquí</a></p>
+        <p><a href="/">← Volver al inicio</a></p>
+    </div>
+</div>
+
+<!-- Cargar Firebase de la forma CORRECTA (versión UMD) -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
 <script>
 // Configuración de Firebase
 const firebaseConfig = {
@@ -12,38 +56,19 @@ const firebaseConfig = {
 
 console.log('✅ Script cargado correctamente');
 
-// Cargar Firebase de forma tradicional
-function loadFirebase() {
-    return new Promise((resolve) => {
-        // Verificar si ya está cargado
-        if (window.firebase) {
-            resolve(window.firebase);
-            return;
-        }
-        
-        // Cargar Firebase app
-        const scriptApp = document.createElement('script');
-        scriptApp.src = 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        scriptApp.onload = () => {
-            // Cargar Firebase auth
-            const scriptAuth = document.createElement('script');
-            scriptAuth.src = 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-            scriptAuth.onload = () => {
-                console.log('✅ Firebase cargado');
-                resolve(window.firebase);
-            };
-            document.head.appendChild(scriptAuth);
-        };
-        document.head.appendChild(scriptApp);
-    });
-}
-
-// Inicializar cuando todo esté listo
-document.addEventListener('DOMContentLoaded', async () => {
+// Inicializar Firebase cuando los scripts estén listos
+document.addEventListener('DOMContentLoaded', () => {
     console.log('📝 DOM cargado, inicializando...');
     
-    const firebase = await loadFirebase();
+    // Verificar que firebase está disponible
+    if (typeof firebase === 'undefined') {
+        console.error('❌ Firebase no está disponible');
+        document.getElementById('firebase-error').textContent = 'Error cargando Firebase. Recarga la página.';
+        document.getElementById('firebase-error').style.display = 'block';
+        return;
+    }
     
+    // Inicializar Firebase
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
@@ -151,3 +176,124 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('✅ Evento submit asignado');
 });
 </script>
+
+<style>
+.auth-container {
+    max-width: 400px;
+    margin: 40px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.auth-container h1 {
+    text-align: center;
+    color: #4a90e2;
+    margin-bottom: 30px;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+}
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+.form-group input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74,144,226,0.1);
+}
+.btn-block {
+    width: 100%;
+    padding: 12px;
+    background: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.btn-block:hover:not(:disabled) {
+    background: #357abd;
+}
+.btn-block:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+.auth-links {
+    margin-top: 20px;
+    text-align: center;
+}
+.auth-links p {
+    margin: 10px 0;
+    color: #666;
+}
+.auth-links a {
+    color: #4a90e2;
+    text-decoration: none;
+}
+.auth-links a:hover {
+    text-decoration: underline;
+}
+.alerta {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    animation: slideIn 0.3s ease;
+}
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.alerta.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+.alerta.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4a90e2;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+#loading-spinner p {
+    margin-top: 10px;
+    color: #666;
+}
+@media (max-width: 480px) {
+    .auth-container {
+        margin: 20px;
+        padding: 20px;
+    }
+}
+</style>
