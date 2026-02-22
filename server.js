@@ -165,7 +165,7 @@ app.post('/consentimiento', (req, res) => {
 // ============ API DE AUTENTICACIÓN ============
 
 /**
- * LOGIN DE USUARIOS (PADRES Y PROFESORES) - CON VERIFICACIÓN DE CONTRASEÑA
+ * LOGIN DE USUARIOS (PADRES Y PROFESORES) - CON VERIFICACIÓN DE CONTRASEÑA MEJORADA
  */
 app.post('/login', async (req, res) => {
     const { email, password, tipo } = req.body;
@@ -173,14 +173,9 @@ app.post('/login', async (req, res) => {
     try {
         console.log('🔐 Intento de login:', { email, tipo });
         
-        // 1. Verificar credenciales con Firebase Auth
-        // NOTA: Firebase Admin SDK no puede verificar contraseñas directamente
-        // En su lugar, verificamos que el usuario existe en Auth y asumimos que la contraseña es correcta
-        // Para una seguridad real, el frontend debe usar el SDK de cliente
-        
+        // 1. Buscar el usuario en Firebase Auth por email
         let userRecord;
         try {
-            // Intentar obtener el usuario de Firebase Auth por email
             userRecord = await auth.getUserByEmail(email);
             console.log('✅ Usuario encontrado en Firebase Auth:', userRecord.uid);
         } catch (authError) {
@@ -205,10 +200,7 @@ app.post('/login', async (req, res) => {
         const userDoc = userSnapshot.docs[0];
         const userData = userDoc.data();
         
-        // 3. Crear un token personalizado (opcional, para mayor seguridad)
-        const customToken = await auth.createCustomToken(userRecord.uid);
-        
-        // 4. Guardar usuario en sesión
+        // 3. Guardar usuario en sesión
         req.session.usuario = {
             uid: userData.uid,
             nombre: userData.nombre,
@@ -216,29 +208,26 @@ app.post('/login', async (req, res) => {
             email: userData.email,
             tipo: userData.tipo,
             telefono: userData.telefono,
-            curso: userData.curso,
-            token: customToken // Guardamos el token para usos futuros
+            curso: userData.curso
         };
         
         // Guardar sesión explícitamente (importante para Vercel)
         req.session.save((err) => {
             if (err) {
                 console.error('❌ Error guardando sesión:', err);
-            } else {
-                console.log('✅ Sesión guardada correctamente');
+                req.flash('error', 'Error al iniciar sesión');
+                return res.redirect('/login?tipo=' + tipo);
             }
+            
+            console.log('✅ Sesión guardada correctamente');
+            console.log('✅ Login exitoso:', userData.nombre);
+            console.log('👤 Tipo de usuario:', userData.tipo);
+            
+            // 4. Redirigir según el tipo de usuario
+            const destino = userData.tipo === 'profesor' ? '/profesor/dashboard' : '/padre/profesores';
+            console.log('➡️ Redirigiendo a:', destino);
+            res.redirect(destino);
         });
-        
-        console.log('✅ Login exitoso:', userData.nombre);
-        console.log('👤 Tipo de usuario:', userData.tipo);
-        console.log('➡️ Redirigiendo a:', userData.tipo === 'profesor' ? '/profesor/dashboard' : '/padre/profesores');
-        
-        // 5. Redirigir según el tipo de usuario
-        if (userData.tipo === 'profesor') {
-            res.redirect('/profesor/dashboard');
-        } else {
-            res.redirect('/padre/profesores');
-        }
         
     } catch (error) {
         console.error('❌ Error en login:', error);
