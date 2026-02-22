@@ -58,35 +58,57 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-// Configuración de sesiones
+// IMPORTANTE: Configurar trust proxy para Vercel
+// Esto permite que las cookies funcionen correctamente detrás del proxy de Vercel
+app.set('trust proxy', 1);
+
+// Configuración de sesiones - VERSIÓN CORREGIDA PARA VERCEL
 if (process.env.NODE_ENV === 'production') {
     console.log('🔧 Configurando sesiones para producción (Vercel)');
     app.use(session({
         secret: process.env.SESSION_SECRET || 'clave-secreta-temporal',
         resave: false,
         saveUninitialized: false,
+        name: 'tutorias.sid', // Nombre personalizado para la cookie
         cookie: { 
             secure: true,
-            maxAge: 1000 * 60 * 60 * 24,
+            maxAge: 1000 * 60 * 60 * 24, // 24 horas
             httpOnly: true,
-            sameSite: 'strict'
-        }
+            sameSite: 'lax', // Cambiado de 'strict' a 'lax' para permitir redirecciones
+            domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
+        },
+        rolling: true // Renueva la cookie en cada petición
     }));
 } else {
     app.use(session({
         secret: process.env.SESSION_SECRET || 'clave-secreta-temporal',
         resave: false,
         saveUninitialized: true,
+        name: 'tutorias.sid',
         cookie: { 
             secure: false,
             maxAge: 1000 * 60 * 60 * 24,
             httpOnly: true,
-            sameSite: 'strict'
-        }
+            sameSite: 'lax'
+        },
+        rolling: true
     }));
 }
 
 app.use(flash());
+
+// Middleware para logging de sesiones (MUY ÚTIL PARA DEPURACIÓN)
+app.use((req, res, next) => {
+    console.log(`🌐 [${new Date().toISOString()}] ${req.method} ${req.path}`);
+    console.log(`🍪 Cookies:`, req.cookies);
+    console.log(`🆔 Session ID:`, req.session.id);
+    console.log(`👤 Usuario en sesión:`, req.session.usuario ? 'SÍ' : 'NO');
+    if (req.session.usuario) {
+        console.log(`   Email: ${req.session.usuario.email}`);
+        console.log(`   Tipo: ${req.session.usuario.tipo}`);
+    }
+    next();
+});
 
 // Configuración de vistas
 app.set('view engine', 'ejs');
@@ -117,13 +139,31 @@ app.use((req, res, next) => {
 // ============ RUTAS DE AUTENTICACIÓN ============
 app.use('/auth', authRoutes);
 
-// Middleware de autenticación
+// Middleware de autenticación MEJORADO con logs
 const authMiddleware = (req, res, next) => {
-    if (!req.session.usuario) {
-        req.flash('error', 'Por favor, inicia sesión primero');
-        return res.redirect('/login');
+    console.log('='.repeat(50));
+    console.log('🔐 MIDDLEWARE DE AUTENTICACIÓN');
+    console.log('🕒 Timestamp:', new Date().toISOString());
+    console.log('🍪 Cookies:', req.cookies);
+    console.log('🆔 Session ID:', req.session.id);
+    console.log('👤 Session usuario:', req.session.usuario ? 'PRESENTE' : 'VACÍO');
+    
+    if (req.session.usuario) {
+        console.log('✅ Usuario autenticado:', req.session.usuario.email);
+        console.log('👤 Tipo:', req.session.usuario.tipo);
+        console.log('➡️ Continuando a la ruta...');
+        console.log('='.repeat(50));
+        return next();
     }
-    next();
+    
+    console.log('❌ No hay usuario en sesión');
+    console.log('📦 Contenido de req.session:', req.session);
+    console.log('🔍 Headers:', req.headers);
+    console.log('➡️ Redirigiendo a /login');
+    console.log('='.repeat(50));
+    
+    req.flash('error', 'Por favor, inicia sesión primero');
+    return res.redirect('/login');
 };
 
 const profesorMiddleware = (req, res, next) => {
@@ -134,6 +174,22 @@ const profesorMiddleware = (req, res, next) => {
     }
     next();
 };
+
+// ============ RUTA DE DEPURACIÓN (ELIMINAR DESPUÉS) ============
+app.get('/debug-session', (req, res) => {
+    console.log('🔍 DEBUG SESSION');
+    console.log('Session ID:', req.session.id);
+    console.log('Session usuario:', req.session.usuario);
+    console.log('Cookies:', req.cookies);
+    
+    res.json({
+        sessionId: req.session.id,
+        session: req.session,
+        usuario: req.session.usuario || null,
+        cookies: req.cookies,
+        headers: req.headers
+    });
+});
 
 // ============ RUTAS PÚBLICAS ============
 
@@ -175,7 +231,7 @@ app.post('/consentimiento', (req, res) => {
         res.cookie('consentimiento', 'true', {
             maxAge: 30 * 24 * 60 * 60 * 1000,
             httpOnly: true,
-            sameSite: 'strict'
+            sameSite: 'lax'
         });
     }
     
