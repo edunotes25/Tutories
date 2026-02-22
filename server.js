@@ -22,7 +22,7 @@ const axios = require('axios'); // AÑADIDO para verificar contraseñas
 require('dotenv').config();
 
 // Importar configuración de Firebase
-const { db, auth, COLLECTIONS } = require('./backend/config/firebase');
+const { db, auth, COLLECTIONS } = require('./backend/lib/firebase-admin.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
