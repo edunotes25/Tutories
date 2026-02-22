@@ -166,7 +166,7 @@ app.post('/consentimiento', (req, res) => {
 /**
  * LOGIN DE USUARIOS (PADRES Y PROFESORES)
  */
-app.post('/api/login', async (req, res) => {
+app.post('/login', async (req, res) => {
     const { email, password, tipo } = req.body;
     
     try {
