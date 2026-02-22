@@ -1,7 +1,6 @@
 <div class="auth-container">
     <h1 id="tituloLogin">Iniciar Sesión</h1>
     
-    <!-- Mensajes del servidor (EJS) -->
     <% if (error && error.length > 0) { %>
         <div class="alerta error"><%= error %></div>
     <% } %>
@@ -20,11 +19,10 @@
         <p>Iniciando sesión...</p>
     </div>
     
-    <!-- Formulario modificado - ya no hace POST directo -->
     <form id="login-form" class="auth-form">
         <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" required placeholder="tu@email.com">
+            <input type="email" id="email" name="email" required placeholder="tu@email.com" value="<%= locals.email || '' %>">
         </div>
         
         <div class="form-group">
@@ -43,27 +41,32 @@
     </div>
 </div>
 
-<!-- Cargar Firebase desde CDN -->
+<!-- Cargar Firebase de la forma TRADICIONAL (NO como módulos) -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
 
 <script>
-// Configuración de Firebase - Usando variables de entorno de EJS
+// Configuración de Firebase - usando las variables que vienen del servidor
 const firebaseConfig = {
-    apiKey: "<%= process.env.NEXT_PUBLIC_FIREBASE_API_KEY %>",
-    authDomain: "<%= process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN %>",
-    projectId: "<%= process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID %>",
-    storageBucket: "<%= process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET %>",
-    messagingSenderId: "<%= process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID %>",
-    appId: "<%= process.env.NEXT_PUBLIC_FIREBASE_APP_ID %>"
+    apiKey: "<%= locals.env?.NEXT_PUBLIC_FIREBASE_API_KEY || '' %>",
+    authDomain: "<%= locals.env?.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '' %>",
+    projectId: "<%= locals.env?.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '' %>",
+    storageBucket: "<%= locals.env?.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '' %>",
+    messagingSenderId: "<%= locals.env?.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '' %>",
+    appId: "<%= locals.env?.NEXT_PUBLIC_FIREBASE_APP_ID || '' %>"
 };
 
-// Inicializar Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
+console.log('Firebase Config:', firebaseConfig);
 
-// Configurar persistencia de sesión (opcional)
-auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+// Inicializar Firebase (usando la variable global firebase)
+try {
+    firebase.initializeApp(firebaseConfig);
+    console.log('✅ Firebase inicializado correctamente');
+} catch (error) {
+    console.error('❌ Error al inicializar Firebase:', error);
+}
+
+const auth = firebase.auth();
 
 // Elementos del DOM
 const urlParams = new URLSearchParams(window.location.search);
@@ -77,17 +80,25 @@ const firebaseSuccess = document.getElementById('firebase-success');
 const loadingSpinner = document.getElementById('loading-spinner');
 const submitBtn = document.getElementById('submit-btn');
 
+// Configurar según el tipo de usuario
+tipoInput.value = tipo;
+
+if (tipo === 'profesor') {
+    titulo.innerText = 'Iniciar Sesión - Profesor';
+    registroLink.innerHTML = '¿No tienes cuenta? <a href="/registro">Regístrate como profesor</a>';
+} else {
+    titulo.innerText = 'Iniciar Sesión - Padre/Madre';
+    registroLink.innerHTML = '¿No tienes cuenta? <a href="/registro-padre">Regístrate como padre</a>';
+}
+
 // Función para mostrar mensajes
-function showMessage(element, message, isError = true) {
-    // Ocultar todos los mensajes primero
+function showMessage(element, message, isSuccess = false) {
     firebaseError.style.display = 'none';
     firebaseSuccess.style.display = 'none';
     
-    // Mostrar el mensaje correspondiente
     element.textContent = message;
     element.style.display = 'block';
     
-    // Auto-ocultar después de 5 segundos
     setTimeout(() => {
         element.style.display = 'none';
     }, 5000);
@@ -106,17 +117,6 @@ function setLoading(isLoading) {
     }
 }
 
-// Configurar según el tipo de usuario
-tipoInput.value = tipo;
-
-if (tipo === 'profesor') {
-    titulo.innerText = 'Iniciar Sesión - Profesor';
-    registroLink.innerHTML = '¿No tienes cuenta? <a href="/registro">Regístrate como profesor</a>';
-} else {
-    titulo.innerText = 'Iniciar Sesión - Padre/Madre';
-    registroLink.innerHTML = '¿No tienes cuenta? <a href="/registro-padre">Regístrate como padre</a>';
-}
-
 // Manejar envío del formulario
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -125,31 +125,22 @@ loginForm.addEventListener('submit', async (e) => {
     const password = document.getElementById('password').value;
     const tipo = tipoInput.value;
     
-    // Validaciones básicas
     if (!email || !password) {
         showMessage(firebaseError, 'Por favor completa todos los campos');
-        return;
-    }
-    
-    if (password.length < 6) {
-        showMessage(firebaseError, 'La contraseña debe tener al menos 6 caracteres');
         return;
     }
     
     setLoading(true);
     
     try {
-        // 1. Autenticar con Firebase
         console.log('Intentando autenticar con Firebase...');
         const userCredential = await auth.signInWithEmailAndPassword(email, password);
         const user = userCredential.user;
         
         console.log('✅ Usuario autenticado:', user.uid);
         
-        // 2. Obtener token de ID
         const idToken = await user.getIdToken();
         
-        // 3. Verificar con el backend
         console.log('Verificando con backend...');
         const response = await fetch('/auth/verify-login', {
             method: 'POST',
@@ -166,18 +157,14 @@ loginForm.addEventListener('submit', async (e) => {
         
         if (data.success) {
             console.log('✅ Verificación exitosa, redirigiendo a:', data.redirect);
-            showMessage(firebaseSuccess, '¡Login exitoso! Redirigiendo...', false);
+            showMessage(firebaseSuccess, '¡Login exitoso! Redirigiendo...', true);
             
-            // Redirigir después de un breve delay
             setTimeout(() => {
                 window.location.href = data.redirect;
             }, 1000);
         } else {
             console.error('❌ Error en verificación:', data.error);
-            
-            // Si hay error, cerrar sesión de Firebase
             await auth.signOut();
-            
             showMessage(firebaseError, data.error || 'Error al verificar el usuario');
             setLoading(false);
         }
@@ -186,71 +173,27 @@ loginForm.addEventListener('submit', async (e) => {
         console.error('❌ Error de autenticación:', error);
         setLoading(false);
         
-        // Manejar errores específicos de Firebase
         let mensaje = 'Error al iniciar sesión';
         
-        switch (error.code) {
-            case 'auth/user-not-found':
-                mensaje = 'Usuario no encontrado. ¿Estás registrado?';
-                break;
-            case 'auth/wrong-password':
-                mensaje = 'Contraseña incorrecta';
-                break;
-            case 'auth/invalid-email':
-                mensaje = 'El formato del email no es válido';
-                break;
-            case 'auth/user-disabled':
-                mensaje = 'Esta cuenta ha sido deshabilitada';
-                break;
-            case 'auth/too-many-requests':
-                mensaje = 'Demasiados intentos fallidos. Intenta más tarde';
-                break;
-            case 'auth/network-request-failed':
-                mensaje = 'Error de conexión. Verifica tu internet';
-                break;
-            case 'auth/invalid-credential':
-                mensaje = 'Credenciales inválidas';
-                break;
-            default:
-                mensaje = error.message || 'Error al iniciar sesión';
+        if (error.code === 'auth/user-not-found') {
+            mensaje = 'Usuario no encontrado';
+        } else if (error.code === 'auth/wrong-password') {
+            mensaje = 'Contraseña incorrecta';
+        } else if (error.code === 'auth/invalid-email') {
+            mensaje = 'Email inválido';
+        } else if (error.code === 'auth/too-many-requests') {
+            mensaje = 'Demasiados intentos. Intenta más tarde';
+        } else if (error.code === 'auth/network-request-failed') {
+            mensaje = 'Error de conexión';
         }
         
         showMessage(firebaseError, mensaje);
     }
 });
-
-// Verificar si ya hay una sesión activa
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        console.log('Usuario ya autenticado:', user.email);
-        // Opcional: redirigir automáticamente
-        // window.location.href = '/dashboard';
-    }
-});
-
-// Función para recuperar contraseña (opcional)
-window.recuperarPassword = async () => {
-    const email = document.getElementById('email').value;
-    
-    if (!email) {
-        showMessage(firebaseError, 'Por favor ingresa tu email');
-        return;
-    }
-    
-    try {
-        await auth.sendPasswordResetEmail(email);
-        showMessage(firebaseSuccess, 'Email de recuperación enviado. Revisa tu bandeja de entrada', false);
-    } catch (error) {
-        let mensaje = 'Error al enviar email de recuperación';
-        if (error.code === 'auth/user-not-found') {
-            mensaje = 'No hay usuario registrado con este email';
-        }
-        showMessage(firebaseError, mensaje);
-    }
-};
 </script>
 
 <style>
+/* Tu mismo CSS */
 .auth-container {
     max-width: 400px;
     margin: 40px auto;
@@ -364,7 +307,6 @@ window.recuperarPassword = async () => {
     border: 1px solid #c3e6cb;
 }
 
-/* Spinner de carga */
 .spinner {
     border: 4px solid #f3f3f3;
     border-top: 4px solid #4a90e2;
@@ -385,7 +327,6 @@ window.recuperarPassword = async () => {
     color: #666;
 }
 
-/* Responsive */
 @media (max-width: 480px) {
     .auth-container {
         margin: 20px;
