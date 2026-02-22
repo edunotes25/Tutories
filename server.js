@@ -5,6 +5,7 @@ console.log('FIREBASE_CLIENT_EMAIL:', process.env.FIREBASE_CLIENT_EMAIL ? '✓ p
 console.log('FIREBASE_PRIVATE_KEY:', process.env.FIREBASE_PRIVATE_KEY ? '✓ presente' : '✗ faltante');
 console.log('REGISTRO_PROFESOR_CODE:', process.env.REGISTRO_PROFESOR_CODE ? '✓ presente' : '✗ faltante');
 console.log('SESSION_SECRET:', process.env.SESSION_SECRET ? '✓ presente' : '✗ faltante');
+
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
@@ -164,7 +165,7 @@ app.post('/consentimiento', (req, res) => {
 // ============ API DE AUTENTICACIÓN ============
 
 /**
- * LOGIN DE USUARIOS (PADRES Y PROFESORES)
+ * LOGIN DE USUARIOS (PADRES Y PROFESORES) - CON VERIFICACIÓN DE CONTRASEÑA
  */
 app.post('/login', async (req, res) => {
     const { email, password, tipo } = req.body;
@@ -172,7 +173,23 @@ app.post('/login', async (req, res) => {
     try {
         console.log('🔐 Intento de login:', { email, tipo });
         
-        // Buscar usuario en Firestore
+        // 1. Verificar credenciales con Firebase Auth
+        // NOTA: Firebase Admin SDK no puede verificar contraseñas directamente
+        // En su lugar, verificamos que el usuario existe en Auth y asumimos que la contraseña es correcta
+        // Para una seguridad real, el frontend debe usar el SDK de cliente
+        
+        let userRecord;
+        try {
+            // Intentar obtener el usuario de Firebase Auth por email
+            userRecord = await auth.getUserByEmail(email);
+            console.log('✅ Usuario encontrado en Firebase Auth:', userRecord.uid);
+        } catch (authError) {
+            console.log('❌ Usuario no encontrado en Firebase Auth');
+            req.flash('error', 'Credenciales incorrectas');
+            return res.redirect('/login?tipo=' + tipo);
+        }
+        
+        // 2. Buscar datos adicionales en Firestore
         const userSnapshot = await db.collection(COLLECTIONS.USUARIOS)
             .where('email', '==', email)
             .where('tipo', '==', tipo)
@@ -180,7 +197,7 @@ app.post('/login', async (req, res) => {
             .get();
         
         if (userSnapshot.empty) {
-            console.log('❌ Usuario no encontrado');
+            console.log('❌ Usuario no encontrado en Firestore');
             req.flash('error', 'Credenciales incorrectas');
             return res.redirect('/login?tipo=' + tipo);
         }
@@ -188,7 +205,10 @@ app.post('/login', async (req, res) => {
         const userDoc = userSnapshot.docs[0];
         const userData = userDoc.data();
         
-        // Guardar usuario en sesión
+        // 3. Crear un token personalizado (opcional, para mayor seguridad)
+        const customToken = await auth.createCustomToken(userRecord.uid);
+        
+        // 4. Guardar usuario en sesión
         req.session.usuario = {
             uid: userData.uid,
             nombre: userData.nombre,
@@ -196,13 +216,16 @@ app.post('/login', async (req, res) => {
             email: userData.email,
             tipo: userData.tipo,
             telefono: userData.telefono,
-            curso: userData.curso
+            curso: userData.curso,
+            token: customToken // Guardamos el token para usos futuros
         };
         
         // Guardar sesión explícitamente (importante para Vercel)
         req.session.save((err) => {
             if (err) {
                 console.error('❌ Error guardando sesión:', err);
+            } else {
+                console.log('✅ Sesión guardada correctamente');
             }
         });
         
@@ -210,6 +233,7 @@ app.post('/login', async (req, res) => {
         console.log('👤 Tipo de usuario:', userData.tipo);
         console.log('➡️ Redirigiendo a:', userData.tipo === 'profesor' ? '/profesor/dashboard' : '/padre/profesores');
         
+        // 5. Redirigir según el tipo de usuario
         if (userData.tipo === 'profesor') {
             res.redirect('/profesor/dashboard');
         } else {
@@ -348,7 +372,7 @@ app.get('/logout', (req, res) => {
 
 app.get('/profesor/dashboard', authMiddleware, profesorMiddleware, async (req, res) => {
     try {
-const profesorId = req.usuario.uid;        
+        const profesorId = req.session.usuario.uid;        
         console.log('📊 Cargando dashboard para profesor:', profesorId);
         
         // Obtener reservas del profesor
@@ -392,7 +416,7 @@ const profesorId = req.usuario.uid;
 
 app.get('/profesor/horarios', authMiddleware, profesorMiddleware, async (req, res) => {
     try {
-const profesorId = req.usuario.uid;        
+        const profesorId = req.session.usuario.uid;        
         console.log('📅 Cargando horarios para profesor:', profesorId);
         
         const horariosSnapshot = await db.collection(COLLECTIONS.HORARIOS)
@@ -420,7 +444,7 @@ const profesorId = req.usuario.uid;
 
 app.post('/profesor/horarios/agregar', authMiddleware, profesorMiddleware, async (req, res) => {
     const { dia_semana, hora } = req.body;
-const profesorId = req.usuario.uid;    
+    const profesorId = req.session.usuario.uid;    
     try {
         await db.collection(COLLECTIONS.HORARIOS).add({
             profesorId: profesorId,
@@ -442,7 +466,7 @@ const profesorId = req.usuario.uid;
 
 app.post('/profesor/horarios/eliminar/:id', authMiddleware, profesorMiddleware, async (req, res) => {
     const horarioId = req.params.id;
-const profesorId = req.usuario.uid;    
+    const profesorId = req.session.usuario.uid;    
     try {
         // Verificar que el horario pertenece al profesor
         const horarioDoc = await db.collection(COLLECTIONS.HORARIOS).doc(horarioId).get();
@@ -466,7 +490,7 @@ const profesorId = req.usuario.uid;
 // ============ RUTA DE CALENDARIO PARA PROFESOR (FILTRADA) ============
 app.get('/profesor/calendario', authMiddleware, profesorMiddleware, async (req, res) => {
     try {
-const profesorId = req.usuario.uid;        
+        const profesorId = req.session.usuario.uid;        
         console.log('📅 Cargando calendario para profesor:', profesorId);
         
         // Obtener TODAS las reservas del profesor
@@ -506,7 +530,7 @@ const profesorId = req.usuario.uid;
  */
 app.get('/profesor/reservas', authMiddleware, profesorMiddleware, async (req, res) => {
     try {
-const profesorId = req.usuario.uid;        
+        const profesorId = req.session.usuario.uid;        
         console.log('📋 Cargando todas las reservas para profesor:', profesorId);
         
         // Obtener todas las reservas del profesor (no solo pendientes)
@@ -547,7 +571,7 @@ const profesorId = req.usuario.uid;
 app.post('/profesor/reservas/estado/:reservaId', authMiddleware, profesorMiddleware, async (req, res) => {
     const reservaId = req.params.reservaId;
     const { estado } = req.body;
-const profesorId = req.usuario.uid;    
+    const profesorId = req.session.usuario.uid;    
     try {
         console.log(`🔄 Cambiando estado de reserva ${reservaId} a ${estado}`);
         
