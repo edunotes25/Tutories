@@ -39,12 +39,23 @@
     </div>
 </div>
 
-<!-- Cargar Firebase de la forma MÁS SIMPLE posible -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+<!-- SOLUCIÓN: Usar import maps y type="module" -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"
+  }
+}
+</script>
 
-<!-- Script de inicialización separado -->
-<script>
+<!-- Script principal como módulo -->
+<script type="module">
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+
+console.log('✅ Módulos de Firebase importados correctamente');
+
 // Configuración de Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyBn_qSBGxQh-Gp8laagdzYAKPfKuNHho7",
@@ -55,191 +66,240 @@ const firebaseConfig = {
     appId: "1:1025787276190:web:eaa4f1c523639f1d66848f"
 };
 
-console.log('Intentando inicializar Firebase...');
-console.log('Firebase disponible:', typeof firebase !== 'undefined');
+// Inicializar Firebase
+let app;
+let auth;
 
-// Inicializar Firebase cuando los scripts estén listos
-function initFirebase() {
-    try {
-        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-            console.log('✅ Firebase inicializado correctamente');
-            return true;
-        } else if (firebase.apps.length) {
-            console.log('✅ Firebase ya estaba inicializado');
-            return true;
-        } else {
-            console.log('⏳ Firebase no está listo, reintentando...');
-            return false;
-        }
-    } catch (error) {
-        console.error('❌ Error:', error);
-        return false;
+try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    console.log('✅ Firebase inicializado correctamente');
+} catch (error) {
+    console.error('❌ Error inicializando Firebase:', error);
+    document.getElementById('firebase-error').textContent = 'Error al inicializar Firebase';
+    document.getElementById('firebase-error').style.display = 'block';
+}
+
+// Elementos del DOM
+const urlParams = new URLSearchParams(window.location.search);
+const tipo = urlParams.get('tipo') || 'padre';
+const titulo = document.getElementById('tituloLogin');
+const registroLink = document.getElementById('registroLink');
+const tipoInput = document.getElementById('tipoInput');
+const loginForm = document.getElementById('login-form');
+const firebaseError = document.getElementById('firebase-error');
+const firebaseSuccess = document.getElementById('firebase-success');
+const loadingSpinner = document.getElementById('loading-spinner');
+const submitBtn = document.getElementById('submit-btn');
+
+// Configurar según tipo
+tipoInput.value = tipo;
+
+if (tipo === 'profesor') {
+    titulo.innerText = 'Iniciar Sesión - Profesor';
+    registroLink.innerHTML = '¿No tienes cuenta? <a href="/registro">Regístrate como profesor</a>';
+} else {
+    titulo.innerText = 'Iniciar Sesión - Padre/Madre';
+    registroLink.innerHTML = '¿No tienes cuenta? <a href="/registro-padre">Regístrate como padre</a>';
+}
+
+function showMessage(element, message, isSuccess = false) {
+    firebaseError.style.display = 'none';
+    firebaseSuccess.style.display = 'none';
+    element.textContent = message;
+    element.style.display = 'block';
+    setTimeout(() => element.style.display = 'none', 5000);
+}
+
+function setLoading(isLoading) {
+    if (isLoading) {
+        loadingSpinner.style.display = 'block';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Iniciando sesión...';
+    } else {
+        loadingSpinner.style.display = 'none';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Iniciar Sesión';
     }
 }
 
-// Intentar inicializar inmediatamente y también cuando cargue la página
-if (!initFirebase()) {
-    // Si falla, esperar a que los scripts terminen de cargar
-    window.addEventListener('load', function() {
-        setTimeout(initFirebase, 100);
-    });
-}
-</script>
-
-<!-- Script principal con la lógica de login -->
-<script>
-// Esperar a que Firebase esté listo
-function waitForFirebase() {
-    return new Promise((resolve) => {
-        if (typeof firebase !== 'undefined' && firebase.apps.length) {
-            resolve();
-            return;
-        }
-        
-        let attempts = 0;
-        const interval = setInterval(() => {
-            attempts++;
-            if (typeof firebase !== 'undefined' && firebase.apps.length) {
-                clearInterval(interval);
-                resolve();
-            } else if (attempts > 20) { // 2 segundos máximo
-                clearInterval(interval);
-                console.error('⏰ Timeout esperando Firebase');
-                resolve(); // Resolvemos igual para no bloquear
-            }
-        }, 100);
-    });
-}
-
-// Cuando la página cargue
-document.addEventListener('DOMContentLoaded', async function() {
-    await waitForFirebase();
+// Manejar login
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
     
-    if (typeof firebase === 'undefined') {
-        console.error('❌ Firebase no está disponible');
-        document.getElementById('firebase-error').textContent = 'Error cargando Firebase. Recarga la página.';
-        document.getElementById('firebase-error').style.display = 'block';
+    if (!auth) {
+        showMessage(firebaseError, 'Firebase no está inicializado');
         return;
     }
     
-    const auth = firebase.auth();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const tipo = tipoInput.value;
     
-    // Elementos del DOM
-    const urlParams = new URLSearchParams(window.location.search);
-    const tipo = urlParams.get('tipo') || 'padre';
-    const titulo = document.getElementById('tituloLogin');
-    const registroLink = document.getElementById('registroLink');
-    const tipoInput = document.getElementById('tipoInput');
-    const loginForm = document.getElementById('login-form');
-    const firebaseError = document.getElementById('firebase-error');
-    const firebaseSuccess = document.getElementById('firebase-success');
-    const loadingSpinner = document.getElementById('loading-spinner');
-    const submitBtn = document.getElementById('submit-btn');
-    
-    // Configurar según tipo
-    tipoInput.value = tipo;
-    
-    if (tipo === 'profesor') {
-        titulo.innerText = 'Iniciar Sesión - Profesor';
-        registroLink.innerHTML = '¿No tienes cuenta? <a href="/registro">Regístrate como profesor</a>';
-    } else {
-        titulo.innerText = 'Iniciar Sesión - Padre/Madre';
-        registroLink.innerHTML = '¿No tienes cuenta? <a href="/registro-padre">Regístrate como padre</a>';
+    if (!email || !password) {
+        showMessage(firebaseError, 'Completa todos los campos');
+        return;
     }
     
-    function showMessage(element, message, isSuccess = false) {
-        firebaseError.style.display = 'none';
-        firebaseSuccess.style.display = 'none';
-        element.textContent = message;
-        element.style.display = 'block';
-        setTimeout(() => element.style.display = 'none', 5000);
-    }
+    setLoading(true);
     
-    function setLoading(isLoading) {
-        if (isLoading) {
-            loadingSpinner.style.display = 'block';
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Iniciando sesión...';
+    try {
+        console.log('Intentando login con:', email);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log('✅ Login exitoso:', userCredential.user.uid);
+        
+        const idToken = await userCredential.user.getIdToken();
+        
+        const response = await fetch('/auth/verify-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken, tipo })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showMessage(firebaseSuccess, '¡Login exitoso! Redirigiendo...', true);
+            setTimeout(() => window.location.href = data.redirect, 1000);
         } else {
-            loadingSpinner.style.display = 'none';
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Iniciar Sesión';
-        }
-    }
-    
-    // Manejar login
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
-        const tipo = tipoInput.value;
-        
-        if (!email || !password) {
-            showMessage(firebaseError, 'Completa todos los campos');
-            return;
-        }
-        
-        setLoading(true);
-        
-        try {
-            console.log('Intentando login con:', email);
-            const userCredential = await auth.signInWithEmailAndPassword(email, password);
-            console.log('✅ Login exitoso');
-            
-            const idToken = await userCredential.user.getIdToken();
-            
-            const response = await fetch('/auth/verify-login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ idToken, tipo })
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                showMessage(firebaseSuccess, '¡Login exitoso! Redirigiendo...', true);
-                setTimeout(() => window.location.href = data.redirect, 1000);
-            } else {
-                await auth.signOut();
-                showMessage(firebaseError, data.error || 'Error de verificación');
-                setLoading(false);
-            }
-        } catch (error) {
+            await auth.signOut();
+            showMessage(firebaseError, data.error || 'Error de verificación');
             setLoading(false);
-            console.error('Error:', error);
-            
-            let mensaje = 'Error al iniciar sesión';
-            if (error.code === 'auth/user-not-found') mensaje = 'Usuario no encontrado';
-            else if (error.code === 'auth/wrong-password') mensaje = 'Contraseña incorrecta';
-            else if (error.code === 'auth/invalid-email') mensaje = 'Email inválido';
-            else if (error.code === 'auth/too-many-requests') mensaje = 'Demasiados intentos';
-            
-            showMessage(firebaseError, mensaje);
         }
-    });
+    } catch (error) {
+        setLoading(false);
+        console.error('Error:', error);
+        
+        let mensaje = 'Error al iniciar sesión';
+        if (error.code === 'auth/user-not-found') mensaje = 'Usuario no encontrado';
+        else if (error.code === 'auth/wrong-password') mensaje = 'Contraseña incorrecta';
+        else if (error.code === 'auth/invalid-email') mensaje = 'Email inválido';
+        else if (error.code === 'auth/too-many-requests') mensaje = 'Demasiados intentos';
+        else if (error.code === 'auth/invalid-credential') mensaje = 'Credenciales inválidas';
+        
+        showMessage(firebaseError, mensaje);
+    }
 });
 </script>
 
 <style>
 /* Tu mismo CSS */
-.auth-container { max-width: 400px; margin: 40px auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-.auth-container h1 { text-align: center; color: #4a90e2; margin-bottom: 30px; }
-.form-group { margin-bottom: 20px; }
-.form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #333; }
-.form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
-.form-group input:focus { outline: none; border-color: #4a90e2; }
-.btn-block { width: 100%; padding: 12px; background: #4a90e2; color: white; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer; }
-.btn-block:hover { background: #357abd; }
-.btn-block:disabled { background: #ccc; cursor: not-allowed; }
-.auth-links { margin-top: 20px; text-align: center; }
-.auth-links p { margin: 10px 0; color: #666; }
-.auth-links a { color: #4a90e2; text-decoration: none; }
-.alerta { padding: 15px; border-radius: 5px; margin-bottom: 20px; }
-.alerta.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-.alerta.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-.spinner { border: 4px solid #f3f3f3; border-top: 4px solid #4a90e2; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-#loading-spinner p { margin-top: 10px; color: #666; }
+.auth-container {
+    max-width: 400px;
+    margin: 40px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.auth-container h1 {
+    text-align: center;
+    color: #4a90e2;
+    margin-bottom: 30px;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+}
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+.form-group input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74,144,226,0.1);
+}
+.btn-block {
+    width: 100%;
+    padding: 12px;
+    background: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.btn-block:hover:not(:disabled) {
+    background: #357abd;
+}
+.btn-block:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+.auth-links {
+    margin-top: 20px;
+    text-align: center;
+}
+.auth-links p {
+    margin: 10px 0;
+    color: #666;
+}
+.auth-links a {
+    color: #4a90e2;
+    text-decoration: none;
+}
+.auth-links a:hover {
+    text-decoration: underline;
+}
+.alerta {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    animation: slideIn 0.3s ease;
+}
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.alerta.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+.alerta.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4a90e2;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+#loading-spinner p {
+    margin-top: 10px;
+    color: #666;
+}
+@media (max-width: 480px) {
+    .auth-container {
+        margin: 20px;
+        padding: 20px;
+    }
+}
 </style>
