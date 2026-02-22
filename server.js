@@ -69,15 +69,14 @@ if (process.env.NODE_ENV === 'production') {
         secret: process.env.SESSION_SECRET || 'clave-secreta-temporal',
         resave: false,
         saveUninitialized: false,
-        name: 'tutorias.sid', // Nombre personalizado para la cookie
+        name: 'tutorias.sid',
         cookie: { 
             secure: true,
-            maxAge: 1000 * 60 * 60 * 24, // 24 horas
+            maxAge: 1000 * 60 * 60 * 24,
             httpOnly: true,
-            sameSite: 'lax' // Cambiado de 'strict' a 'lax' para permitir redirecciones
-            // 👉 DOMAIN ELIMINADO - dejar que el navegador lo maneje automáticamente
+            sameSite: 'lax'
         },
-        rolling: true // Renueva la cookie en cada petición
+        rolling: true
     }));
 } else {
     app.use(session({
@@ -97,7 +96,7 @@ if (process.env.NODE_ENV === 'production') {
 
 app.use(flash());
 
-// Middleware para logging de sesiones (MUY ÚTIL PARA DEPURACIÓN)
+// Middleware para logging de sesiones
 app.use((req, res, next) => {
     console.log(`🌐 [${new Date().toISOString()}] ${req.method} ${req.path}`);
     console.log(`🍪 Cookies:`, req.cookies);
@@ -175,7 +174,7 @@ const profesorMiddleware = (req, res, next) => {
     next();
 };
 
-// ============ RUTA DE DEPURACIÓN (ELIMINAR DESPUÉS) ============
+// ============ RUTA DE DEPURACIÓN ============
 app.get('/debug-session', (req, res) => {
     console.log('🔍 DEBUG SESSION');
     console.log('Session ID:', req.session.id);
@@ -413,7 +412,7 @@ app.post('/api/registro', async (req, res) => {
 });
 
 /**
- * REGISTRO DE PADRES - VERSIÓN MEJORADA CON MÁS LOGS
+ * REGISTRO DE PADRES
  */
 app.post('/api/registro-padre', async (req, res) => {
     console.log('📝 Datos recibidos en registro padre:', req.body);
@@ -471,7 +470,6 @@ app.post('/api/registro-padre', async (req, res) => {
             console.log('✅ Datos de padre guardados en Firestore');
         } catch (firestoreError) {
             console.error('❌ Error en Firestore:', firestoreError);
-            // Si falla Firestore, eliminamos el usuario de Auth para mantener consistencia
             try {
                 await auth.deleteUser(userRecord.uid);
                 console.log('✅ Usuario de Auth eliminado por consistencia');
@@ -576,9 +574,19 @@ app.get('/profesor/horarios', authMiddleware, profesorMiddleware, async (req, re
     }
 });
 
+// ============ RUTA CORREGIDA PARA AGREGAR HORARIOS CON VALIDACIÓN ============
 app.post('/profesor/horarios/agregar', authMiddleware, profesorMiddleware, async (req, res) => {
     const { dia_semana, hora } = req.body;
-    const profesorId = req.session.usuario.uid;    
+    const profesorId = req.session.usuario.uid;
+    
+    // Validar que la hora tenga formato correcto (HH:MM)
+    const horaRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+    if (!hora || !horaRegex.test(hora)) {
+        console.log('❌ Formato de hora inválido:', hora);
+        req.flash('error', 'Formato de hora inválido. Use HH:MM (ej: 14:30, 09:00)');
+        return res.redirect('/profesor/horarios');
+    }
+    
     try {
         await db.collection(COLLECTIONS.HORARIOS).add({
             profesorId: profesorId,
