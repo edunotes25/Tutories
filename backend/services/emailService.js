@@ -1,5 +1,11 @@
 const nodemailer = require('nodemailer');
 
+// Determinar la URL base según el entorno
+// En producción usará la variable de Vercel, en local usará localhost
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+
+console.log('📧 Email Service - BASE_URL:', BASE_URL);
+
 // Configuración del transporte de email
 let transporter = null;
 
@@ -47,6 +53,9 @@ const enviarConfirmacion = async (reserva, profesor) => {
         return false;
     }
     
+    const cancelUrl = `${BASE_URL}/cancelar/${reserva.tokenAcceso}`;
+    const profesoresUrl = `${BASE_URL}/padre/profesores`;
+    
     const mailOptions = {
         from: '"Sistema de Tutorías" <tutorias@colegio.edu>',
         to: reserva.padreEmail,
@@ -87,7 +96,11 @@ const enviarConfirmacion = async (reserva, profesor) => {
                         
                         <p>Si necesita cancelar la tutoría, puede hacerlo a través del siguiente enlace:</p>
                         <p style="text-align: center;">
-                            <a href="http://localhost:3000/cancelar/${reserva.tokenAcceso}" class="boton-cancelar">Cancelar reserva</a>
+                            <a href="${cancelUrl}" class="boton-cancelar">Cancelar reserva</a>
+                        </p>
+                        
+                        <p style="text-align: center;">
+                            <a href="${profesoresUrl}">📅 Reservar otra tutoría</a>
                         </p>
                         
                         <p>Muchas gracias por utilizar nuestro sistema.</p>
@@ -130,6 +143,8 @@ const enviarCancelacionPadre = async (reserva, profesor) => {
         return false;
     }
     
+    const profesoresUrl = `${BASE_URL}/padre/profesores`;
+    
     const mailOptions = {
         from: '"Sistema de Tutorías" <tutorias@colegio.edu>',
         to: reserva.padreEmail,
@@ -168,7 +183,7 @@ const enviarCancelacionPadre = async (reserva, profesor) => {
                         
                         <p>Si desea reservar una nueva tutoría, puede hacerlo a través de nuestro sistema:</p>
                         <p style="text-align: center;">
-                            <a href="http://localhost:3000/padre/profesores" class="boton">Reservar nueva tutoría</a>
+                            <a href="${profesoresUrl}" class="boton">Reservar nueva tutoría</a>
                         </p>
                         
                         <p>Disculpe las molestias.</p>
@@ -209,6 +224,8 @@ const enviarNotificacionProfesor = async (reserva, profesor, padre) => {
         console.log('⚠️ Transporte de email no disponible');
         return false;
     }
+    
+    const reservasUrl = `${BASE_URL}/profesor/reservas`;
     
     const mailOptions = {
         from: '"Sistema de Tutorías" <tutorias@colegio.edu>',
@@ -251,7 +268,7 @@ const enviarNotificacionProfesor = async (reserva, profesor, padre) => {
                         
                         <p>Este horario ya está disponible nuevamente para otras reservas.</p>
                         <p style="text-align: center;">
-                            <a href="http://localhost:3000/profesor/reservas" class="boton">Ver mis reservas</a>
+                            <a href="${reservasUrl}" class="boton">Ver mis reservas</a>
                         </p>
                     </div>
                     <div class="footer">
