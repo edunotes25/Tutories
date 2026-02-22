@@ -18,16 +18,19 @@ const rateLimit = require('express-rate-limit');
 const expressLayouts = require('express-ejs-layouts');
 const flash = require('connect-flash');
 const { v4: uuidv4 } = require('uuid');
-const axios = require('axios'); // AÑADIDO para verificar contraseñas
+const axios = require('axios');
 require('dotenv').config();
 
 // Importar configuración de Firebase
 const { db, auth, COLLECTIONS } = require('./backend/lib/firebase-admin.js');
 
+// Importar rutas de autenticación
+const authRoutes = require('./backend/routes/auth');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuración de seguridad - CORREGIDA para permitir event handlers
+// Configuración de seguridad
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -37,7 +40,7 @@ app.use(helmet({
             scriptSrc: ["'self'", "'unsafe-inline'", "https://www.gstatic.com", "https://apis.google.com"],
             scriptSrcAttr: ["'self'", "'unsafe-inline'"],
             imgSrc: ["'self'", "data:"],
-            connectSrc: ["'self'", "https://identitytoolkit.googleapis.com"], // AÑADIDO para Firebase Auth
+            connectSrc: ["'self'", "https://identitytoolkit.googleapis.com"],
         },
     },
 }));
@@ -55,24 +58,21 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-// Configuración de sesiones - ADAPTADA PARA VERCEL
+// Configuración de sesiones
 if (process.env.NODE_ENV === 'production') {
-    // Para producción en Vercel, usamos sesiones sin almacenamiento persistente
     console.log('🔧 Configurando sesiones para producción (Vercel)');
-    
     app.use(session({
         secret: process.env.SESSION_SECRET || 'clave-secreta-temporal',
         resave: false,
         saveUninitialized: false,
         cookie: { 
-            secure: true, // HTTPS obligatorio en Vercel
-            maxAge: 1000 * 60 * 60 * 24, // 24 horas
+            secure: true,
+            maxAge: 1000 * 60 * 60 * 24,
             httpOnly: true,
             sameSite: 'strict'
         }
     }));
 } else {
-    // Desarrollo local - sesiones en memoria
     app.use(session({
         secret: process.env.SESSION_SECRET || 'clave-secreta-temporal',
         resave: false,
@@ -113,6 +113,9 @@ app.use((req, res, next) => {
     };
     next();
 });
+
+// ============ RUTAS DE AUTENTICACIÓN ============
+app.use('/auth', authRoutes);
 
 // Middleware de autenticación
 const authMiddleware = (req, res, next) => {
@@ -182,7 +185,7 @@ app.post('/consentimiento', (req, res) => {
 // ============ API DE AUTENTICACIÓN ============
 
 /**
- * LOGIN DE USUARIOS (PADRES Y PROFESORES) - CORREGIDO CON VERIFICACIÓN DE CONTRASEÑA
+ * LOGIN DE USUARIOS (PADRES Y PROFESORES)
  */
 app.post('/login', async (req, res) => {
     const { email, password, tipo } = req.body;
@@ -190,14 +193,12 @@ app.post('/login', async (req, res) => {
     try {
         console.log('🔐 Intento de login:', { email, tipo });
         
-        // Verificar que tenemos la API key
         if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
             console.error('❌ NEXT_PUBLIC_FIREBASE_API_KEY no está configurada');
             req.flash('error', 'Error de configuración del servidor');
             return res.redirect('/login?tipo=' + tipo);
         }
         
-        // 1. Verificar credenciales usando la REST API de Firebase
         try {
             const response = await axios.post(
                 `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}`,
@@ -208,11 +209,9 @@ app.post('/login', async (req, res) => {
                 }
             );
             
-            // Si llegamos aquí, las credenciales son correctas
-            const { localId, idToken, email: verifiedEmail } = response.data;
+            const { localId, idToken } = response.data;
             console.log('✅ Credenciales verificadas en Firebase Auth:', localId);
             
-            // 2. Buscar datos adicionales en Firestore
             const userSnapshot = await db.collection(COLLECTIONS.USUARIOS)
                 .where('email', '==', email)
                 .where('tipo', '==', tipo)
@@ -228,14 +227,12 @@ app.post('/login', async (req, res) => {
             const userDoc = userSnapshot.docs[0];
             const userData = userDoc.data();
             
-            // 3. Verificar que el UID coincide
             if (userData.uid !== localId) {
                 console.log('❌ Discrepancia en UID entre Auth y Firestore');
                 req.flash('error', 'Error en la configuración de la cuenta');
                 return res.redirect('/login?tipo=' + tipo);
             }
             
-            // 4. Guardar usuario en sesión
             req.session.usuario = {
                 uid: userData.uid,
                 nombre: userData.nombre,
@@ -244,10 +241,9 @@ app.post('/login', async (req, res) => {
                 tipo: userData.tipo,
                 telefono: userData.telefono,
                 curso: userData.curso,
-                idToken: idToken // Guardar token para futuras verificaciones
+                idToken: idToken
             };
             
-            // Guardar sesión explícitamente
             req.session.save((err) => {
                 if (err) {
                     console.error('❌ Error guardando sesión:', err);
@@ -257,16 +253,13 @@ app.post('/login', async (req, res) => {
                 
                 console.log('✅ Sesión guardada correctamente');
                 console.log('✅ Login exitoso:', userData.nombre);
-                console.log('👤 Tipo de usuario:', userData.tipo);
                 
-                // Redirigir según el tipo de usuario
                 const destino = userData.tipo === 'profesor' ? '/profesor/dashboard' : '/padre/profesores';
                 console.log('➡️ Redirigiendo a:', destino);
                 res.redirect(destino);
             });
             
         } catch (axiosError) {
-            // Manejar errores de la API de Firebase
             console.error('❌ Error de Firebase Auth:', axiosError.response?.data || axiosError.message);
             
             let errorMessage = 'Email o contraseña incorrectos';
@@ -302,7 +295,7 @@ app.post('/login', async (req, res) => {
 });
 
 /**
- * REGISTRO DE PROFESORES CON VALIDACIÓN DE CÓDIGO
+ * REGISTRO DE PROFESORES
  */
 app.post('/api/registro', async (req, res) => {
     console.log('📝 Datos recibidos en registro profesor:', req.body);
@@ -310,14 +303,12 @@ app.post('/api/registro', async (req, res) => {
     const { nombre, email, password, telefono, curso, descripcion, codigoRegistro } = req.body;
     
     try {
-        // Validar código de registro para profesores
         if (!codigoRegistro || codigoRegistro !== process.env.REGISTRO_PROFESOR_CODE) {
-            console.log('❌ Código incorrecto:', codigoRegistro, 'Esperado:', process.env.REGISTRO_PROFESOR_CODE);
+            console.log('❌ Código incorrecto:', codigoRegistro);
             req.flash('error', 'Código de registro incorrecto');
             return res.redirect('/registro');
         }
         
-        // Verificar si el usuario ya existe
         const userSnapshot = await db.collection(COLLECTIONS.USUARIOS)
             .where('email', '==', email)
             .get();
@@ -327,7 +318,6 @@ app.post('/api/registro', async (req, res) => {
             return res.redirect('/registro');
         }
         
-        // Crear usuario en Firebase Auth
         const userRecord = await auth.createUser({
             email: email,
             password: password,
@@ -336,7 +326,6 @@ app.post('/api/registro', async (req, res) => {
         
         console.log('✅ Usuario profesor creado en Auth:', userRecord.uid);
         
-        // Guardar datos adicionales en Firestore
         await db.collection(COLLECTIONS.USUARIOS).doc(userRecord.uid).set({
             uid: userRecord.uid,
             nombre: nombre,
@@ -357,7 +346,6 @@ app.post('/api/registro', async (req, res) => {
     } catch (error) {
         console.error('❌ Error en registro profesor:', error);
         
-        // Si el error es de Firebase Auth
         if (error.code === 'auth/email-already-exists') {
             req.flash('error', 'El email ya está registrado');
         } else {
@@ -369,7 +357,7 @@ app.post('/api/registro', async (req, res) => {
 });
 
 /**
- * REGISTRO DE PADRES (SIN CÓDIGO) - CON DATOS DEL ALUMNO
+ * REGISTRO DE PADRES
  */
 app.post('/api/registro-padre', async (req, res) => {
     console.log('📝 Datos recibidos en registro padre:', req.body);
@@ -377,7 +365,6 @@ app.post('/api/registro-padre', async (req, res) => {
     const { nombre, nombreAlumno, email, password, telefono } = req.body;
     
     try {
-        // Verificar si el usuario ya existe
         const userSnapshot = await db.collection(COLLECTIONS.USUARIOS)
             .where('email', '==', email)
             .get();
@@ -387,7 +374,6 @@ app.post('/api/registro-padre', async (req, res) => {
             return res.redirect('/registro-padre');
         }
         
-        // Crear usuario en Firebase Auth
         const userRecord = await auth.createUser({
             email: email,
             password: password,
@@ -396,7 +382,6 @@ app.post('/api/registro-padre', async (req, res) => {
         
         console.log('✅ Usuario padre creado en Auth:', userRecord.uid);
         
-        // Guardar datos adicionales en Firestore
         await db.collection(COLLECTIONS.USUARIOS).doc(userRecord.uid).set({
             uid: userRecord.uid,
             nombre: nombre,
@@ -442,7 +427,6 @@ app.get('/profesor/dashboard', authMiddleware, profesorMiddleware, async (req, r
         const profesorId = req.session.usuario.uid;        
         console.log('📊 Cargando dashboard para profesor:', profesorId);
         
-        // Obtener reservas del profesor
         const reservasSnapshot = await db.collection(COLLECTIONS.RESERVAS)
             .where('profesorId', '==', profesorId)
             .where('estado', '==', 'pendiente')
@@ -455,7 +439,6 @@ app.get('/profesor/dashboard', authMiddleware, profesorMiddleware, async (req, r
             reservas.push({ id: doc.id, ...doc.data() });
         });
         
-        // Obtener horarios del profesor
         const horariosSnapshot = await db.collection(COLLECTIONS.HORARIOS)
             .where('profesorId', '==', profesorId)
             .where('activo', '==', true)
@@ -535,7 +518,6 @@ app.post('/profesor/horarios/eliminar/:id', authMiddleware, profesorMiddleware, 
     const horarioId = req.params.id;
     const profesorId = req.session.usuario.uid;    
     try {
-        // Verificar que el horario pertenece al profesor
         const horarioDoc = await db.collection(COLLECTIONS.HORARIOS).doc(horarioId).get();
         
         if (!horarioDoc.exists || horarioDoc.data().profesorId !== profesorId) {
@@ -560,7 +542,6 @@ app.get('/profesor/calendario', authMiddleware, profesorMiddleware, async (req, 
         const profesorId = req.session.usuario.uid;        
         console.log('📅 Cargando calendario para profesor:', profesorId);
         
-        // Obtener TODAS las reservas del profesor
         const reservasSnapshot = await db.collection(COLLECTIONS.RESERVAS)
             .where('profesorId', '==', profesorId)
             .orderBy('fecha', 'desc')
@@ -570,7 +551,6 @@ app.get('/profesor/calendario', authMiddleware, profesorMiddleware, async (req, 
         const reservas = [];
         reservasSnapshot.forEach(doc => {
             const data = doc.data();
-            // Filtrar para NO mostrar las canceladas
             if (data.estado !== 'cancelada') {
                 reservas.push({ id: doc.id, ...data });
             }
@@ -592,15 +572,11 @@ app.get('/profesor/calendario', authMiddleware, profesorMiddleware, async (req, 
 
 // ============ RUTAS DE RESERVAS DE PROFESOR ============
 
-/**
- * VER TODAS LAS RESERVAS DEL PROFESOR
- */
 app.get('/profesor/reservas', authMiddleware, profesorMiddleware, async (req, res) => {
     try {
         const profesorId = req.session.usuario.uid;        
         console.log('📋 Cargando todas las reservas para profesor:', profesorId);
         
-        // Obtener todas las reservas del profesor (no solo pendientes)
         const reservasSnapshot = await db.collection(COLLECTIONS.RESERVAS)
             .where('profesorId', '==', profesorId)
             .orderBy('fecha', 'desc')
@@ -614,7 +590,6 @@ app.get('/profesor/reservas', authMiddleware, profesorMiddleware, async (req, re
         
         console.log(`✅ Encontradas ${reservas.length} reservas totales`);
         
-        // Separar reservas por estado
         const reservasPendientes = reservas.filter(r => r.estado === 'pendiente' || r.estado === 'confirmada');
         const reservasHistorial = reservas.filter(r => r.estado === 'cancelada' || r.estado === 'completada');
         
@@ -632,9 +607,6 @@ app.get('/profesor/reservas', authMiddleware, profesorMiddleware, async (req, re
     }
 });
 
-/**
- * CAMBIAR ESTADO DE UNA RESERVA (COMPLETAR/CANCELAR) - CON EMAIL DE CANCELACIÓN
- */
 app.post('/profesor/reservas/estado/:reservaId', authMiddleware, profesorMiddleware, async (req, res) => {
     const reservaId = req.params.reservaId;
     const { estado } = req.body;
@@ -642,7 +614,6 @@ app.post('/profesor/reservas/estado/:reservaId', authMiddleware, profesorMiddlew
     try {
         console.log(`🔄 Cambiando estado de reserva ${reservaId} a ${estado}`);
         
-        // Verificar que la reserva pertenece al profesor
         const reservaDoc = await db.collection(COLLECTIONS.RESERVAS).doc(reservaId).get();
         
         if (!reservaDoc.exists) {
@@ -657,34 +628,26 @@ app.post('/profesor/reservas/estado/:reservaId', authMiddleware, profesorMiddlew
             return res.redirect('/profesor/reservas');
         }
         
-        // Guardar estado anterior para saber si es cancelación
         const estadoAnterior = reservaData.estado;
         
-        // Actualizar estado
         await db.collection(COLLECTIONS.RESERVAS).doc(reservaId).update({
             estado: estado,
             fechaActualizacion: new Date().toISOString()
         });
         
-        // Si es una cancelación, enviar email al padre
         if (estado === 'cancelada' && estadoAnterior !== 'cancelada') {
             try {
-                // Importar servicio de email
                 const { enviarCancelacionPadre } = require('./backend/services/emailService');
                 
-                // Obtener datos del profesor para el email
                 const profesorDoc = await db.collection(COLLECTIONS.USUARIOS).doc(profesorId).get();
                 const profesor = profesorDoc.data();
                 
-                // Añadir nombre del profesor a los datos de la reserva
                 reservaData.profesorNombre = profesor.nombre;
                 
-                // Enviar email
                 await enviarCancelacionPadre(reservaData, profesor);
                 console.log('✅ Email de cancelación enviado al padre');
             } catch (emailError) {
                 console.error('❌ Error al enviar email de cancelación:', emailError);
-                // No detenemos el flujo si falla el email
             }
         }
         
@@ -719,7 +682,6 @@ app.get('/padre/profesores', authMiddleware, async (req, res) => {
         for (const doc of profesoresSnapshot.docs) {
             const profesor = doc.data();
             
-            // Contar horarios disponibles
             const horariosSnapshot = await db.collection(COLLECTIONS.HORARIOS)
                 .where('profesorId', '==', profesor.uid)
                 .where('activo', '==', true)
@@ -746,7 +708,6 @@ app.get('/padre/profesores', authMiddleware, async (req, res) => {
     }
 });
 
-// ============ RUTA DE RESERVA ============
 app.get('/padre/reservar/:profesorId', authMiddleware, async (req, res) => {
     const profesorId = req.params.profesorId;
     
@@ -754,14 +715,12 @@ app.get('/padre/reservar/:profesorId', authMiddleware, async (req, res) => {
     console.log('👤 Usuario actual:', req.session.usuario);
     
     try {
-        // Verificar que el usuario es padre
         if (req.session.usuario.tipo !== 'padre') {
             console.log('❌ Usuario no es padre, es:', req.session.usuario.tipo);
             req.flash('error', 'Acceso no autorizado');
             return res.redirect('/');
         }
         
-        // Verificar que el profesorId no está vacío
         if (!profesorId) {
             console.log('❌ profesorId vacío');
             req.flash('error', 'ID de profesor no válido');
@@ -770,7 +729,6 @@ app.get('/padre/reservar/:profesorId', authMiddleware, async (req, res) => {
         
         console.log('📚 Buscando profesor en Firestore con ID:', profesorId);
         
-        // Obtener datos del profesor
         const profesorDoc = await db.collection(COLLECTIONS.USUARIOS).doc(profesorId).get();
         
         if (!profesorDoc.exists) {
@@ -782,7 +740,6 @@ app.get('/padre/reservar/:profesorId', authMiddleware, async (req, res) => {
         const profesorData = profesorDoc.data();
         console.log('✅ Profesor encontrado:', profesorData.nombre);
         
-        // Verificar que el usuario es un profesor
         if (profesorData.tipo !== 'profesor') {
             console.log('❌ El usuario no es profesor, es:', profesorData.tipo);
             req.flash('error', 'El usuario seleccionado no es un profesor');
@@ -791,7 +748,6 @@ app.get('/padre/reservar/:profesorId', authMiddleware, async (req, res) => {
         
         const profesor = { id: profesorDoc.id, ...profesorData };
         
-        // Obtener horarios del profesor
         console.log('📅 Buscando horarios del profesor...');
         const horariosSnapshot = await db.collection(COLLECTIONS.HORARIOS)
             .where('profesorId', '==', profesorId)
@@ -804,7 +760,6 @@ app.get('/padre/reservar/:profesorId', authMiddleware, async (req, res) => {
         });
         console.log(`✅ Encontrados ${horarios.length} horarios`);
         
-        // Obtener TODAS las reservas existentes
         console.log('📖 Buscando TODAS las reservas existentes...');
         const reservasSnapshot = await db.collection(COLLECTIONS.RESERVAS)
             .where('profesorId', '==', profesorId)
@@ -823,7 +778,6 @@ app.get('/padre/reservar/:profesorId', authMiddleware, async (req, res) => {
         
         console.log(`✅ Encontradas ${reservas.length} reservas:`, reservas);
         
-        // Renderizar la vista
         console.log('🎨 Renderizando vista padre/reservas');
         res.render('padre/reservas', {
             titulo: `Reservar con ${profesor.nombre}`,
@@ -840,14 +794,12 @@ app.get('/padre/reservar/:profesorId', authMiddleware, async (req, res) => {
     }
 });
 
-// ============ RUTA DE CREAR RESERVA CON EMAIL DE CONFIRMACIÓN ============
 app.post('/api/padre/reservar', authMiddleware, async (req, res) => {
     const { profesorId, fecha, hora, nombrePadre, nombreAlumno, emailPadre, telefono, comentarios } = req.body;
     const reservaId = uuidv4();
     const tokenAcceso = uuidv4();
     
     try {
-        // Verificar disponibilidad
         const reservasSnapshot = await db.collection(COLLECTIONS.RESERVAS)
             .where('profesorId', '==', profesorId)
             .where('fecha', '==', fecha)
@@ -860,7 +812,6 @@ app.post('/api/padre/reservar', authMiddleware, async (req, res) => {
             return res.json({ error: 'Horario no disponible' });
         }
         
-        // Crear la reserva
         await db.collection(COLLECTIONS.RESERVAS).doc(reservaId).set({
             reservaId: reservaId,
             profesorId: profesorId,
@@ -877,16 +828,12 @@ app.post('/api/padre/reservar', authMiddleware, async (req, res) => {
             fechaReserva: new Date().toISOString()
         });
         
-        // Enviar email de confirmación
         try {
-            // Importar servicio de email
             const { enviarConfirmacion } = require('./backend/services/emailService');
             
-            // Obtener datos del profesor para el email
             const profesorDoc = await db.collection(COLLECTIONS.USUARIOS).doc(profesorId).get();
             const profesor = profesorDoc.data();
             
-            // Preparar datos de la reserva para el email
             const reservaData = {
                 reservaId: reservaId,
                 padreNombre: nombrePadre,
@@ -898,12 +845,10 @@ app.post('/api/padre/reservar', authMiddleware, async (req, res) => {
                 tokenAcceso: tokenAcceso
             };
             
-            // Enviar email
             await enviarConfirmacion(reservaData, profesor);
             console.log('✅ Email de confirmación enviado al padre');
         } catch (emailError) {
             console.error('❌ Error al enviar email de confirmación:', emailError);
-            // No detenemos el flujo si falla el email
         }
         
         res.json({
@@ -931,7 +876,6 @@ app.get('/confirmacion/:reservaId', authMiddleware, async (req, res) => {
         
         const reserva = reservaDoc.data();
         
-        // Obtener datos del profesor
         const profesorDoc = await db.collection(COLLECTIONS.USUARIOS).doc(reserva.profesorId).get();
         const profesor = profesorDoc.data();
         
@@ -949,7 +893,8 @@ app.get('/confirmacion/:reservaId', authMiddleware, async (req, res) => {
     }
 });
 
-// ============ RUTA DE CANCELACIÓN CORREGIDA CON DATOS DEL PROFESOR ============
+// ============ RUTAS DE CANCELACIÓN ============
+
 app.get('/cancelar/:token', async (req, res) => {
     const token = req.params.token;
     
@@ -966,11 +911,9 @@ app.get('/cancelar/:token', async (req, res) => {
         const reservaDoc = reservasSnapshot.docs[0];
         const reserva = reservaDoc.data();
         
-        // Obtener datos del profesor
         const profesorDoc = await db.collection(COLLECTIONS.USUARIOS).doc(reserva.profesorId).get();
         const profesor = profesorDoc.data();
         
-        // Añadir nombre del profesor a la reserva
         reserva.profesorNombre = profesor.nombre;
         
         res.render('cancelar', {
@@ -986,7 +929,6 @@ app.get('/cancelar/:token', async (req, res) => {
     }
 });
 
-// ============ RUTA DE CANCELACIÓN POST (CON NOTIFICACIÓN AL PROFESOR) ============
 app.post('/cancelar/:token', async (req, res) => {
     const token = req.params.token;
     
@@ -1003,7 +945,6 @@ app.post('/cancelar/:token', async (req, res) => {
         const reservaDoc = reservasSnapshot.docs[0];
         const reservaData = reservaDoc.data();
         
-        // Guardar estado anterior
         const estadoAnterior = reservaData.estado;
         
         await db.collection(COLLECTIONS.RESERVAS).doc(reservaDoc.id).update({
@@ -1011,31 +952,24 @@ app.post('/cancelar/:token', async (req, res) => {
             fechaCancelacion: new Date().toISOString()
         });
         
-        // Si no estaba ya cancelada, enviar emails
         if (estadoAnterior !== 'cancelada') {
             try {
-                // Obtener datos del profesor
                 const profesorDoc = await db.collection(COLLECTIONS.USUARIOS).doc(reservaData.profesorId).get();
                 const profesor = profesorDoc.data();
                 
-                // Obtener datos del padre
                 const padre = {
                     nombre: reservaData.padreNombre,
                     email: reservaData.padreEmail,
                     telefono: reservaData.padreTelefono || 'No especificado'
                 };
                 
-                // Añadir nombre del profesor a los datos de la reserva
                 reservaData.profesorNombre = profesor.nombre;
                 
-                // Importar servicios de email
                 const { enviarCancelacionPadre, enviarNotificacionProfesor } = require('./backend/services/emailService');
                 
-                // Enviar email de confirmación al padre
                 await enviarCancelacionPadre(reservaData, profesor);
                 console.log('✅ Email de confirmación de cancelación enviado al padre');
                 
-                // Enviar notificación al profesor
                 await enviarNotificacionProfesor(reservaData, profesor, padre);
                 console.log('✅ Notificación de cancelación enviada al profesor');
                 

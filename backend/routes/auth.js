@@ -1,22 +1,35 @@
 // backend/routes/auth.js
 const express = require('express');
 const router = express.Router();
-const admin = require('firebase-admin');
 
-// Verificar token de Firebase y crear sesión
+// Importar Firebase Admin (ajusta la ruta según tu estructura)
+const { db, auth, COLLECTIONS } = require('../lib/firebase-admin');
+
+// Ruta para verificar el login de Firebase
 router.post('/verify-login', async (req, res) => {
     try {
         const { idToken, tipo } = req.body;
         
-        // Verificar el token de Firebase
-        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        if (!idToken) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Token no proporcionado' 
+            });
+        }
+
+        console.log('🔍 Verificando token de Firebase...');
+        
+        // Verificar el token con Firebase Admin
+        const decodedToken = await auth.verifyIdToken(idToken);
         const uid = decodedToken.uid;
         
+        console.log('✅ Token verificado para UID:', uid);
+        
         // Buscar usuario en Firestore
-        const db = admin.firestore();
-        const userDoc = await db.collection('usuarios').doc(uid).get();
+        const userDoc = await db.collection(COLLECTIONS.USUARIOS).doc(uid).get();
         
         if (!userDoc.exists) {
+            console.log('❌ Usuario no encontrado en Firestore');
             return res.json({ 
                 success: false, 
                 error: 'Usuario no encontrado en la base de datos' 
@@ -24,51 +37,78 @@ router.post('/verify-login', async (req, res) => {
         }
         
         const userData = userDoc.data();
+        console.log('✅ Usuario encontrado:', userData.nombre);
         
-        // Verificar que el tipo coincida
+        // Verificar tipo de usuario
         if (userData.tipo !== tipo) {
+            console.log('❌ Tipo incorrecto. Esperado:', tipo, 'Obtenido:', userData.tipo);
             return res.json({ 
                 success: false, 
                 error: 'Tipo de usuario incorrecto' 
             });
         }
         
-        // Crear sesión
-        req.session.userId = uid;
-        req.session.userTipo = tipo;
-        req.session.userEmail = decodedToken.email;
+        // Guardar en sesión
+        req.session.usuario = {
+            uid: userData.uid,
+            nombre: userData.nombre,
+            nombreAlumno: userData.nombreAlumno || '',
+            email: userData.email,
+            tipo: userData.tipo,
+            telefono: userData.telefono,
+            curso: userData.curso || ''
+        };
         
-        // Determinar redirección
-        let redirect = '/dashboard';
-        if (tipo === 'profesor') {
-            redirect = '/dashboard/profesor';
-        } else {
-            redirect = '/dashboard/padre';
-        }
-        
-        res.json({ 
-            success: true, 
-            redirect: redirect,
-            user: {
-                uid: uid,
-                email: decodedToken.email,
-                tipo: tipo
+        // Guardar sesión explícitamente
+        req.session.save((err) => {
+            if (err) {
+                console.error('❌ Error guardando sesión:', err);
+                return res.json({ 
+                    success: false, 
+                    error: 'Error al crear sesión' 
+                });
             }
+            
+            console.log('✅ Sesión guardada para:', userData.nombre);
+            
+            // Determinar redirección
+            const redirect = tipo === 'profesor' ? '/profesor/dashboard' : '/padre/profesores';
+            
+            res.json({ 
+                success: true, 
+                redirect: redirect,
+                user: {
+                    uid: uid,
+                    email: decodedToken.email,
+                    nombre: userData.nombre,
+                    tipo: tipo
+                }
+            });
         });
         
     } catch (error) {
-        console.error('Error verificando token:', error);
-        res.json({ 
+        console.error('❌ Error en verify-login:', error);
+        
+        // Si el error es de token inválido
+        if (error.code === 'auth/id-token-expired') {
+            return res.status(401).json({ 
+                success: false, 
+                error: 'Token expirado' 
+            });
+        }
+        
+        if (error.code === 'auth/argument-error') {
+            return res.status(401).json({ 
+                success: false, 
+                error: 'Token inválido' 
+            });
+        }
+        
+        res.status(401).json({ 
             success: false, 
-            error: 'Token inválido o expirado' 
+            error: 'Error de autenticación' 
         });
     }
-});
-
-// Cerrar sesión
-router.post('/logout', async (req, res) => {
-    req.session.destroy();
-    res.json({ success: true });
 });
 
 module.exports = router;
