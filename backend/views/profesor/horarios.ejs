@@ -1,8 +1,8 @@
 <div class="dashboard-header">
-    <h1>Gestionar Horarios - <%= usuario.nombre %></h1>
+    <h1><%= __('gestionar_horarios') %> - <%= usuario.nombre %></h1>
     <div>
-        <a href="/profesor/dashboard" class="btn btn-secondary">Volver al panel</a>
-        <a href="/logout" class="btn btn-secondary">Cerrar sesión</a>
+        <a href="/profesor/dashboard" class="btn btn-secondary"><%= __('volver_panel') %></a>
+        <a href="/logout" class="btn btn-secondary"><%= __('cerrar_sesion') %></a>
     </div>
 </div>
 
@@ -16,24 +16,24 @@
 
 <div class="horarios-grid">
     <div class="horarios-card">
-        <h2>Agregar nuevo horario</h2>
+        <h2><%= __('agregar_nuevo_horario') %></h2>
         
         <form action="/profesor/horarios/agregar" method="POST" class="horario-form">
             <div class="form-group">
-                <label for="dia_semana">Día de la semana</label>
+                <label for="dia_semana"><%= __('dia_semana') %></label>
                 <select id="dia_semana" name="dia_semana" required>
-                    <option value="1">Lunes</option>
-                    <option value="2">Martes</option>
-                    <option value="3">Miércoles</option>
-                    <option value="4">Jueves</option>
-                    <option value="5">Viernes</option>
+                    <option value="1"><%= __('lunes') %></option>
+                    <option value="2"><%= __('martes') %></option>
+                    <option value="3"><%= __('miercoles') %></option>
+                    <option value="4"><%= __('jueves') %></option>
+                    <option value="5"><%= __('viernes') %></option>
                 </select>
             </div>
             
             <div class="form-group">
-                <label for="hora">Hora</label>
+                <label for="hora"><%= __('hora') %></label>
                 <select id="hora" name="hora" required>
-                    <option value="">Selecciona una hora</option>
+                    <option value=""><%= __('selecciona_hora') %></option>
                     <% for(let hora = 8; hora <= 19; hora++) { %>
                         <% for(let minuto of ['00', '30']) { %>
                             <option value="<%= hora.toString().padStart(2, '0') %>:<%= minuto %>">
@@ -45,27 +45,33 @@
                 </select>
             </div>
             
-            <button type="submit" class="btn btn-primary btn-block">Agregar horario</button>
+            <button type="submit" class="btn btn-primary btn-block"><%= __('agregar_horario') %></button>
         </form>
     </div>
     
     <div class="horarios-card">
-        <h2>Mis horarios actuales</h2>
+        <h2><%= __('mis_horarios') %></h2>
         
         <% if (horarios.length === 0) { %>
-            <p class="text-center">No tienes horarios configurados</p>
+            <p class="text-center"><%= __('no_hay_horarios') %></p>
         <% } else { %>
             <table class="horarios-tabla">
                 <thead>
                     <tr>
-                        <th>Día</th>
-                        <th>Hora</th>
-                        <th>Acción</th>
+                        <th><%= __('dia_semana') %></th>
+                        <th><%= __('hora') %></th>
+                        <th><%= __('accion') %></th>
                     </tr>
                 </thead>
                 <tbody>
                     <% 
-                        const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+                        const dias = [
+                            '<%= __("lunes") %>',
+                            '<%= __("martes") %>',
+                            '<%= __("miercoles") %>',
+                            '<%= __("jueves") %>',
+                            '<%= __("viernes") %>'
+                        ];
                         horarios.forEach(horario => { 
                     %>
                         <tr>
@@ -73,7 +79,7 @@
                             <td><%= horario.hora %></td>
                             <td>
                                 <form action="/profesor/horarios/eliminar/<%= horario.id %>" method="POST" style="display: inline;">
-                                    <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('¿Eliminar este horario?')">Eliminar</button>
+                                    <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('<%= __("confirmar_eliminacion") %>')"><%= __('eliminar') %></button>
                                 </form>
                             </td>
                         </tr>

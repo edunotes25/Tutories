@@ -1,8 +1,8 @@
 <div class="dashboard-header">
-    <h1>Calendario de Reservas - <%= usuario.nombre %></h1>
+    <h1><%= __('calendario_reservas') %> - <%= usuario.nombre %></h1>
     <div>
-        <a href="/profesor/dashboard" class="btn btn-secondary">Volver al panel</a>
-        <a href="/logout" class="btn btn-secondary">Cerrar sesión</a>
+        <a href="/profesor/dashboard" class="btn btn-secondary"><%= __('volver_panel') %></a>
+        <a href="/logout" class="btn btn-secondary"><%= __('cerrar_sesion') %></a>
     </div>
 </div>
 
@@ -15,33 +15,33 @@
 <% } %>
 
 <div class="calendario-container">
-    <h2>Visualización de reservas</h2>
+    <h2><%= __('visualizacion_reservas') %></h2>
     
-    <!-- Leyenda de colores (actualizada) -->
+    <!-- Leyenda de colores -->
     <div class="leyenda">
         <div class="leyenda-item">
             <span class="color-pendiente"></span>
-            <span>Pendiente/Confirmada</span>
+            <span><%= __('pendiente_confirmada') %></span>
         </div>
         <div class="leyenda-item">
             <span class="color-completada"></span>
-            <span>Completada</span>
+            <span><%= __('completada') %></span>
         </div>
         <div class="leyenda-item">
             <span class="color-cancelada" style="opacity: 0.3; text-decoration: line-through;"></span>
-            <span style="color: #999; text-decoration: line-through;">Cancelada (no visible)</span>
+            <span style="color: #999; text-decoration: line-through;"><%= __('cancelada_no_visible') %></span>
         </div>
     </div>
     
     <p class="info-importante">
-        <strong>Nota:</strong> Las reservas canceladas no se muestran en el calendario.
+        <strong><%= __('nota') %>:</strong> <%= __('reservas_canceladas_no_visibles') %>
     </p>
     
     <!-- Calendario -->
     <div class="calendario-navegacion">
-        <button class="btn-nav" id="btnMesAnterior">← Mes anterior</button>
+        <button class="btn-nav" id="btnMesAnterior">← <%= __('mes_anterior') %></button>
         <span class="mes-actual" id="mesActual"></span>
-        <button class="btn-nav" id="btnMesSiguiente">Mes siguiente →</button>
+        <button class="btn-nav" id="btnMesSiguiente"><%= __('mes_siguiente') %> →</button>
     </div>
     
     <div class="calendario-grid" id="calendario">
@@ -53,14 +53,14 @@
 <div id="modalReserva" class="modal" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Detalles de la reserva</h2>
+            <h2><%= __('detalles_reserva') %></h2>
             <span class="close">&times;</span>
         </div>
         <div class="modal-body" id="modalDetalles">
             <!-- Contenido dinámico -->
         </div>
         <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="document.getElementById('modalReserva').style.display='none'">Cerrar</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('modalReserva').style.display='none'"><%= __('cerrar') %></button>
         </div>
     </div>
 </div>
@@ -411,8 +411,32 @@ let reservas = <%- JSON.stringify(todasReservas) %>;
 
 console.log('Reservas activas (excluyendo canceladas):', reservas.length);
 
-// Días de la semana en español
-const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+// Días de la semana traducidos
+const diasSemana = [
+    '<%= __("lunes") %>',
+    '<%= __("martes") %>',
+    '<%= __("miercoles") %>',
+    '<%= __("jueves") %>',
+    '<%= __("viernes") %>',
+    '<%= __("sabado") %>',
+    '<%= __("domingo") %>'
+];
+
+// Meses del año traducidos
+const meses = [
+    '<%= __("enero") %>',
+    '<%= __("febrero") %>',
+    '<%= __("marzo") %>',
+    '<%= __("abril") %>',
+    '<%= __("mayo") %>',
+    '<%= __("junio") %>',
+    '<%= __("julio") %>',
+    '<%= __("agosto") %>',
+    '<%= __("septiembre") %>',
+    '<%= __("octubre") %>',
+    '<%= __("noviembre") %>',
+    '<%= __("diciembre") %>'
+];
 
 // Inicializar calendario
 document.addEventListener('DOMContentLoaded', function() {
@@ -449,7 +473,6 @@ function renderizarCalendario(fecha) {
     const mes = fecha.getMonth();
     
     // Actualizar título del mes
-    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
     document.getElementById('mesActual').textContent = `${meses[mes]} ${año}`;
     
     // Primer día del mes
@@ -489,13 +512,13 @@ function renderizarCalendario(fecha) {
             reservasDia.slice(0, 3).forEach(reserva => {
                 let hora = reserva.hora;
                 let estado = reserva.estado;
-                let nombreAlumno = reserva.nombreAlumno ? reserva.nombreAlumno.substring(0, 8) : 'Alumno';
+                let nombreAlumno = reserva.nombreAlumno ? reserva.nombreAlumno.substring(0, 8) : '<%= __("alumno") %>';
                 
                 html += `<div class="reserva-mini ${estado}" title="${hora} - ${reserva.padreNombre}">${hora} ${nombreAlumno}</div>`;
             });
             
             if (reservasDia.length > 3) {
-                html += `<div class="reserva-mini" style="background: #6c757d;">+${reservasDia.length - 3} más</div>`;
+                html += `<div class="reserva-mini" style="background: #6c757d;">+${reservasDia.length - 3} <%= __("mas") %></div>`;
             }
         }
         
@@ -510,27 +533,27 @@ function mostrarReservasDia(fecha) {
     const reservasDia = reservas.filter(r => r.fecha === fecha);
     
     if (reservasDia.length === 0) {
-        alert('No hay reservas activas para este día');
+        alert('<%= __("no_reservas_activas") %>');
         return;
     }
     
-    let html = `<p><strong>Fecha:</strong> ${new Date(fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>`;
-    html += `<p><strong>Total reservas activas:</strong> ${reservasDia.length}</p>`;
+    let html = `<p><strong><%= __("fecha") %>:</strong> ${new Date(fecha).toLocaleDateString('<%= __("locale_date") %>', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>`;
+    html += `<p><strong><%= __("total_reservas_activas") %>:</strong> ${reservasDia.length}</p>`;
     
     reservasDia.forEach((reserva, index) => {
-        html += `<div class="reserva-separador">Reserva ${index + 1} - ${reserva.hora} (${reserva.estado})</div>`;
+        html += `<div class="reserva-separador"><%= __("reserva") %> ${index + 1} - ${reserva.hora} (${reserva.estado})</div>`;
         
-        html += `<div class="modal-detalle-item"><span class="modal-detalle-label">Estado:</span><span class="modal-detalle-valor"><strong>${reserva.estado}</strong></span></div>`;
-        html += `<div class="modal-detalle-item"><span class="modal-detalle-label">Padre:</span><span class="modal-detalle-valor">${reserva.padreNombre}</span></div>`;
-        html += `<div class="modal-detalle-item"><span class="modal-detalle-label">Email:</span><span class="modal-detalle-valor">${reserva.padreEmail}</span></div>`;
-        html += `<div class="modal-detalle-item"><span class="modal-detalle-label">Alumno:</span><span class="modal-detalle-valor">${reserva.nombreAlumno || 'No especificado'}</span></div>`;
+        html += `<div class="modal-detalle-item"><span class="modal-detalle-label"><%= __("estado") %>:</span><span class="modal-detalle-valor"><strong>${reserva.estado}</strong></span></div>`;
+        html += `<div class="modal-detalle-item"><span class="modal-detalle-label"><%= __("padre") %>:</span><span class="modal-detalle-valor">${reserva.padreNombre}</span></div>`;
+        html += `<div class="modal-detalle-item"><span class="modal-detalle-label"><%= __("email") %>:</span><span class="modal-detalle-valor">${reserva.padreEmail}</span></div>`;
+        html += `<div class="modal-detalle-item"><span class="modal-detalle-label"><%= __("alumno") %>:</span><span class="modal-detalle-valor">${reserva.nombreAlumno || '<%= __("no_especificado") %>'}</span></div>`;
         if (reserva.padreTelefono) {
-            html += `<div class="modal-detalle-item"><span class="modal-detalle-label">Teléfono:</span><span class="modal-detalle-valor">${reserva.padreTelefono}</span></div>`;
+            html += `<div class="modal-detalle-item"><span class="modal-detalle-label"><%= __("telefono") %>:</span><span class="modal-detalle-valor">${reserva.padreTelefono}</span></div>`;
         }
         if (reserva.comentarios) {
-            html += `<div class="modal-detalle-item"><span class="modal-detalle-label">Comentarios:</span><span class="modal-detalle-valor">${reserva.comentarios}</span></div>`;
+            html += `<div class="modal-detalle-item"><span class="modal-detalle-label"><%= __("comentarios") %>:</span><span class="modal-detalle-valor">${reserva.comentarios}</span></div>`;
         }
-        html += `<div class="modal-detalle-item"><span class="modal-detalle-label">ID Reserva:</span><span class="modal-detalle-valor">${reserva.reservaId.substring(0, 8).toUpperCase()}</span></div>`;
+        html += `<div class="modal-detalle-item"><span class="modal-detalle-label"><%= __("id_reserva") %>:</span><span class="modal-detalle-valor">${reserva.reservaId.substring(0, 8).toUpperCase()}</span></div>`;
     });
     
     document.getElementById('modalDetalles').innerHTML = html;

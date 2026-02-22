@@ -1,6 +1,6 @@
 <div class="dashboard-header">
-    <h1>Profesores Disponibles</h1>
-    <a href="/logout" class="btn btn-secondary">Cerrar sesión</a>
+    <h1><%= __('profesores_disponibles') %></h1>
+    <a href="/logout" class="btn btn-secondary"><%= __('cerrar_sesion') %></a>
 </div>
 
 <% if (error && error.length > 0) { %>
@@ -14,29 +14,29 @@
 <div class="profesores-grid">
     <% if (profesores.length === 0) { %>
         <div class="no-profesores">
-            <p>No hay profesores registrados en el sistema</p>
+            <p><%= __('no_profesores_registrados') %></p>
         </div>
     <% } else { %>
         <% profesores.forEach(profesor => { %>
             <div class="profesor-card">
                 <div class="profesor-header">
                     <h3><%= profesor.nombre %></h3>
-                    <span class="badge"><%= profesor.curso || 'Sin curso' %></span>
+                    <span class="badge"><%= profesor.curso || __('sin_curso') %></span>
                 </div>
                 <div class="profesor-body">
-                    <p><strong>Email:</strong> <%= profesor.email %></p>
+                    <p><strong><%= __('email') %>:</strong> <%= profesor.email %></p>
                     <% if (profesor.telefono) { %>
-                        <p><strong>Teléfono:</strong> <%= profesor.telefono %></p>
+                        <p><strong><%= __('telefono') %>:</strong> <%= profesor.telefono %></p>
                     <% } %>
                     <% if (profesor.descripcion) { %>
                         <p class="descripcion"><%= profesor.descripcion %></p>
                     <% } %>
                     <p class="horarios-info">
-                        <strong>Horarios disponibles:</strong> 
+                        <strong><%= __('horarios_disponibles') %>:</strong> 
                         <span class="badge-disponibles"><%= profesor.totalHorarios || 0 %></span>
                     </p>
                     <a href="/padre/reservar/<%= profesor.uid %>" class="btn btn-primary btn-block">
-                        Reservar tutoría
+                        <%= __('reservar_tutoria') %>
                     </a>
                 </div>
             </div>

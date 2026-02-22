@@ -19,6 +19,7 @@ const expressLayouts = require('express-ejs-layouts');
 const flash = require('connect-flash');
 const { v4: uuidv4 } = require('uuid');
 const axios = require('axios');
+const i18n = require('i18n'); // 👈 AÑADIDO
 require('dotenv').config();
 
 // Importar configuración de Firebase
@@ -59,10 +60,32 @@ app.use(express.json());
 app.use(cookieParser());
 
 // IMPORTANTE: Configurar trust proxy para Vercel
-// Esto permite que las cookies funcionen correctamente detrás del proxy de Vercel
 app.set('trust proxy', 1);
 
-// Configuración de sesiones - VERSIÓN CORREGIDA (SIN DOMAIN)
+// ============ CONFIGURACIÓN DE IDIOMAS (i18n) - AÑADIDO ============
+i18n.configure({
+    locales: ['es', 'ca', 'en'],
+    directory: path.join(__dirname, 'backend/locales'),
+    defaultLocale: 'es',
+    cookie: 'lang',
+    queryParameter: 'lang',
+    autoReload: true,
+    updateFiles: false,
+    objectNotation: true
+});
+
+// Inicializar i18n
+app.use(i18n.init);
+
+// Middleware para pasar i18n a las vistas y guardar idioma en cookie
+app.use((req, res, next) => {
+    // Guardar idioma actual en res.locals para las vistas
+    res.locals.locale = req.getLocale();
+    next();
+});
+// ============ FIN CONFIGURACIÓN IDIOMAS ============
+
+// Configuración de sesiones
 if (process.env.NODE_ENV === 'production') {
     console.log('🔧 Configurando sesiones para producción (Vercel)');
     app.use(session({
@@ -118,7 +141,7 @@ app.set('layout', 'layout');
 // Archivos estáticos
 app.use(express.static(path.join(__dirname, 'backend/public')));
 
-// Middleware para pasar variables de entorno a las vistas
+// Middleware para pasar variables a las vistas
 app.use((req, res, next) => {
     res.locals.usuario = req.session.usuario || null;
     res.locals.error = req.flash('error');
@@ -138,7 +161,7 @@ app.use((req, res, next) => {
 // ============ RUTAS DE AUTENTICACIÓN ============
 app.use('/auth', authRoutes);
 
-// Middleware de autenticación MEJORADO con logs
+// Middleware de autenticación
 const authMiddleware = (req, res, next) => {
     console.log('='.repeat(50));
     console.log('🔐 MIDDLEWARE DE AUTENTICACIÓN');
@@ -194,7 +217,7 @@ app.get('/debug-session', (req, res) => {
 
 app.get('/', (req, res) => {
     res.render('index', { 
-        titulo: 'Bienvenido - Sistema de Tutorías'
+        titulo: res.__('titulo') // Usando i18n
     });
 });
 
@@ -203,23 +226,23 @@ app.get('/login', (req, res) => {
         return res.redirect(req.session.usuario.tipo === 'profesor' ? '/profesor/dashboard' : '/padre/profesores');
     }
     res.render('login', { 
-        titulo: 'Iniciar Sesión',
+        titulo: res.__('iniciar_sesion'),
         error: null,
         success: null
     });
 });
 
 app.get('/registro', (req, res) => {
-    res.render('registro', { titulo: 'Registro de Profesor' });
+    res.render('registro', { titulo: res.__('registro_profesor') });
 });
 
 app.get('/registro-padre', (req, res) => {
-    res.render('registro-padre', { titulo: 'Registro de Padre/Madre' });
+    res.render('registro-padre', { titulo: res.__('registro_padre') });
 });
 
 app.get('/aviso-privacidad', (req, res) => {
     res.render('aviso-privacidad', {
-        titulo: 'Aviso de Privacidad - RGPD'
+        titulo: res.__('aviso_privacidad')
     });
 });
 
@@ -534,7 +557,7 @@ app.get('/profesor/dashboard', authMiddleware, profesorMiddleware, async (req, r
         console.log('📊 Dashboard profesor - Reservas:', reservas.length, 'Horarios:', horarios.length);
         
         res.render('profesor/dashboard', {
-            titulo: 'Panel del Profesor',
+            titulo: res.__('panel_profesor'),
             reservas: reservas,
             horarios: horarios
         });
@@ -563,7 +586,7 @@ app.get('/profesor/horarios', authMiddleware, profesorMiddleware, async (req, re
         console.log('✅ Encontrados', horarios.length, 'horarios');
         
         res.render('profesor/horarios', {
-            titulo: 'Gestionar Horarios',
+            titulo: res.__('gestionar_horarios'),
             horarios: horarios
         });
         
@@ -574,7 +597,7 @@ app.get('/profesor/horarios', authMiddleware, profesorMiddleware, async (req, re
     }
 });
 
-// ============ RUTA CORREGIDA PARA AGREGAR HORARIOS CON VALIDACIÓN ============
+// ============ RUTA PARA AGREGAR HORARIOS CON VALIDACIÓN ============
 app.post('/profesor/horarios/agregar', authMiddleware, profesorMiddleware, async (req, res) => {
     const { dia_semana, hora } = req.body;
     const profesorId = req.session.usuario.uid;
@@ -596,11 +619,11 @@ app.post('/profesor/horarios/agregar', authMiddleware, profesorMiddleware, async
             createdAt: new Date().toISOString()
         });
         
-        req.flash('success', 'Horario agregado correctamente');
+        req.flash('success', res.__('horario_agregado'));
         
     } catch (error) {
         console.error('❌ Error al agregar horario:', error);
-        req.flash('error', 'Error al agregar horario');
+        req.flash('error', res.__('error_agregar_horario'));
     }
     
     res.redirect('/profesor/horarios');
@@ -618,11 +641,11 @@ app.post('/profesor/horarios/eliminar/:id', authMiddleware, profesorMiddleware, 
         }
         
         await db.collection(COLLECTIONS.HORARIOS).doc(horarioId).delete();
-        req.flash('success', 'Horario eliminado correctamente');
+        req.flash('success', res.__('horario_eliminado'));
         
     } catch (error) {
         console.error('❌ Error al eliminar horario:', error);
-        req.flash('error', 'Error al eliminar horario');
+        req.flash('error', res.__('error_eliminar_horario'));
     }
     
     res.redirect('/profesor/horarios');
@@ -651,7 +674,7 @@ app.get('/profesor/calendario', authMiddleware, profesorMiddleware, async (req, 
         console.log(`✅ Calendario: mostrando ${reservas.length} reservas (excluyendo canceladas)`);
         
         res.render('profesor/calendario', {
-            titulo: 'Calendario de Reservas',
+            titulo: res.__('calendario_reservas'),
             todasReservas: reservas
         });
         
@@ -686,7 +709,7 @@ app.get('/profesor/reservas', authMiddleware, profesorMiddleware, async (req, re
         const reservasHistorial = reservas.filter(r => r.estado === 'cancelada' || r.estado === 'completada');
         
         res.render('profesor/reservas', {
-            titulo: 'Mis Reservas',
+            titulo: res.__('mis_reservas'),
             reservasPendientes: reservasPendientes,
             reservasHistorial: reservasHistorial,
             todasReservas: reservas
@@ -789,7 +812,7 @@ app.get('/padre/profesores', authMiddleware, async (req, res) => {
         console.log('✅ Encontrados', profesores.length, 'profesores');
         
         res.render('padre/profesores', {
-            titulo: 'Profesores Disponibles',
+            titulo: res.__('profesores_disponibles'),
             profesores: profesores
         });
         
@@ -872,7 +895,7 @@ app.get('/padre/reservar/:profesorId', authMiddleware, async (req, res) => {
         
         console.log('🎨 Renderizando vista padre/reservas');
         res.render('padre/reservas', {
-            titulo: `Reservar con ${profesor.nombre}`,
+            titulo: res.__('reservar_con') + ' ' + profesor.nombre,
             profesor: profesor,
             horarios: horarios,
             reservas: reservas
@@ -974,7 +997,7 @@ app.get('/confirmacion/:reservaId', authMiddleware, async (req, res) => {
         reserva.profesorNombre = profesor.nombre;
         
         res.render('padre/confirmacion', {
-            titulo: 'Reserva Confirmada',
+            titulo: res.__('reserva_confirmada'),
             reserva: reserva
         });
         
@@ -1009,7 +1032,7 @@ app.get('/cancelar/:token', async (req, res) => {
         reserva.profesorNombre = profesor.nombre;
         
         res.render('cancelar', {
-            titulo: 'Cancelar Reserva',
+            titulo: res.__('cancelar_reserva'),
             reserva: reserva,
             token: token,
             reservaId: reservaDoc.id

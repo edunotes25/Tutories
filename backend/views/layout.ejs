@@ -14,6 +14,13 @@
     <meta name="robots" content="noindex, nofollow">
 </head>
 <body>
+    <!-- Selector de idiomas (arriba del todo) -->
+    <div class="idiomas">
+        <a href="?lang=es" class="<%= locale === 'es' ? 'active' : '' %>">🇪🇸 Español</a>
+        <a href="?lang=ca" class="<%= locale === 'ca' ? 'active' : '' %>">🇦🇩 Català</a>
+        <a href="?lang=en" class="<%= locale === 'en' ? 'active' : '' %>">🇬🇧 English</a>
+    </div>
+    
     <%- include('partials/header') %>
     
     <main class="container">
@@ -22,6 +29,37 @@
     
     <%- include('partials/footer') %>
     
-    
+    <style>
+    .idiomas {
+        display: flex;
+        gap: 10px;
+        padding: 10px 20px;
+        justify-content: flex-end;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .idiomas a {
+        padding: 5px 12px;
+        text-decoration: none;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.15);
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    .idiomas a:hover {
+        background: rgba(255,255,255,0.3);
+        transform: translateY(-2px);
+    }
+    .idiomas a.active {
+        background: white;
+        color: #4a90e2;
+        border-color: white;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    </style>
 </body>
 </html>

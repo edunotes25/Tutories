@@ -1,8 +1,8 @@
 <div class="dashboard-header">
-    <h1>Mis Reservas</h1>
+    <h1><%= __('mis_reservas') %></h1>
     <div>
-        <a href="/profesor/dashboard" class="btn btn-secondary">Volver al panel</a>
-        <a href="/logout" class="btn btn-secondary">Cerrar sesión</a>
+        <a href="/profesor/dashboard" class="btn btn-secondary"><%= __('volver_panel') %></a>
+        <a href="/logout" class="btn btn-secondary"><%= __('cerrar_sesion') %></a>
     </div>
 </div>
 
@@ -15,42 +15,42 @@
 <% } %>
 
 <div class="reservas-tabs">
-    <button class="tab-btn active" onclick="mostrarTab('pendientes')">Pendientes (<%= reservasPendientes.length %>)</button>
-    <button class="tab-btn" onclick="mostrarTab('historial')">Historial (<%= reservasHistorial.length %>)</button>
+    <button class="tab-btn active" onclick="mostrarTab('pendientes')"><%= __('pendientes') %> (<%= reservasPendientes.length %>)</button>
+    <button class="tab-btn" onclick="mostrarTab('historial')"><%= __('historial') %> (<%= reservasHistorial.length %>)</button>
 </div>
 
 <div id="pendientes" class="tab-content active">
-    <h2>Reservas Pendientes</h2>
+    <h2><%= __('reservas_pendientes') %></h2>
     
     <% if (reservasPendientes.length === 0) { %>
-        <p class="text-center">No tienes reservas pendientes</p>
+        <p class="text-center"><%= __('no_reservas_pendientes') %></p>
     <% } else { %>
         <div class="reservas-grid">
             <% reservasPendientes.forEach(reserva => { %>
                 <div class="reserva-card">
                     <div class="reserva-header">
-                        <span class="fecha"><%= new Date(reserva.fecha).toLocaleDateString('es-ES') %></span>
+                        <span class="fecha"><%= new Date(reserva.fecha).toLocaleDateString(__('locale_date')) %></span>
                         <span class="hora"><%= reserva.hora %></span>
-                        <span class="estado <%= reserva.estado %>"><%= reserva.estado %></span>
+                        <span class="estado <%= reserva.estado %>"><%= __(reserva.estado) %></span>
                     </div>
                     <div class="reserva-body">
-                        <p><strong>Padre/Madre:</strong> <%= reserva.padreNombre %></p>
-                        <p><strong>Email:</strong> <%= reserva.padreEmail %></p>
+                        <p><strong><%= __('padre') %>:</strong> <%= reserva.padreNombre %></p>
+                        <p><strong><%= __('email') %>:</strong> <%= reserva.padreEmail %></p>
                         <% if (reserva.padreTelefono) { %>
-                            <p><strong>Teléfono:</strong> <%= reserva.padreTelefono %></p>
+                            <p><strong><%= __('telefono') %>:</strong> <%= reserva.padreTelefono %></p>
                         <% } %>
                         <% if (reserva.comentarios) { %>
-                            <p><strong>Comentarios:</strong> <%= reserva.comentarios %></p>
+                            <p><strong><%= __('comentarios') %>:</strong> <%= reserva.comentarios %></p>
                         <% } %>
                     </div>
                     <div class="reserva-acciones">
                         <form action="/profesor/reservas/estado/<%= reserva.reservaId %>" method="POST" style="display: inline;">
                             <input type="hidden" name="estado" value="completada">
-                            <button type="submit" class="btn btn-success btn-small" onclick="return confirm('¿Marcar esta reserva como completada?')">✓ Completada</button>
+                            <button type="submit" class="btn btn-success btn-small" onclick="return confirm('<%= __("confirmar_completada") %>')">✓ <%= __('completada') %></button>
                         </form>
                         <form action="/profesor/reservas/estado/<%= reserva.reservaId %>" method="POST" style="display: inline;">
                             <input type="hidden" name="estado" value="cancelada">
-                            <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('¿Cancelar esta reserva?')">✗ Cancelar</button>
+                            <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('<%= __("confirmar_cancelar") %>')">✗ <%= __('cancelar') %></button>
                         </form>
                     </div>
                 </div>
@@ -60,22 +60,22 @@
 </div>
 
 <div id="historial" class="tab-content">
-    <h2>Historial de Reservas</h2>
+    <h2><%= __('historial_reservas') %></h2>
     
     <% if (reservasHistorial.length === 0) { %>
-        <p class="text-center">No hay reservas en el historial</p>
+        <p class="text-center"><%= __('no_historial') %></p>
     <% } else { %>
         <div class="reservas-grid">
             <% reservasHistorial.forEach(reserva => { %>
                 <div class="reserva-card historial">
                     <div class="reserva-header">
-                        <span class="fecha"><%= new Date(reserva.fecha).toLocaleDateString('es-ES') %></span>
+                        <span class="fecha"><%= new Date(reserva.fecha).toLocaleDateString(__('locale_date')) %></span>
                         <span class="hora"><%= reserva.hora %></span>
-                        <span class="estado <%= reserva.estado %>"><%= reserva.estado %></span>
+                        <span class="estado <%= reserva.estado %>"><%= __(reserva.estado) %></span>
                     </div>
                     <div class="reserva-body">
-                        <p><strong>Padre/Madre:</strong> <%= reserva.padreNombre %></p>
-                        <p><strong>Email:</strong> <%= reserva.padreEmail %></p>
+                        <p><strong><%= __('padre') %>:</strong> <%= reserva.padreNombre %></p>
+                        <p><strong><%= __('email') %>:</strong> <%= reserva.padreEmail %></p>
                     </div>
                 </div>
             <% }) %>

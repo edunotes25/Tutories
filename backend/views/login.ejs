@@ -1,5 +1,5 @@
 <div class="auth-container">
-    <h1 id="tituloLogin">Iniciar Sesión</h1>
+    <h1 id="tituloLogin"><%= __('iniciar_sesion') %></h1>
     
     <% if (error && error.length > 0) { %>
         <div class="alerta error"><%= error %></div>
@@ -14,28 +14,28 @@
     
     <div id="loading-spinner" style="display: none; text-align: center; margin: 20px 0;">
         <div class="spinner"></div>
-        <p>Iniciando sesión...</p>
+        <p><%= __('iniciando_sesion') %></p>
     </div>
     
     <form id="login-form" class="auth-form">
         <div class="form-group">
-            <label for="email">Email</label>
+            <label for="email"><%= __('email') %></label>
             <input type="email" id="email" name="email" required placeholder="tu@email.com">
         </div>
         
         <div class="form-group">
-            <label for="password">Contraseña</label>
+            <label for="password"><%= __('contraseña') %></label>
             <input type="password" id="password" name="password" required>
         </div>
         
         <input type="hidden" name="tipo" id="tipoInput" value="padre">
         
-        <button type="submit" class="btn btn-primary btn-block" id="submit-btn">Iniciar Sesión</button>
+        <button type="submit" class="btn btn-primary btn-block" id="submit-btn"><%= __('iniciar_sesion') %></button>
     </form>
     
     <div class="auth-links">
-        <p id="registroLink">¿No tienes cuenta? <a href="/registro-padre">Regístrate aquí</a></p>
-        <p><a href="/">← Volver al inicio</a></p>
+        <p id="registroLink"><%= __('no_tienes_cuenta') %> <a href="/registro-padre"><%= __('registrate_aqui') %></a></p>
+        <p><a href="/">← <%= __('volver_inicio') %></a></p>
     </div>
 </div>
 
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Verificar que firebase está disponible
     if (typeof firebase === 'undefined') {
         console.error('❌ Firebase no está disponible');
-        document.getElementById('firebase-error').textContent = 'Error cargando Firebase. Recarga la página.';
+        document.getElementById('firebase-error').textContent = '<%= __("error_firebase") %>';
         document.getElementById('firebase-error').style.display = 'block';
         return;
     }
@@ -107,11 +107,11 @@ document.addEventListener('DOMContentLoaded', () => {
     tipoInput.value = tipo;
     
     if (tipo === 'profesor') {
-        titulo.innerText = 'Iniciar Sesión - Profesor';
-        registroLink.innerHTML = '¿No tienes cuenta? <a href="/registro">Regístrate como profesor</a>';
+        titulo.innerText = '<%= __("iniciar_sesion_profesor") %>';
+        registroLink.innerHTML = '<%= __("no_tienes_cuenta") %> <a href="/registro"><%= __("registrate_profesor") %></a>';
     } else {
-        titulo.innerText = 'Iniciar Sesión - Padre/Madre';
-        registroLink.innerHTML = '¿No tienes cuenta? <a href="/registro-padre">Regístrate como padre</a>';
+        titulo.innerText = '<%= __("iniciar_sesion_padre") %>';
+        registroLink.innerHTML = '<%= __("no_tienes_cuenta") %> <a href="/registro-padre"><%= __("registrate_padre") %></a>';
     }
     
     function showMessage(element, message, isSuccess = false) {
@@ -133,11 +133,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isLoading) {
             loadingSpinner.style.display = 'block';
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Iniciando sesión...';
+            submitBtn.textContent = '<%= __("iniciando_sesion") %>';
         } else {
             loadingSpinner.style.display = 'none';
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Iniciar Sesión';
+            submitBtn.textContent = '<%= __("iniciar_sesion") %>';
         }
     }
     
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!email || !password) {
             console.log('❌ Campos vacíos');
-            showMessage(firebaseError, 'Completa todos los campos');
+            showMessage(firebaseError, '<%= __("completa_campos") %>');
             return;
         }
         
@@ -193,14 +193,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('❌ Error parseando JSON:', parseError);
                 const textResponse = await response.text();
                 console.error('📄 Respuesta raw:', textResponse.substring(0, 200));
-                throw new Error('Respuesta del servidor no válida');
+                throw new Error('<%= __("error_respuesta_servidor") %>');
             }
             
             if (data.success) {
                 console.log('✅ Verificación exitosa!');
                 console.log('➡️ Redirigiendo a:', data.redirect);
                 
-                showMessage(firebaseSuccess, '¡Login exitoso! Redirigiendo...', true);
+                showMessage(firebaseSuccess, '<%= __("login_exitoso") %>', true);
                 
                 // Redirigir después de 1 segundo
                 setTimeout(() => {
@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 console.log('❌ Verificación falló:', data.error);
                 await auth.signOut();
-                showMessage(firebaseError, data.error || 'Error de verificación');
+                showMessage(firebaseError, data.error || '<%= __("error_verificacion") %>');
                 setLoading(false);
             }
         } catch (error) {
@@ -224,23 +224,23 @@ document.addEventListener('DOMContentLoaded', () => {
             
             setLoading(false);
             
-            let mensaje = 'Error al iniciar sesión';
+            let mensaje = '<%= __("error_iniciar_sesion") %>';
             
             // Manejo específico de errores de Firebase
             if (error.code === 'auth/user-not-found') {
-                mensaje = 'Usuario no encontrado';
+                mensaje = '<%= __("error_usuario_no_encontrado") %>';
             } else if (error.code === 'auth/wrong-password') {
-                mensaje = 'Contraseña incorrecta';
+                mensaje = '<%= __("error_contraseña_incorrecta") %>';
             } else if (error.code === 'auth/invalid-email') {
-                mensaje = 'Email inválido';
+                mensaje = '<%= __("error_email_invalido") %>';
             } else if (error.code === 'auth/too-many-requests') {
-                mensaje = 'Demasiados intentos fallidos. Intenta más tarde';
+                mensaje = '<%= __("error_demasiados_intentos") %>';
             } else if (error.code === 'auth/invalid-credential') {
-                mensaje = 'Credenciales inválidas. Verifica tu email y contraseña';
+                mensaje = '<%= __("error_credenciales_invalidas") %>';
             } else if (error.code === 'auth/network-request-failed') {
-                mensaje = 'Error de red. Verifica tu conexión';
+                mensaje = '<%= __("error_red") %>';
             } else if (error.message.includes('Failed to fetch')) {
-                mensaje = 'Error de conexión con el servidor';
+                mensaje = '<%= __("error_conexion_servidor") %>';
             }
             
             showMessage(firebaseError, mensaje);
@@ -262,7 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <style>
-/* Tus estilos existentes - sin cambios */
 .auth-container {
     max-width: 400px;
     margin: 40px auto;
