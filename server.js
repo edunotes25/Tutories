@@ -3,6 +3,9 @@ console.log('=== DEBUG ENV VARS ===');
 console.log('FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID ? '✓ presente' : '✗ faltante');
 console.log('FIREBASE_CLIENT_EMAIL:', process.env.FIREBASE_CLIENT_EMAIL ? '✓ presente' : '✗ faltante');
 console.log('FIREBASE_PRIVATE_KEY:', process.env.FIREBASE_PRIVATE_KEY ? '✓ presente' : '✗ faltante');
+console.log('NEXT_PUBLIC_FIREBASE_API_KEY:', process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? '✓ presente' : '✗ faltante');
+console.log('NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:', process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ? '✓ presente' : '✗ faltante');
+console.log('NEXT_PUBLIC_FIREBASE_PROJECT_ID:', process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ? '✓ presente' : '✗ faltante');
 console.log('REGISTRO_PROFESOR_CODE:', process.env.REGISTRO_PROFESOR_CODE ? '✓ presente' : '✗ faltante');
 console.log('SESSION_SECRET:', process.env.SESSION_SECRET ? '✓ presente' : '✗ faltante');
 
@@ -15,6 +18,7 @@ const rateLimit = require('express-rate-limit');
 const expressLayouts = require('express-ejs-layouts');
 const flash = require('connect-flash');
 const { v4: uuidv4 } = require('uuid');
+const axios = require('axios'); // AÑADIDO para verificar contraseñas
 require('dotenv').config();
 
 // Importar configuración de Firebase
@@ -30,9 +34,10 @@ app.use(helmet({
             defaultSrc: ["'self'"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
-            scriptSrc: ["'self'", "'unsafe-inline'"],
-            scriptSrcAttr: ["'self'", "'unsafe-inline'"], // AÑADIDA para permitir onclick
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://www.gstatic.com", "https://apis.google.com"],
+            scriptSrcAttr: ["'self'", "'unsafe-inline'"],
             imgSrc: ["'self'", "data:"],
+            connectSrc: ["'self'", "https://identitytoolkit.googleapis.com"], // AÑADIDO para Firebase Auth
         },
     },
 }));
@@ -92,12 +97,20 @@ app.set('layout', 'layout');
 // Archivos estáticos
 app.use(express.static(path.join(__dirname, 'backend/public')));
 
-// Middleware para variables globales en vistas
+// Middleware para pasar variables de entorno a las vistas
 app.use((req, res, next) => {
     res.locals.usuario = req.session.usuario || null;
     res.locals.error = req.flash('error');
     res.locals.success = req.flash('success');
     res.locals.consentimientoCookies = req.cookies.consentimiento || false;
+    res.locals.env = {
+        NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+        NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+    };
     next();
 });
 
@@ -131,7 +144,11 @@ app.get('/login', (req, res) => {
     if (req.session.usuario) {
         return res.redirect(req.session.usuario.tipo === 'profesor' ? '/profesor/dashboard' : '/padre/profesores');
     }
-    res.render('login', { titulo: 'Iniciar Sesión' });
+    res.render('login', { 
+        titulo: 'Iniciar Sesión',
+        error: null,
+        success: null
+    });
 });
 
 app.get('/registro', (req, res) => {
@@ -165,7 +182,7 @@ app.post('/consentimiento', (req, res) => {
 // ============ API DE AUTENTICACIÓN ============
 
 /**
- * LOGIN DE USUARIOS (PADRES Y PROFESORES) - CON VERIFICACIÓN DE CONTRASEÑA MEJORADA
+ * LOGIN DE USUARIOS (PADRES Y PROFESORES) - CORREGIDO CON VERIFICACIÓN DE CONTRASEÑA
  */
 app.post('/login', async (req, res) => {
     const { email, password, tipo } = req.body;
@@ -173,64 +190,112 @@ app.post('/login', async (req, res) => {
     try {
         console.log('🔐 Intento de login:', { email, tipo });
         
-        // 1. Buscar el usuario en Firebase Auth por email
-        let userRecord;
+        // Verificar que tenemos la API key
+        if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
+            console.error('❌ NEXT_PUBLIC_FIREBASE_API_KEY no está configurada');
+            req.flash('error', 'Error de configuración del servidor');
+            return res.redirect('/login?tipo=' + tipo);
+        }
+        
+        // 1. Verificar credenciales usando la REST API de Firebase
         try {
-            userRecord = await auth.getUserByEmail(email);
-            console.log('✅ Usuario encontrado en Firebase Auth:', userRecord.uid);
-        } catch (authError) {
-            console.log('❌ Usuario no encontrado en Firebase Auth');
-            req.flash('error', 'Credenciales incorrectas');
-            return res.redirect('/login?tipo=' + tipo);
-        }
-        
-        // 2. Buscar datos adicionales en Firestore
-        const userSnapshot = await db.collection(COLLECTIONS.USUARIOS)
-            .where('email', '==', email)
-            .where('tipo', '==', tipo)
-            .limit(1)
-            .get();
-        
-        if (userSnapshot.empty) {
-            console.log('❌ Usuario no encontrado en Firestore');
-            req.flash('error', 'Credenciales incorrectas');
-            return res.redirect('/login?tipo=' + tipo);
-        }
-        
-        const userDoc = userSnapshot.docs[0];
-        const userData = userDoc.data();
-        
-        // 3. Guardar usuario en sesión
-        req.session.usuario = {
-            uid: userData.uid,
-            nombre: userData.nombre,
-            nombreAlumno: userData.nombreAlumno || '',
-            email: userData.email,
-            tipo: userData.tipo,
-            telefono: userData.telefono,
-            curso: userData.curso
-        };
-        
-        // Guardar sesión explícitamente (importante para Vercel)
-        req.session.save((err) => {
-            if (err) {
-                console.error('❌ Error guardando sesión:', err);
-                req.flash('error', 'Error al iniciar sesión');
+            const response = await axios.post(
+                `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}`,
+                {
+                    email: email,
+                    password: password,
+                    returnSecureToken: true
+                }
+            );
+            
+            // Si llegamos aquí, las credenciales son correctas
+            const { localId, idToken, email: verifiedEmail } = response.data;
+            console.log('✅ Credenciales verificadas en Firebase Auth:', localId);
+            
+            // 2. Buscar datos adicionales en Firestore
+            const userSnapshot = await db.collection(COLLECTIONS.USUARIOS)
+                .where('email', '==', email)
+                .where('tipo', '==', tipo)
+                .limit(1)
+                .get();
+            
+            if (userSnapshot.empty) {
+                console.log('❌ Usuario no encontrado en Firestore');
+                req.flash('error', 'Credenciales incorrectas');
                 return res.redirect('/login?tipo=' + tipo);
             }
             
-            console.log('✅ Sesión guardada correctamente');
-            console.log('✅ Login exitoso:', userData.nombre);
-            console.log('👤 Tipo de usuario:', userData.tipo);
+            const userDoc = userSnapshot.docs[0];
+            const userData = userDoc.data();
             
-            // 4. Redirigir según el tipo de usuario
-            const destino = userData.tipo === 'profesor' ? '/profesor/dashboard' : '/padre/profesores';
-            console.log('➡️ Redirigiendo a:', destino);
-            res.redirect(destino);
-        });
+            // 3. Verificar que el UID coincide
+            if (userData.uid !== localId) {
+                console.log('❌ Discrepancia en UID entre Auth y Firestore');
+                req.flash('error', 'Error en la configuración de la cuenta');
+                return res.redirect('/login?tipo=' + tipo);
+            }
+            
+            // 4. Guardar usuario en sesión
+            req.session.usuario = {
+                uid: userData.uid,
+                nombre: userData.nombre,
+                nombreAlumno: userData.nombreAlumno || '',
+                email: userData.email,
+                tipo: userData.tipo,
+                telefono: userData.telefono,
+                curso: userData.curso,
+                idToken: idToken // Guardar token para futuras verificaciones
+            };
+            
+            // Guardar sesión explícitamente
+            req.session.save((err) => {
+                if (err) {
+                    console.error('❌ Error guardando sesión:', err);
+                    req.flash('error', 'Error al iniciar sesión');
+                    return res.redirect('/login?tipo=' + tipo);
+                }
+                
+                console.log('✅ Sesión guardada correctamente');
+                console.log('✅ Login exitoso:', userData.nombre);
+                console.log('👤 Tipo de usuario:', userData.tipo);
+                
+                // Redirigir según el tipo de usuario
+                const destino = userData.tipo === 'profesor' ? '/profesor/dashboard' : '/padre/profesores';
+                console.log('➡️ Redirigiendo a:', destino);
+                res.redirect(destino);
+            });
+            
+        } catch (axiosError) {
+            // Manejar errores de la API de Firebase
+            console.error('❌ Error de Firebase Auth:', axiosError.response?.data || axiosError.message);
+            
+            let errorMessage = 'Email o contraseña incorrectos';
+            
+            if (axiosError.response?.data?.error?.message) {
+                const firebaseError = axiosError.response.data.error.message;
+                switch (firebaseError) {
+                    case 'EMAIL_NOT_FOUND':
+                    case 'INVALID_PASSWORD':
+                    case 'INVALID_LOGIN_CREDENTIALS':
+                        errorMessage = 'Email o contraseña incorrectos';
+                        break;
+                    case 'USER_DISABLED':
+                        errorMessage = 'Esta cuenta ha sido deshabilitada';
+                        break;
+                    case 'TOO_MANY_ATTEMPTS_TRY_LATER':
+                        errorMessage = 'Demasiados intentos fallidos. Intenta más tarde';
+                        break;
+                    default:
+                        errorMessage = 'Error al iniciar sesión: ' + firebaseError;
+                }
+            }
+            
+            req.flash('error', errorMessage);
+            return res.redirect('/login?tipo=' + tipo);
+        }
         
     } catch (error) {
-        console.error('❌ Error en login:', error);
+        console.error('❌ Error inesperado en login:', error);
         req.flash('error', 'Error al iniciar sesión');
         res.redirect('/login?tipo=' + tipo);
     }
@@ -291,7 +356,14 @@ app.post('/api/registro', async (req, res) => {
         
     } catch (error) {
         console.error('❌ Error en registro profesor:', error);
-        req.flash('error', 'Error en el registro: ' + error.message);
+        
+        // Si el error es de Firebase Auth
+        if (error.code === 'auth/email-already-exists') {
+            req.flash('error', 'El email ya está registrado');
+        } else {
+            req.flash('error', 'Error en el registro: ' + error.message);
+        }
+        
         res.redirect('/registro');
     }
 });
@@ -343,7 +415,13 @@ app.post('/api/registro-padre', async (req, res) => {
         
     } catch (error) {
         console.error('❌ Error en registro padre:', error);
-        req.flash('error', 'Error en el registro: ' + error.message);
+        
+        if (error.code === 'auth/email-already-exists') {
+            req.flash('error', 'El email ya está registrado');
+        } else {
+            req.flash('error', 'Error en el registro: ' + error.message);
+        }
+        
         res.redirect('/registro-padre');
     }
 });
@@ -476,7 +554,7 @@ app.post('/profesor/horarios/eliminar/:id', authMiddleware, profesorMiddleware, 
     res.redirect('/profesor/horarios');
 });
 
-// ============ RUTA DE CALENDARIO PARA PROFESOR (FILTRADA) ============
+// ============ RUTA DE CALENDARIO PARA PROFESOR ============
 app.get('/profesor/calendario', authMiddleware, profesorMiddleware, async (req, res) => {
     try {
         const profesorId = req.session.usuario.uid;        
@@ -668,7 +746,7 @@ app.get('/padre/profesores', authMiddleware, async (req, res) => {
     }
 });
 
-// ============ RUTA DE RESERVA CORREGIDA (SIN FILTRO DE FECHA) ============
+// ============ RUTA DE RESERVA ============
 app.get('/padre/reservar/:profesorId', authMiddleware, async (req, res) => {
     const profesorId = req.params.profesorId;
     
@@ -726,12 +804,12 @@ app.get('/padre/reservar/:profesorId', authMiddleware, async (req, res) => {
         });
         console.log(`✅ Encontrados ${horarios.length} horarios`);
         
-        // Obtener TODAS las reservas existentes (SIN FILTRO DE FECHA)
+        // Obtener TODAS las reservas existentes
         console.log('📖 Buscando TODAS las reservas existentes...');
         const reservasSnapshot = await db.collection(COLLECTIONS.RESERVAS)
             .where('profesorId', '==', profesorId)
             .where('estado', 'in', ['pendiente', 'confirmada'])
-            .get(); // SIN el filtro de fecha
+            .get();
         
         const reservas = [];
         reservasSnapshot.forEach(doc => {
@@ -1004,5 +1082,6 @@ if (process.env.NODE_ENV === 'production') {
     console.log(`✅ Servidor funcionando en http://localhost:${PORT}`);
     console.log(`🔥 Conectado a Firebase Project: ${process.env.FIREBASE_PROJECT_ID || 'no configurado'}`);
     console.log(`🔑 Código de registro de profesores configurado: ${process.env.REGISTRO_PROFESOR_CODE ? 'SÍ' : 'NO'}`);
+    console.log(`🔑 API Key de Firebase configurada: ${process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? 'SÍ' : 'NO'}`);
   });
 }
