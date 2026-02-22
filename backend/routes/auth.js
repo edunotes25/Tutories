@@ -71,7 +71,9 @@ router.post('/verify-login', async (req, res) => {
         
     } catch (error) {
         console.error('❌ Error en verify-login:', error);
-        
+    console.error('Código:', error.code);
+    console.error('Mensaje completo:', error.message);
+
         if (error.code === 'auth/id-token-expired') {
             return res.status(401).json({ 
                 success: false, 
