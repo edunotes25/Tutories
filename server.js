@@ -62,7 +62,7 @@ app.use(cookieParser());
 // Esto permite que las cookies funcionen correctamente detrás del proxy de Vercel
 app.set('trust proxy', 1);
 
-// Configuración de sesiones - VERSIÓN CORREGIDA PARA VERCEL
+// Configuración de sesiones - VERSIÓN CORREGIDA (SIN DOMAIN)
 if (process.env.NODE_ENV === 'production') {
     console.log('🔧 Configurando sesiones para producción (Vercel)');
     app.use(session({
@@ -74,8 +74,8 @@ if (process.env.NODE_ENV === 'production') {
             secure: true,
             maxAge: 1000 * 60 * 60 * 24, // 24 horas
             httpOnly: true,
-            sameSite: 'lax', // Cambiado de 'strict' a 'lax' para permitir redirecciones
-            domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
+            sameSite: 'lax' // Cambiado de 'strict' a 'lax' para permitir redirecciones
+            // 👉 DOMAIN ELIMINADO - dejar que el navegador lo maneje automáticamente
         },
         rolling: true // Renueva la cookie en cada petición
     }));
