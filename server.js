@@ -357,7 +357,7 @@ app.post('/api/registro', async (req, res) => {
 });
 
 /**
- * REGISTRO DE PADRES
+ * REGISTRO DE PADRES - VERSIÓN MEJORADA CON MÁS LOGS
  */
 app.post('/api/registro-padre', async (req, res) => {
     console.log('📝 Datos recibidos en registro padre:', req.body);
@@ -365,48 +365,76 @@ app.post('/api/registro-padre', async (req, res) => {
     const { nombre, nombreAlumno, email, password, telefono } = req.body;
     
     try {
+        console.log('1️⃣ Verificando si el email ya existe...');
         const userSnapshot = await db.collection(COLLECTIONS.USUARIOS)
             .where('email', '==', email)
             .get();
         
         if (!userSnapshot.empty) {
+            console.log('❌ Email ya registrado');
             req.flash('error', 'El email ya está registrado');
             return res.redirect('/registro-padre');
         }
+        console.log('✅ Email disponible');
         
-        const userRecord = await auth.createUser({
-            email: email,
-            password: password,
-            displayName: nombre
-        });
+        console.log('2️⃣ Creando usuario en Firebase Auth...');
+        console.log('   Email:', email);
+        console.log('   Password length:', password.length);
         
-        console.log('✅ Usuario padre creado en Auth:', userRecord.uid);
+        let userRecord;
+        try {
+            userRecord = await auth.createUser({
+                email: email,
+                password: password,
+                displayName: nombre
+            });
+            console.log('✅ Usuario padre creado en Auth. UID:', userRecord.uid);
+        } catch (authError) {
+            console.error('❌ Error en Firebase Auth:', authError);
+            console.error('Código:', authError.code);
+            console.error('Mensaje:', authError.message);
+            req.flash('error', 'Error en autenticación: ' + authError.message);
+            return res.redirect('/registro-padre');
+        }
         
-        await db.collection(COLLECTIONS.USUARIOS).doc(userRecord.uid).set({
-            uid: userRecord.uid,
-            nombre: nombre,
-            nombreAlumno: nombreAlumno || '',
-            email: email,
-            tipo: 'padre',
-            telefono: telefono || '',
-            createdAt: new Date().toISOString(),
-            activo: true
-        });
+        console.log('3️⃣ Guardando datos en Firestore...');
+        console.log('   Colección:', COLLECTIONS.USUARIOS);
+        console.log('   Documento ID:', userRecord.uid);
         
-        console.log('✅ Datos de padre guardados en Firestore');
+        try {
+            await db.collection(COLLECTIONS.USUARIOS).doc(userRecord.uid).set({
+                uid: userRecord.uid,
+                nombre: nombre,
+                nombreAlumno: nombreAlumno || '',
+                email: email,
+                tipo: 'padre',
+                telefono: telefono || '',
+                createdAt: new Date().toISOString(),
+                activo: true
+            });
+            console.log('✅ Datos de padre guardados en Firestore');
+        } catch (firestoreError) {
+            console.error('❌ Error en Firestore:', firestoreError);
+            // Si falla Firestore, eliminamos el usuario de Auth para mantener consistencia
+            try {
+                await auth.deleteUser(userRecord.uid);
+                console.log('✅ Usuario de Auth eliminado por consistencia');
+            } catch (deleteError) {
+                console.error('❌ No se pudo eliminar el usuario de Auth:', deleteError);
+            }
+            req.flash('error', 'Error al guardar datos del usuario');
+            return res.redirect('/registro-padre');
+        }
         
+        console.log('4️⃣ Registro completado con éxito');
         req.flash('success', 'Registro completado. Ya puedes iniciar sesión');
+        console.log('5️⃣ Redirigiendo a /login?tipo=padre');
         res.redirect('/login?tipo=padre');
         
     } catch (error) {
-        console.error('❌ Error en registro padre:', error);
-        
-        if (error.code === 'auth/email-already-exists') {
-            req.flash('error', 'El email ya está registrado');
-        } else {
-            req.flash('error', 'Error en el registro: ' + error.message);
-        }
-        
+        console.error('❌ Error general en registro padre:', error);
+        console.error('Stack:', error.stack);
+        req.flash('error', 'Error en el registro: ' + error.message);
         res.redirect('/registro-padre');
     }
 });
