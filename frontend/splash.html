@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Tutorías - Colegio Público</title>
+    <title>Sistema de Tutories - Col·legi Públic</title>
     
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* Estilos específicos para la splash page */
+        /* Estils específics per a la splash page */
         .splash-container {
             min-height: 100vh;
             display: flex;
@@ -110,12 +110,12 @@
             box-shadow: 0 15px 30px rgba(0,0,0,0.2);
         }
 
-        .splash-option.padres:hover {
+        .splash-option.pares:hover {
             border-color: #4a90e2;
             background: linear-gradient(135deg, #f5f7fa 0%, #e9ecf5 100%);
         }
 
-        .splash-option.profesores:hover {
+        .splash-option.professors:hover {
             border-color: #764ba2;
             background: linear-gradient(135deg, #f5f0ff 0%, #e9e0ff 100%);
         }
@@ -125,11 +125,11 @@
             margin-bottom: 20px;
         }
 
-        .splash-option.padres i {
+        .splash-option.pares i {
             color: #4a90e2;
         }
 
-        .splash-option.profesores i {
+        .splash-option.professors i {
             color: #764ba2;
         }
 
@@ -157,22 +157,22 @@
             cursor: pointer;
         }
 
-        .splash-option.padres .btn-option {
+        .splash-option.pares .btn-option {
             color: #4a90e2;
             border-color: #4a90e2;
         }
 
-        .splash-option.padres:hover .btn-option {
+        .splash-option.pares:hover .btn-option {
             background: #4a90e2;
             color: white;
         }
 
-        .splash-option.profesores .btn-option {
+        .splash-option.professors .btn-option {
             color: #764ba2;
             border-color: #764ba2;
         }
 
-        .splash-option.profesores:hover .btn-option {
+        .splash-option.professors:hover .btn-option {
             background: #764ba2;
             color: white;
         }
@@ -226,7 +226,7 @@
             }
         }
 
-        /* Animación de fondo */
+        /* Animació de fons */
         .floating-shapes {
             position: absolute;
             top: 0;
@@ -280,7 +280,7 @@
 </head>
 <body>
     <div class="splash-container">
-        <!-- Formas flotantes decorativas -->
+        <!-- Formes flotants decoratives -->
         <div class="floating-shapes">
             <div class="shape shape1"></div>
             <div class="shape shape2"></div>
@@ -289,84 +289,84 @@
 
         <div class="splash-card">
             <div class="splash-badge">
-                <i class="fas fa-shield-alt"></i> Cumple RGPD
+                <i class="fas fa-shield-alt"></i> Compleix RGPD
             </div>
 
             <div class="splash-header">
                 <i class="fas fa-calendar-alt"></i>
-                <h1>Sistema de Tutorías</h1>
-                <p>Selecciona tu perfil para continuar</p>
+                <h1>Sistema de Tutories</h1>
+                <p>Selecciona el teu perfil per continuar</p>
             </div>
 
             <div class="splash-options">
-                <!-- Opción Padres -->
-                <div class="splash-option padres" onclick="window.location.href='/padres'">
+                <!-- Opció Pares -->
+                <div class="splash-option pares" onclick="window.location.href='/pares'">
                     <i class="fas fa-users"></i>
-                    <h2>Padres/Madres</h2>
-                    <p>Accede para reservar tutorías con los profesores, consultar tus citas y recibir confirmaciones por email.</p>
+                    <h2>Pares/Mares</h2>
+                    <p>Accedeix per reservar tutories amb els professors, consultar les teves cites i rebre confirmacions per email.</p>
                     <button class="btn-option">
-                        <i class="fas fa-calendar-plus"></i> Reservar tutoría
+                        <i class="fas fa-calendar-plus"></i> Reservar tutoria
                     </button>
                     <div style="margin-top: 20px; font-size: 0.9rem; color: #999;">
-                        <i class="fas fa-check-circle" style="color: #4a90e2;"></i> Sin registro necesario
+                        <i class="fas fa-check-circle" style="color: #4a90e2;"></i> Sense registre necessari
                     </div>
                 </div>
 
-                <!-- Opción Profesores -->
-                <div class="splash-option profesores" onclick="window.location.href='/login'">
+                <!-- Opció Professors -->
+                <div class="splash-option professors" onclick="window.location.href='/login'">
                     <i class="fas fa-chalkboard-teacher"></i>
-                    <h2>Profesores</h2>
-                    <p>Accede a tu panel personal para gestionar tus tutorías, ver el calendario y consultar tus citas.</p>
+                    <h2>Professors</h2>
+                    <p>Accedeix al teu panell personal per gestionar les teves tutories, veure el calendari i consultar les teves cites.</p>
                     <button class="btn-option">
-                        <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                        <i class="fas fa-sign-in-alt"></i> Iniciar sessió
                     </button>
                     <div style="margin-top: 20px; font-size: 0.9rem; color: #999;">
-                        <i class="fas fa-lock" style="color: #764ba2;"></i> Acceso privado
+                        <i class="fas fa-lock" style="color: #764ba2;"></i> Accés privat
                     </div>
                 </div>
             </div>
 
             <div class="splash-footer">
-                <a href="#" onclick="alert('Política de privacidad disponible en el centro educativo')">
-                    <i class="fas fa-shield-alt"></i> Privacidad
+                <a href="#" onclick="alert('Política de privacitat disponible al centre educatiu')">
+                    <i class="fas fa-shield-alt"></i> Privacitat
                 </a>
-                <a href="#" onclick="alert('Contacto: tutorias@colegio.es - Tel: 912 345 678')">
-                    <i class="fas fa-envelope"></i> Contacto
+                <a href="#" onclick="alert('Contacte: tutories@colegi.es - Tel: 912 345 678')">
+                    <i class="fas fa-envelope"></i> Contacte
                 </a>
-                <a href="#" onclick="alert('Para ayuda, contacte con el centro educativo')">
-                    <i class="fas fa-question-circle"></i> Ayuda
+                <a href="#" onclick="alert('Per a ajuda, contacteu amb el centre educatiu')">
+                    <i class="fas fa-question-circle"></i> Ajuda
                 </a>
             </div>
         </div>
     </div>
 
     <script>
-        // Guardar la selección del usuario en localStorage (opcional)
-        function guardarPreferencia(tipo) {
-            localStorage.setItem('ultimoAcceso', tipo);
+        // Guardar la selecció de l'usuari a localStorage (opcional)
+        function guardarPreferencia(tipus) {
+            localStorage.setItem('ultimAcces', tipus);
             localStorage.setItem('ultimaVisita', new Date().toISOString());
         }
 
-        // Añadir evento a las opciones
-        document.querySelector('.splash-option.padres').addEventListener('click', () => {
-            guardarPreferencia('padres');
+        // Afegir esdeveniment a les opcions
+        document.querySelector('.splash-option.pares').addEventListener('click', () => {
+            guardarPreferencia('pares');
         });
 
-        document.querySelector('.splash-option.profesores').addEventListener('click', () => {
-            guardarPreferencia('profesores');
+        document.querySelector('.splash-option.professors').addEventListener('click', () => {
+            guardarPreferencia('professors');
         });
 
-        // Comprobar si ya había seleccionado antes (últimas 24h)
-        const ultimoAcceso = localStorage.getItem('ultimoAcceso');
+        // Comprovar si ja havia seleccionat abans (últimes 24h)
+        const ultimAcces = localStorage.getItem('ultimAcces');
         const ultimaVisita = localStorage.getItem('ultimaVisita');
 
-        if (ultimoAcceso && ultimaVisita) {
-            const horasPasadas = (new Date() - new Date(ultimaVisita)) / (1000 * 60 * 60);
+        if (ultimAcces && ultimaVisita) {
+            const horesPassades = (new Date() - new Date(ultimaVisita)) / (1000 * 60 * 60);
             
-            if (horasPasadas < 24) { // Si pasaron menos de 24 horas
-                if (ultimoAcceso === 'padres' && confirm('¿Quieres ir directamente a la sección de padres?')) {
-                    window.location.href = '/padres';
-                } else if (ultimoAcceso === 'profesores' && confirm('¿Quieres ir directamente al login de profesores?')) {
+            if (horesPassades < 24) { // Si van passar menys de 24 hores
+                if (ultimAcces === 'pares' && confirm('Vols anar directament a la secció de pares?')) {
+                    window.location.href = '/pares';
+                } else if (ultimAcces === 'professors' && confirm('Vols anar directament al login de professors?')) {
                     window.location.href = '/login';
                 }
             }

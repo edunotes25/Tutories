@@ -1,0 +1,80 @@
+<div class="reserva-header">
+    <h1>Reservar tutoria amb <%= professor.nom %></h1>
+    <a href="/" class="btn btn-secondary">← Tornar</a>
+</div>
+
+<div class="reserva-container">
+    <div class="calendari-section">
+        <h2>Seleccionar data</h2>
+        
+        <div class="calendari-navegacio">
+            <button class="btn-nav" onclick="canviarSetmana(-1)">← Setmana anterior</button>
+            <span class="setmana-actual" id="setmanaActual"></span>
+            <button class="btn-nav" onclick="canviarSetmana(1)">Setmana següent →</button>
+        </div>
+        
+        <div class="calendari-grid" id="calendari">
+            <!-- Generat dinàmicament amb JS -->
+        </div>
+    </div>
+    
+    <div class="formulari-section">
+        <h2>Dades de la reserva</h2>
+        
+        <div class="reserva-info" id="reservaInfo" style="display: none;">
+            <p><strong>Professor:</strong> <%= professor.nom %></p>
+            <p><strong>Data:</strong> <span id="dataSeleccionada"></span></p>
+            <p><strong>Hora:</strong> <span id="horaSeleccionada"></span></p>
+        </div>
+        
+        <form id="formulariReserva" class="formulari-reserva" style="display: none;">
+            <input type="hidden" name="professorId" value="<%= professor.id %>">
+            <input type="hidden" name="data" id="dataInput">
+            <input type="hidden" name="hora" id="horaInput">
+            
+            <div class="form-group">
+                <label for="nomPare">Nom del pare/mare/tutor *</label>
+                <input type="text" id="nomPare" name="nomPare" required 
+                       placeholder="Ex: Maria García López">
+            </div>
+            
+            <div class="form-group">
+                <label for="emailPare">Email *</label>
+                <input type="email" id="emailPare" name="emailPare" required 
+                       placeholder="exemple@correu.com">
+                <small>Li enviarem la confirmació a aquesta adreça</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefon">Telèfon (opcional)</label>
+                <input type="tel" id="telefon" name="telefon" 
+                       placeholder="600 123 456">
+            </div>
+            
+            <div class="form-group">
+                <label for="comentaris">Comentaris (opcional)</label>
+                <textarea id="comentaris" name="comentaris" rows="3" 
+                          placeholder="Alguna observació per al professor?"></textarea>
+            </div>
+            
+            <div class="form-group consentiment">
+                <input type="checkbox" id="acceptaCondicions" name="acceptaCondicions" required>
+                <label for="acceptaCondicions">
+                    He llegit i accepto l'<a href="/avis-privacitat" target="_blank">avís de privacitat</a> 
+                    i consento el tractament de les meves dades per a aquesta reserva *
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Confirmar reserva</button>
+        </form>
+        
+        <div id="missatgeAlerta" class="alerta" style="display: none;"></div>
+    </div>
+</div>
+
+<script>
+    // Dades inicials passades des del servidor
+    const horarisProfessor = <%- JSON.stringify(horaris) %>;
+    const reservesExistents = <%- JSON.stringify(reserves) %>;
+    const professorId = '<%= professor.id %>';
+</script>

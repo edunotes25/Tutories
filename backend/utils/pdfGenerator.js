@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 class PDFGenerator {
-    async generarConfirmacion(datos) {
+    async generarConfirmacio(dades) {
         return new Promise((resolve, reject) => {
             try {
                 const doc = new PDFDocument();
@@ -13,21 +13,21 @@ class PDFGenerator {
                 doc.on('data', chunk => chunks.push(chunk));
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
 
-                // Configurar documento
+                // Configurar document
                 doc.font('Helvetica');
                 
-                // Encabezado
+                // Capçalera
                 doc.fontSize(20)
                    .fillColor('#4a90e2')
-                   .text('Confirmación de Tutoría', { align: 'center' })
+                   .text('Confirmació de Tutoria', { align: 'center' })
                    .moveDown();
 
                 doc.fontSize(12)
                    .fillColor('#333')
-                   .text('Colegio Público - Sistema de Tutorías', { align: 'center' })
+                   .text('Col·legi Públic - Sistema de Tutories', { align: 'center' })
                    .moveDown(2);
 
-                // Línea separadora
+                // Línia separadora
                 doc.strokeColor('#4a90e2')
                    .lineWidth(2)
                    .moveTo(50, doc.y)
@@ -35,24 +35,24 @@ class PDFGenerator {
                    .stroke()
                    .moveDown(2);
 
-                // Datos de la reserva
+                // Dades de la reserva
                 doc.fontSize(14)
                    .fillColor('#333')
-                   .text('Datos de la Reserva:', { underline: true })
+                   .text('Dades de la Reserva:', { underline: true })
                    .moveDown();
 
-                const datosReserva = [
-                    ['ID de Reserva:', datos.id],
-                    ['Nombre del Padre/Madre:', datos.nombre],
-                    ['Email:', datos.email],
-                    ['Nombre del Alumno:', datos.nombreAlumno],
-                    ['Profesor:', datos.profesor],
-                    ['Fecha:', datos.fecha],
-                    ['Hora:', datos.hora]
+                const dadesReserva = [
+                    ['ID de Reserva:', dades.id],
+                    ['Nom del Pare/Mare:', dades.nom],
+                    ['Email:', dades.email],
+                    ['Nom de l\'Alumne:', dades.nomAlumne],
+                    ['Professor:', dades.professor],
+                    ['Data:', dades.data],
+                    ['Hora:', dades.hora]
                 ];
 
                 doc.fontSize(12);
-                datosReserva.forEach(([label, value]) => {
+                dadesReserva.forEach(([label, value]) => {
                     doc.text(`${label} ${value}`, {
                         continued: false,
                         lineGap: 5
@@ -61,26 +61,26 @@ class PDFGenerator {
 
                 doc.moveDown(2);
 
-                // Información importante
+                // Informació important
                 doc.fontSize(14)
                    .fillColor('#4a90e2')
-                   .text('Información Importante:', { underline: true })
+                   .text('Informació Important:', { underline: true })
                    .moveDown();
 
                 doc.fontSize(11)
                    .fillColor('#666')
-                   .text('• Por favor, llegue 5 minutos antes de la hora programada.')
-                   .text('• La reunión se realizará en el aula habitual del profesor.')
-                   .text('• Si necesita cancelar, contacte con el centro lo antes posible.')
-                   .text('• Guarde este comprobante para su referencia.')
+                   .text('• Si us plau, arribi 5 minuts abans de l\'hora programada.')
+                   .text('• La reunió es realitzarà a l\'aula habitual del professor.')
+                   .text('• Si necessita cancel·lar, contacti amb el centre com més aviat millor.')
+                   .text('• Guardi aquest comprovant per a la seva referència.')
                    .moveDown(2);
 
-                // Pie de página
+                // Peu de pàgina
                 doc.fontSize(10)
                    .fillColor('#999')
-                   .text('Este documento es un comprobante de su reserva.', { align: 'center' })
-                   .text('Los datos personales serán eliminados automáticamente después de 24 horas.', { align: 'center' })
-                   .text('© 2024 - Colegio Público - Cumple con RGPD', { align: 'center' });
+                   .text('Aquest document és un comprovant de la seva reserva.', { align: 'center' })
+                   .text('Les dades personals seran eliminades automàticament després de 24 hores.', { align: 'center' })
+                   .text('© 2024 - Col·legi Públic - Compleix amb RGPD', { align: 'center' });
 
                 doc.end();
 
@@ -90,7 +90,7 @@ class PDFGenerator {
         });
     }
 
-    async generarHorarioProfesor(profesor, fecha, reservas) {
+    async generarHorariProfessor(professor, data, reserves) {
         return new Promise((resolve, reject) => {
             try {
                 const doc = new PDFDocument();
@@ -99,23 +99,23 @@ class PDFGenerator {
                 doc.on('data', chunk => chunks.push(chunk));
                 doc.on('end', () => resolve(Buffer.concat(chunks)));
 
-                // Encabezado
+                // Capçalera
                 doc.fontSize(20)
                    .fillColor('#4a90e2')
-                   .text('Horario de Tutorías', { align: 'center' })
+                   .text('Horari de Tutories', { align: 'center' })
                    .moveDown();
 
                 doc.fontSize(14)
                    .fillColor('#333')
-                   .text(`Profesor: ${profesor}`, { align: 'center' })
-                   .text(`Fecha: ${fecha}`, { align: 'center' })
+                   .text(`Professor: ${professor}`, { align: 'center' })
+                   .text(`Data: ${data}`, { align: 'center' })
                    .moveDown(2);
 
-                // Crear tabla de horarios
-                const horas = ['09:00', '10:00', '11:00', '12:00', '16:00', '17:00', '18:00'];
+                // Crear taula d'horaris
+                const hores = ['09:00', '10:00', '11:00', '12:00', '16:00', '17:00', '18:00'];
                 
-                horas.forEach(hora => {
-                    const reserva = reservas.find(r => r.hora === hora);
+                hores.forEach(hora => {
+                    const reserva = reserves.find(r => r.hora === hora);
                     
                     doc.rect(50, doc.y, 500, 30)
                        .fillColor(reserva ? '#f0f7ff' : '#f5f5f5')
@@ -126,7 +126,7 @@ class PDFGenerator {
                        .text(hora, 60, doc.y + 8);
                     
                     if (reserva) {
-                        doc.text(`${reserva.nombreAlumno} - ${reserva.contacto?.nombre || 'Reservado'}`, 150, doc.y + 8);
+                        doc.text(`${reserva.nomAlumne} - ${reserva.contacte?.nom || 'Reservat'}`, 150, doc.y + 8);
                     } else {
                         doc.text('Disponible', 150, doc.y + 8, { fillColor: '#4a90e2' });
                     }

@@ -1,15 +1,15 @@
 const nodemailer = require('nodemailer');
 
-// Determinar la URL base según el entorno
-// En producción usará la variable de Vercel, en local usará localhost
+// Determinar la URL base segons l'entorn
+// En producció utilitzarà la variable de Vercel, en local utilitzarà localhost
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 console.log('📧 Email Service - BASE_URL:', BASE_URL);
 
-// Configuración del transporte de email
+// Configuració del transport d'email
 let transporter = null;
 
-const inicializarTransporter = () => {
+const inicialitzarTransporter = () => {
     if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
         transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST,
@@ -20,10 +20,10 @@ const inicializarTransporter = () => {
                 pass: process.env.SMTP_PASS
             }
         });
-        console.log('✅ Transporte de email configurado');
+        console.log('✅ Transport d\'email configurat');
     } else {
-        console.log('⚠️ Variables de email no configuradas, usando ethereal.email para pruebas');
-        // Crear cuenta de prueba de ethereal
+        console.log('⚠️ Variables d\'email no configurades, utilitzant ethereal.email per proves');
+        // Crear compte de prova d'ethereal
         nodemailer.createTestAccount().then(account => {
             transporter = nodemailer.createTransport({
                 host: account.smtp.host,
@@ -34,32 +34,32 @@ const inicializarTransporter = () => {
                     pass: account.pass
                 }
             });
-            console.log('📧 Cuenta de prueba creada:', account.user);
+            console.log('📧 Compte de prova creat:', account.user);
         }).catch(err => {
-            console.error('❌ Error al crear cuenta de prueba:', err);
+            console.error('❌ Error en crear compte de prova:', err);
         });
     }
 };
 
-// Inicializar al cargar el módulo
-inicializarTransporter();
+// Inicialitzar en carregar el mòdul
+inicialitzarTransporter();
 
 /**
- * Enviar email de confirmación de reserva al padre
+ * Enviar email de confirmació de reserva al pare/mare
  */
-const enviarConfirmacion = async (reserva, profesor) => {
+const enviarConfirmacio = async (reserva, professor) => {
     if (!transporter) {
-        console.log('⚠️ Transporte de email no disponible');
+        console.log('⚠️ Transport d\'email no disponible');
         return false;
     }
     
-    const cancelUrl = `${BASE_URL}/cancelar/${reserva.tokenAcceso}`;
-    const profesoresUrl = `${BASE_URL}/padre/profesores`;
+    const cancelUrl = `${BASE_URL}/cancelar/${reserva.tokenAcces}`;
+    const professorsUrl = `${BASE_URL}/pare/professors`;
     
     const mailOptions = {
-        from: '"Sistema de Tutorías" <tutorias@colegio.edu>',
-        to: reserva.padreEmail,
-        subject: `✅ Tutoría confirmada con ${profesor.nombre}`,
+        from: '"Sistema de Tutories" <tutories@colegio.edu>',
+        to: reserva.emailPare,
+        subject: `✅ Tutoria confirmada amb ${professor.nom}`,
         html: `
             <!DOCTYPE html>
             <html>
@@ -79,36 +79,36 @@ const enviarConfirmacion = async (reserva, profesor) => {
             <body>
                 <div class="container">
                     <div class="header">
-                        <h1>¡Tutoría Confirmada!</h1>
+                        <h1>Tutoria Confirmada!</h1>
                     </div>
                     <div class="content">
-                        <p>Estimado/a <strong>${reserva.padreNombre}</strong>,</p>
-                        <p>Su tutoría ha sido confirmada correctamente:</p>
+                        <p>Benvolgut/da <strong>${reserva.nomPare}</strong>,</p>
+                        <p>La seva tutoria ha estat confirmada correctament:</p>
                         
                         <div class="detalle">
-                            <p><strong>Profesor:</strong> ${profesor.nombre}</p>
-                            <p><strong>Alumno:</strong> ${reserva.nombreAlumno || 'No especificado'}</p>
-                            <p><strong>Fecha:</strong> ${new Date(reserva.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                            <p><strong>Professor:</strong> ${professor.nom}</p>
+                            <p><strong>Alumne:</strong> ${reserva.nomAlumne || 'No especificat'}</p>
+                            <p><strong>Data:</strong> ${new Date(reserva.data).toLocaleDateString('ca-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                             <p><strong>Hora:</strong> ${reserva.hora}</p>
                             <p><strong>ID Reserva:</strong> ${reserva.reservaId.substring(0, 8).toUpperCase()}</p>
-                            ${reserva.comentarios ? `<p><strong>Comentarios:</strong> ${reserva.comentarios}</p>` : ''}
+                            ${reserva.comentaris ? `<p><strong>Comentaris:</strong> ${reserva.comentaris}</p>` : ''}
                         </div>
                         
-                        <p>Si necesita cancelar la tutoría, puede hacerlo a través del siguiente enlace:</p>
+                        <p>Si necessita cancel·lar la tutoria, pot fer-ho a través del següent enllaç:</p>
                         <p style="text-align: center;">
-                            <a href="${cancelUrl}" class="boton-cancelar">Cancelar reserva</a>
+                            <a href="${cancelUrl}" class="boton-cancelar">Cancel·lar reserva</a>
                         </p>
                         
                         <p style="text-align: center;">
-                            <a href="${profesoresUrl}">📅 Reservar otra tutoría</a>
+                            <a href="${professorsUrl}">📅 Reservar una altra tutoria</a>
                         </p>
                         
-                        <p>Muchas gracias por utilizar nuestro sistema.</p>
+                        <p>Moltes gràcies per utilitzar el nostre sistema.</p>
                     </div>
                     <div class="footer">
-                        <p>Colegio Público - Sistema de Tutorías</p>
-                        <p>Este es un mensaje automático, por favor no responda a este correo.</p>
-                        <p><small>Sus datos son tratados según la normativa RGPD. Serán eliminados 24h después de la tutoría.</small></p>
+                        <p>Col·legi Públic - Sistema de Tutories</p>
+                        <p>Aquest és un missatge automàtic, si us plau no respongueu a aquest correu.</p>
+                        <p><small>Les seves dades són tractades segons la normativa RGPD. Seran eliminades 24h després de la tutoria.</small></p>
                     </div>
                 </div>
             </body>
@@ -118,37 +118,37 @@ const enviarConfirmacion = async (reserva, profesor) => {
     
     try {
         const info = await transporter.sendMail(mailOptions);
-        console.log('📧 Email de confirmación enviado al padre:', info.messageId);
+        console.log('📧 Email de confirmació enviat al pare/mare:', info.messageId);
         
         if (info.messageId && nodemailer.getTestMessageUrl) {
             const previewUrl = nodemailer.getTestMessageUrl(info);
             if (previewUrl) {
-                console.log('📧 Vista previa:', previewUrl);
+                console.log('📧 Vista prèvia:', previewUrl);
             }
         }
         
         return true;
     } catch (error) {
-        console.error('❌ Error al enviar email de confirmación:', error);
+        console.error('❌ Error en enviar email de confirmació:', error);
         return false;
     }
 };
 
 /**
- * Enviar email de cancelación al padre
+ * Enviar email de cancel·lació al pare/mare
  */
-const enviarCancelacionPadre = async (reserva, profesor) => {
+const enviarCancelacioPare = async (reserva, professor) => {
     if (!transporter) {
-        console.log('⚠️ Transporte de email no disponible');
+        console.log('⚠️ Transport d\'email no disponible');
         return false;
     }
     
-    const profesoresUrl = `${BASE_URL}/padre/profesores`;
+    const professorsUrl = `${BASE_URL}/pare/professors`;
     
     const mailOptions = {
-        from: '"Sistema de Tutorías" <tutorias@colegio.edu>',
-        to: reserva.padreEmail,
-        subject: `❌ Tutoría cancelada - ${profesor.nombre}`,
+        from: '"Sistema de Tutories" <tutories@colegio.edu>',
+        to: reserva.emailPare,
+        subject: `❌ Tutoria cancel·lada - ${professor.nom}`,
         html: `
             <!DOCTYPE html>
             <html>
@@ -167,30 +167,30 @@ const enviarCancelacionPadre = async (reserva, profesor) => {
             <body>
                 <div class="container">
                     <div class="header">
-                        <h1>Tutoría Cancelada</h1>
+                        <h1>Tutoria Cancel·lada</h1>
                     </div>
                     <div class="content">
-                        <p>Estimado/a <strong>${reserva.padreNombre}</strong>,</p>
-                        <p>Lamentamos informarle que la siguiente tutoría ha sido <strong style="color: #dc3545;">CANCELADA</strong>:</p>
+                        <p>Benvolgut/da <strong>${reserva.nomPare}</strong>,</p>
+                        <p>Lamentem informar-li que la següent tutoria ha estat <strong style="color: #dc3545;">CANCEL·LADA</strong>:</p>
                         
                         <div class="detalle">
-                            <p><strong>Profesor:</strong> ${profesor.nombre}</p>
-                            <p><strong>Alumno:</strong> ${reserva.nombreAlumno || 'No especificado'}</p>
-                            <p><strong>Fecha:</strong> ${new Date(reserva.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                            <p><strong>Professor:</strong> ${professor.nom}</p>
+                            <p><strong>Alumne:</strong> ${reserva.nomAlumne || 'No especificat'}</p>
+                            <p><strong>Data:</strong> ${new Date(reserva.data).toLocaleDateString('ca-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                             <p><strong>Hora:</strong> ${reserva.hora}</p>
                             <p><strong>ID Reserva:</strong> ${reserva.reservaId.substring(0, 8).toUpperCase()}</p>
                         </div>
                         
-                        <p>Si desea reservar una nueva tutoría, puede hacerlo a través de nuestro sistema:</p>
+                        <p>Si desitja reservar una nova tutoria, pot fer-ho a través del nostre sistema:</p>
                         <p style="text-align: center;">
-                            <a href="${profesoresUrl}" class="boton">Reservar nueva tutoría</a>
+                            <a href="${professorsUrl}" class="boton">Reservar nova tutoria</a>
                         </p>
                         
-                        <p>Disculpe las molestias.</p>
+                        <p>Disculpi les molèsties.</p>
                     </div>
                     <div class="footer">
-                        <p>Colegio Público - Sistema de Tutorías</p>
-                        <p>Este es un mensaje automático, por favor no responda a este correo.</p>
+                        <p>Col·legi Públic - Sistema de Tutories</p>
+                        <p>Aquest és un missatge automàtic, si us plau no respongueu a aquest correu.</p>
                     </div>
                 </div>
             </body>
@@ -200,37 +200,37 @@ const enviarCancelacionPadre = async (reserva, profesor) => {
     
     try {
         const info = await transporter.sendMail(mailOptions);
-        console.log('📧 Email de cancelación enviado al padre:', info.messageId);
+        console.log('📧 Email de cancel·lació enviat al pare/mare:', info.messageId);
         
         if (info.messageId && nodemailer.getTestMessageUrl) {
             const previewUrl = nodemailer.getTestMessageUrl(info);
             if (previewUrl) {
-                console.log('📧 Vista previa:', previewUrl);
+                console.log('📧 Vista prèvia:', previewUrl);
             }
         }
         
         return true;
     } catch (error) {
-        console.error('❌ Error al enviar email de cancelación al padre:', error);
+        console.error('❌ Error en enviar email de cancel·lació al pare/mare:', error);
         return false;
     }
 };
 
 /**
- * Enviar email de notificación de cancelación al profesor
+ * Enviar email de notificació de cancel·lació al professor
  */
-const enviarNotificacionProfesor = async (reserva, profesor, padre) => {
+const enviarNotificacioProfessor = async (reserva, professor, pare) => {
     if (!transporter) {
-        console.log('⚠️ Transporte de email no disponible');
+        console.log('⚠️ Transport d\'email no disponible');
         return false;
     }
     
-    const reservasUrl = `${BASE_URL}/profesor/reservas`;
+    const reservesUrl = `${BASE_URL}/professor/reserves`;
     
     const mailOptions = {
-        from: '"Sistema de Tutorías" <tutorias@colegio.edu>',
-        to: profesor.email,
-        subject: `⚠️ Tutoría cancelada por ${padre.nombre}`,
+        from: '"Sistema de Tutories" <tutories@colegio.edu>',
+        to: professor.email,
+        subject: `⚠️ Tutoria cancel·lada per ${pare.nom}`,
         html: `
             <!DOCTYPE html>
             <html>
@@ -249,31 +249,31 @@ const enviarNotificacionProfesor = async (reserva, profesor, padre) => {
             <body>
                 <div class="container">
                     <div class="header">
-                        <h1>Tutoría Cancelada por el Padre</h1>
+                        <h1>Tutoria Cancel·lada pel Pare/Mare</h1>
                     </div>
                     <div class="content">
-                        <p>Estimado/a <strong>${profesor.nombre}</strong>,</p>
-                        <p>Le informamos que la siguiente tutoría ha sido <strong style="color: #dc3545;">CANCELADA</strong> por el padre/madre:</p>
+                        <p>Benvolgut/da <strong>${professor.nom}</strong>,</p>
+                        <p>Us informem que la següent tutoria ha estat <strong style="color: #dc3545;">CANCEL·LADA</strong> pel pare/mare:</p>
                         
                         <div class="detalle">
-                            <p><strong>Padre/Madre:</strong> ${padre.nombre}</p>
-                            <p><strong>Email de contacto:</strong> ${padre.email}</p>
-                            <p><strong>Teléfono:</strong> ${padre.telefono || 'No especificado'}</p>
-                            <p><strong>Alumno:</strong> ${reserva.nombreAlumno || 'No especificado'}</p>
-                            <p><strong>Fecha:</strong> ${new Date(reserva.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                            <p><strong>Pare/Mare:</strong> ${pare.nom}</p>
+                            <p><strong>Email de contacte:</strong> ${pare.email}</p>
+                            <p><strong>Telèfon:</strong> ${pare.telefon || 'No especificat'}</p>
+                            <p><strong>Alumne:</strong> ${reserva.nomAlumne || 'No especificat'}</p>
+                            <p><strong>Data:</strong> ${new Date(reserva.data).toLocaleDateString('ca-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                             <p><strong>Hora:</strong> ${reserva.hora}</p>
                             <p><strong>ID Reserva:</strong> ${reserva.reservaId.substring(0, 8).toUpperCase()}</p>
-                            ${reserva.comentarios ? `<p><strong>Comentarios:</strong> ${reserva.comentarios}</p>` : ''}
+                            ${reserva.comentaris ? `<p><strong>Comentaris:</strong> ${reserva.comentaris}</p>` : ''}
                         </div>
                         
-                        <p>Este horario ya está disponible nuevamente para otras reservas.</p>
+                        <p>Aquest horari ja està disponible novament per a altres reserves.</p>
                         <p style="text-align: center;">
-                            <a href="${reservasUrl}" class="boton">Ver mis reservas</a>
+                            <a href="${reservesUrl}" class="boton">Veure les meves reserves</a>
                         </p>
                     </div>
                     <div class="footer">
-                        <p>Colegio Público - Sistema de Tutorías</p>
-                        <p>Este es un mensaje automático, por favor no responda a este correo.</p>
+                        <p>Col·legi Públic - Sistema de Tutories</p>
+                        <p>Aquest és un missatge automàtic, si us plau no respongueu a aquest correu.</p>
                     </div>
                 </div>
             </body>
@@ -283,24 +283,24 @@ const enviarNotificacionProfesor = async (reserva, profesor, padre) => {
     
     try {
         const info = await transporter.sendMail(mailOptions);
-        console.log('📧 Notificación enviada al profesor:', info.messageId);
+        console.log('📧 Notificació enviada al professor:', info.messageId);
         
         if (info.messageId && nodemailer.getTestMessageUrl) {
             const previewUrl = nodemailer.getTestMessageUrl(info);
             if (previewUrl) {
-                console.log('📧 Vista previa:', previewUrl);
+                console.log('📧 Vista prèvia:', previewUrl);
             }
         }
         
         return true;
     } catch (error) {
-        console.error('❌ Error al enviar notificación al profesor:', error);
+        console.error('❌ Error en enviar notificació al professor:', error);
         return false;
     }
 };
 
 module.exports = {
-    enviarConfirmacion,
-    enviarCancelacionPadre,
-    enviarNotificacionProfesor
+    enviarConfirmacio,
+    enviarCancelacioPare,
+    enviarNotificacioProfessor
 };

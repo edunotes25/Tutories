@@ -1,8 +1,8 @@
 <div class="dashboard-header">
-    <h1>Gestionar Horarios - <%= usuario.nombre %></h1>
+    <h1>Gestionar Horaris - <%= usuari.nom %></h1>
     <div>
-        <a href="/profesor/dashboard" class="btn btn-secondary">Volver al panel</a>
-        <a href="/logout" class="btn btn-secondary">Cerrar sesión</a>
+        <a href="/professor/dashboard" class="btn btn-secondary">Tornar al panell</a>
+        <a href="/logout" class="btn btn-secondary">Tancar sessió</a>
     </div>
 </div>
 
@@ -14,19 +14,19 @@
     <div class="alerta error"><%= error %></div>
 <% } %>
 
-<div class="horarios-grid">
-    <div class="horarios-card">
-        <h2>Agregar nuevo horario</h2>
+<div class="horaris-grid">
+    <div class="horaris-card">
+        <h2>Afegir nou horari</h2>
         
-        <form action="/profesor/horarios/agregar" method="POST" class="horario-form">
+        <form action="/professor/horaris/afegir" method="POST" class="horari-form">
             <div class="form-group">
-                <label for="dia_semana">Día de la semana</label>
-                <select id="dia_semana" name="dia_semana" required>
-                    <option value="1">Lunes</option>
-                    <option value="2">Martes</option>
-                    <option value="3">Miércoles</option>
-                    <option value="4">Jueves</option>
-                    <option value="5">Viernes</option>
+                <label for="dia_setmana">Dia de la setmana</label>
+                <select id="dia_setmana" name="dia_setmana" required>
+                    <option value="1">Dilluns</option>
+                    <option value="2">Dimarts</option>
+                    <option value="3">Dimecres</option>
+                    <option value="4">Dijous</option>
+                    <option value="5">Divendres</option>
                 </select>
             </div>
             
@@ -35,9 +35,9 @@
                 <select id="hora" name="hora" required>
                     <option value="">Selecciona una hora</option>
                     <% for(let hora = 8; hora <= 19; hora++) { %>
-                        <% for(let minuto of ['00', '30']) { %>
-                            <option value="<%= hora.toString().padStart(2, '0') %>:<%= minuto %>">
-                                <%= hora.toString().padStart(2, '0') %>:<%= minuto %>
+                        <% for(let minut of ['00', '30']) { %>
+                            <option value="<%= hora.toString().padStart(2, '0') %>:<%= minut %>">
+                                <%= hora.toString().padStart(2, '0') %>:<%= minut %>
                             </option>
                         <% } %>
                     <% } %>
@@ -45,35 +45,35 @@
                 </select>
             </div>
             
-            <button type="submit" class="btn btn-primary btn-block">Agregar horario</button>
+            <button type="submit" class="btn btn-primary btn-block">Afegir horari</button>
         </form>
     </div>
     
-    <div class="horarios-card">
-        <h2>Mis horarios actuales</h2>
+    <div class="horaris-card">
+        <h2>Els meus horaris actuals</h2>
         
-        <% if (horarios.length === 0) { %>
-            <p class="text-center">No tienes horarios configurados</p>
+        <% if (horaris.length === 0) { %>
+            <p class="text-center">No tens horaris configurats</p>
         <% } else { %>
-            <table class="horarios-tabla">
+            <table class="horaris-taula">
                 <thead>
                     <tr>
-                        <th>Día</th>
+                        <th>Dia</th>
                         <th>Hora</th>
-                        <th>Acción</th>
+                        <th>Acció</th>
                     </tr>
                 </thead>
                 <tbody>
                     <% 
-                        const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
-                        horarios.forEach(horario => { 
+                        const dies = ['Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres'];
+                        horaris.forEach(horari => { 
                     %>
                         <tr>
-                            <td><%= dias[horario.diaSemana - 1] %></td>
-                            <td><%= horario.hora %></td>
+                            <td><%= dies[horari.diaSetmana - 1] %></td>
+                            <td><%= horari.hora %></td>
                             <td>
-                                <form action="/profesor/horarios/eliminar/<%= horario.id %>" method="POST" style="display: inline;">
-                                    <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('¿Eliminar este horario?')">Eliminar</button>
+                                <form action="/professor/horaris/eliminar/<%= horari.id %>" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Eliminar aquest horari?')">Eliminar</button>
                                 </form>
                             </td>
                         </tr>
@@ -85,39 +85,39 @@
 </div>
 
 <style>
-.horarios-grid {
+.horaris-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 30px;
     margin-top: 30px;
 }
 
-.horarios-card {
+.horaris-card {
     background: white;
     padding: 25px;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.horarios-card h2 {
+.horaris-card h2 {
     color: #4a90e2;
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 2px solid #f0f0f0;
 }
 
-.horario-form .form-group {
+.horari-form .form-group {
     margin-bottom: 20px;
 }
 
-.horario-form label {
+.horari-form label {
     display: block;
     margin-bottom: 5px;
     font-weight: 500;
 }
 
-.horario-form select,
-.horario-form input {
+.horari-form select,
+.horari-form input {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
@@ -125,26 +125,26 @@
     font-size: 1rem;
 }
 
-.horario-form select:focus,
-.horario-form input:focus {
+.horari-form select:focus,
+.horari-form input:focus {
     outline: none;
     border-color: #4a90e2;
     box-shadow: 0 0 0 3px rgba(74,144,226,0.1);
 }
 
-.horarios-tabla {
+.horaris-taula {
     width: 100%;
     border-collapse: collapse;
 }
 
-.horarios-tabla th,
-.horarios-tabla td {
+.horaris-taula th,
+.horaris-taula td {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid #f0f0f0;
 }
 
-.horarios-tabla th {
+.horaris-taula th {
     background: #f5f5f5;
     font-weight: 600;
 }

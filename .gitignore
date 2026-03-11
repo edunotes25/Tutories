@@ -1,10 +1,28 @@
-.vercel
-.env*.local
+# Dependències
 node_modules/
+package-lock.json
+
+# Fitxers d'entorn
 .env
 .env.local
 .env.production
+
+# Fitxers de sistema
 .DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
 *.log
-backend/data/*.db
-backend/config/firebase-service-account.json
+
+# Firebase
+firebase-debug.log
+.firebase/
+*-firebase-adminsdk-*.json
+
+# Cache
+.temp
+.cache

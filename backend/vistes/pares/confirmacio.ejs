@@ -1,69 +1,69 @@
-<div class="confirmacion-container">
-    <div class="confirmacion-icono">✓</div>
+<div class="confirmacio-container">
+    <div class="confirmacio-icona">✓</div>
     
-    <h1>¡Reserva confirmada!</h1>
+    <h1>Reserva confirmada!</h1>
     
-    <div class="confirmacion-detalles">
-        <h2>Detalles de la tutoría</h2>
+    <div class="confirmacio-detalls">
+        <h2>Detalls de la tutoria</h2>
         
-        <div class="detalle-item">
-            <span class="detalle-label">Profesor:</span>
-            <span class="detalle-valor"><%= reserva.profesorNombre %></span>
+        <div class="detall-item">
+            <span class="detall-etiqueta">Professor:</span>
+            <span class="detall-valor"><%= reserva.professorNom %></span>
         </div>
         
-        <div class="detalle-item">
-            <span class="detalle-label">Alumno:</span>
-            <span class="detalle-valor"><%= reserva.nombreAlumno || 'No especificado' %></span>
+        <div class="detall-item">
+            <span class="detall-etiqueta">Alumne:</span>
+            <span class="detall-valor"><%= reserva.nomAlumne || 'No especificat' %></span>
         </div>
 
         
-        <div class="detalle-item">
-            <span class="detalle-label">Fecha:</span>
-            <span class="detalle-valor"><%= new Date(reserva.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+        <div class="detall-item">
+            <span class="detall-etiqueta">Data:</span>
+            <span class="detall-valor"><%= new Date(reserva.data).toLocaleDateString('ca-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
         </div>
         
-        <div class="detalle-item">
-            <span class="detalle-label">Hora:</span>
-            <span class="detalle-valor"><%= reserva.hora %></span>
+        <div class="detall-item">
+            <span class="detall-etiqueta">Hora:</span>
+            <span class="detall-valor"><%= reserva.hora %></span>
         </div>
         
-        <div class="detalle-item">
-            <span class="detalle-label">ID Reserva:</span>
-            <span class="detalle-valor"><%= reserva.reservaId.substring(0, 8).toUpperCase() %></span>
+        <div class="detall-item">
+            <span class="detall-etiqueta">ID Reserva:</span>
+            <span class="detall-valor"><%= reserva.reservaId.substring(0, 8).toUpperCase() %></span>
         </div>
     </div>
     
-    <div class="confirmacion-acciones">
-        <p>Hemos registrado tu reserva correctamente.</p>
-        <p>Se ha enviado una confirmación a <strong><%= reserva.padreEmail %></strong></p>
+    <div class="confirmacio-accions">
+        <p>Hem registrat la teva reserva correctament.</p>
+        <p>S'ha enviat una confirmació a <strong><%= reserva.emailPare %></strong></p>
         
-        <div class="botones-accion">
+        <div class="botons-accio">
             <button onclick="window.print()" class="btn btn-secondary">
                 🖨️ Imprimir
             </button>
-            <a href="/padre/profesores" class="btn btn-primary">
-                Volver a profesores
+            <a href="/pare/professors" class="btn btn-primary">
+                Tornar a professors
             </a>
         </div>
     </div>
     
     <div class="info-rgpd">
         <p>
-            <strong>Importante (RGPD):</strong> Tus datos serán eliminados automáticamente 
-            24 horas después de la tutoría. Puedes cancelar la reserva desde el enlace 
-            incluido en el email de confirmación.
+            <strong>Important (RGPD):</strong> Les teves dades seran eliminades automàticament 
+            24 hores després de la tutoria. Pots cancel·lar la reserva des de l'enllaç 
+            inclòs al correu electrònic de confirmació.
         </p>
     </div>
 </div>
 
 <style>
-.confirmacion-container {
+.confirmacio-container {
     max-width: 600px;
     margin: 0 auto;
     text-align: center;
 }
 
-.confirmacion-icono {
+.confirmacio-icona {
     width: 80px;
     height: 80px;
     background: #28a745;
@@ -76,7 +76,7 @@
     margin: 0 auto 30px;
 }
 
-.confirmacion-detalles {
+.confirmacio-detalls {
     background: white;
     padding: 30px;
     border-radius: 10px;
@@ -85,35 +85,35 @@
     text-align: left;
 }
 
-.confirmacion-detalles h2 {
+.confirmacio-detalls h2 {
     color: #4a90e2;
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 2px solid #f0f0f0;
 }
 
-.detalle-item {
+.detall-item {
     display: flex;
     padding: 10px 0;
     border-bottom: 1px solid #f0f0f0;
 }
 
-.detalle-item:last-child {
+.detall-item:last-child {
     border-bottom: none;
 }
 
-.detalle-label {
+.detall-etiqueta {
     flex: 0 0 120px;
     font-weight: 600;
     color: #6c757d;
 }
 
-.detalle-valor {
+.detall-valor {
     flex: 1;
     color: #333;
 }
 
-.confirmacion-acciones {
+.confirmacio-accions {
     background: white;
     padding: 30px;
     border-radius: 10px;
@@ -121,12 +121,12 @@
     margin-bottom: 30px;
 }
 
-.confirmacion-acciones p {
+.confirmacio-accions p {
     margin: 10px 0;
     color: #666;
 }
 
-.botones-accion {
+.botons-accio {
     display: flex;
     gap: 15px;
     justify-content: center;

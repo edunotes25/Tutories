@@ -1,5 +1,5 @@
 <div class="auth-container">
-    <h1 id="tituloLogin">Iniciar Sesión</h1>
+    <h1 id="titolLogin">Iniciar Sessió</h1>
     
     <% if (error && error.length > 0) { %>
         <div class="alerta error"><%= error %></div>
@@ -14,7 +14,7 @@
     
     <div id="loading-spinner" style="display: none; text-align: center; margin: 20px 0;">
         <div class="spinner"></div>
-        <p>Iniciando sesión...</p>
+        <p>Iniciant sessió...</p>
     </div>
     
     <form id="login-form" class="auth-form">
@@ -24,27 +24,27 @@
         </div>
         
         <div class="form-group">
-            <label for="password">Contraseña</label>
+            <label for="password">Contrasenya</label>
             <input type="password" id="password" name="password" required>
         </div>
         
-        <input type="hidden" name="tipo" id="tipoInput" value="padre">
+        <input type="hidden" name="tipus" id="tipusInput" value="pare">
         
-        <button type="submit" class="btn btn-primary btn-block" id="submit-btn">Iniciar Sesión</button>
+        <button type="submit" class="btn btn-primary btn-block" id="submit-btn">Iniciar Sessió</button>
     </form>
     
     <div class="auth-links">
-        <p id="registroLink">¿No tienes cuenta? <a href="/registro-padre">Regístrate aquí</a></p>
-        <p><a href="/">← Volver al inicio</a></p>
+        <p id="registreLink">No tens compte? <a href="/registre-pare">Registra't aquí</a></p>
+        <p><a href="/">← Tornar a l'inici</a></p>
     </div>
 </div>
 
-<!-- Cargar Firebase de la forma CORRECTA (versión UMD) -->
+<!-- Carregar Firebase de la forma CORRECTA (versió UMD) -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
 <script>
-// Configuración de Firebase
+// Configuració de Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyBn_qSBGxQh-Gp8laagdzYAKPfKuNHho7s",
     authDomain: "tutories-679c5.firebaseapp.com",
@@ -54,48 +54,48 @@ const firebaseConfig = {
     appId: "1:1025787276190:web:eaa4f1c523639f1d66848f"
 };
 
-console.log('✅ Script cargado correctamente');
+console.log('✅ Script carregat correctament');
 
-// Inicializar Firebase cuando los scripts estén listos
+// Inicialitzar Firebase quan els scripts estiguin llestos
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('📝 DOM cargado, inicializando...');
+    console.log('📝 DOM carregat, inicialitzant...');
     
-    // Verificar que firebase está disponible
+    // Verificar que firebase està disponible
     if (typeof firebase === 'undefined') {
-        console.error('❌ Firebase no está disponible');
-        document.getElementById('firebase-error').textContent = 'Error cargando Firebase. Recarga la página.';
+        console.error('❌ Firebase no està disponible');
+        document.getElementById('firebase-error').textContent = 'Error carregant Firebase. Recarrega la pàgina.';
         document.getElementById('firebase-error').style.display = 'block';
         return;
     }
     
-    // Inicializar Firebase
+    // Inicialitzar Firebase
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
-        console.log('✅ Firebase inicializado por primera vez');
+        console.log('✅ Firebase inicialitzat per primera vegada');
     } else {
-        console.log('✅ Firebase ya estaba inicializado');
+        console.log('✅ Firebase ja estava inicialitzat');
     }
     
     const auth = firebase.auth();
-    console.log('✅ Objeto auth obtenido');
+    console.log('✅ Objecte auth obtingut');
     
-    // Elementos del DOM
+    // Elements del DOM
     const urlParams = new URLSearchParams(window.location.search);
-    const tipo = urlParams.get('tipo') || 'padre';
-    const titulo = document.getElementById('tituloLogin');
-    const registroLink = document.getElementById('registroLink');
-    const tipoInput = document.getElementById('tipoInput');
+    const tipus = urlParams.get('tipus') || 'pare';
+    const titol = document.getElementById('titolLogin');
+    const registreLink = document.getElementById('registreLink');
+    const tipusInput = document.getElementById('tipusInput');
     const loginForm = document.getElementById('login-form');
     const firebaseError = document.getElementById('firebase-error');
     const firebaseSuccess = document.getElementById('firebase-success');
     const loadingSpinner = document.getElementById('loading-spinner');
     const submitBtn = document.getElementById('submit-btn');
     
-    // Verificar que todos los elementos existen
-    console.log('📋 Elementos del DOM:', {
-        titulo: !!titulo,
-        registroLink: !!registroLink,
-        tipoInput: !!tipoInput,
+    // Verificar que tots els elements existeixen
+    console.log('📋 Elements del DOM:', {
+        titol: !!titol,
+        registreLink: !!registreLink,
+        tipusInput: !!tipusInput,
         loginForm: !!loginForm,
         firebaseError: !!firebaseError,
         firebaseSuccess: !!firebaseSuccess,
@@ -103,27 +103,27 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn: !!submitBtn
     });
     
-    // Configurar según tipo
-    tipoInput.value = tipo;
+    // Configurar segons tipus
+    tipusInput.value = tipus;
     
-    if (tipo === 'profesor') {
-        titulo.innerText = 'Iniciar Sesión - Profesor';
-        registroLink.innerHTML = '¿No tienes cuenta? <a href="/registro">Regístrate como profesor</a>';
+    if (tipus === 'professor') {
+        titol.innerText = 'Iniciar Sessió - Professor';
+        registreLink.innerHTML = 'No tens compte? <a href="/registre">Registra\'t com a professor</a>';
     } else {
-        titulo.innerText = 'Iniciar Sesión - Padre/Madre';
-        registroLink.innerHTML = '¿No tienes cuenta? <a href="/registro-padre">Regístrate como padre</a>';
+        titol.innerText = 'Iniciar Sessió - Pare/Mare';
+        registreLink.innerHTML = 'No tens compte? <a href="/registre-pare">Registra\'t com a pare</a>';
     }
     
-    function showMessage(element, message, isSuccess = false) {
-        // Ocultar ambos mensajes primero
+    function mostrarMissatge(element, missatge, isSuccess = false) {
+        // Amagar els dos missatges primer
         firebaseError.style.display = 'none';
         firebaseSuccess.style.display = 'none';
         
-        // Mostrar el mensaje correspondiente
-        element.textContent = message;
+        // Mostrar el missatge corresponent
+        element.textContent = missatge;
         element.style.display = 'block';
         
-        // Auto-ocultar después de 5 segundos
+        // Auto-amagar després de 5 segons
         setTimeout(() => {
             element.style.display = 'none';
         }, 5000);
@@ -133,90 +133,90 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isLoading) {
             loadingSpinner.style.display = 'block';
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Iniciando sesión...';
+            submitBtn.textContent = 'Iniciant sessió...';
         } else {
             loadingSpinner.style.display = 'none';
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Iniciar Sesión';
+            submitBtn.textContent = 'Iniciar Sessió';
         }
     }
     
-    // Manejar login
+    // Gestionar login
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        console.log('🚀 Submit capturado!');
-        console.log('📝 Tipo de usuario:', tipoInput.value);
+        console.log('🚀 Submit capturat!');
+        console.log('📝 Tipus d\'usuari:', tipusInput.value);
         
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
-        const tipo = tipoInput.value;
+        const tipus = tipusInput.value;
         
         console.log('📧 Email:', email);
-        console.log('🔑 Password length:', password.length);
+        console.log('🔑 Longitud contrasenya:', password.length);
         
         if (!email || !password) {
-            console.log('❌ Campos vacíos');
-            showMessage(firebaseError, 'Completa todos los campos');
+            console.log('❌ Camps buits');
+            mostrarMissatge(firebaseError, 'Completa tots els camps');
             return;
         }
         
         setLoading(true);
         
         try {
-            console.log('🔄 Intentando login con Firebase Auth...');
+            console.log('🔄 Intentant login amb Firebase Auth...');
             const userCredential = await auth.signInWithEmailAndPassword(email, password);
-            console.log('✅ Login Firebase exitoso!');
+            console.log('✅ Login Firebase exitós!');
             console.log('🆔 UID:', userCredential.user.uid);
-            console.log('📧 Email verificado:', userCredential.user.emailVerified);
+            console.log('📧 Email verificat:', userCredential.user.emailVerified);
             
-            console.log('🔄 Obteniendo token de ID...');
+            console.log('🔄 Obtenint token d\'ID...');
             const idToken = await userCredential.user.getIdToken();
-            console.log('✅ Token obtenido (primeros 20 chars):', idToken.substring(0, 20) + '...');
+            console.log('✅ Token obtingut (primers 20 caràcters):', idToken.substring(0, 20) + '...');
             
-            console.log('🔄 Enviando a /auth/verify-login...');
+            console.log('🔄 Enviant a /auth/verify-login...');
             const response = await fetch('/auth/verify-login', {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ idToken, tipo })
+                body: JSON.stringify({ idToken, tipus })
             });
             
-            console.log('📥 Respuesta recibida. Status:', response.status);
+            console.log('📥 Resposta rebuda. Status:', response.status);
             
             let data;
             try {
                 data = await response.json();
-                console.log('📦 Datos de respuesta:', data);
+                console.log('📦 Dades de resposta:', data);
             } catch (parseError) {
-                console.error('❌ Error parseando JSON:', parseError);
+                console.error('❌ Error parsejant JSON:', parseError);
                 const textResponse = await response.text();
-                console.error('📄 Respuesta raw:', textResponse.substring(0, 200));
-                throw new Error('Respuesta del servidor no válida');
+                console.error('📄 Resposta raw:', textResponse.substring(0, 200));
+                throw new Error('Resposta del servidor no vàlida');
             }
             
             if (data.success) {
-                console.log('✅ Verificación exitosa!');
-                console.log('➡️ Redirigiendo a:', data.redirect);
+                console.log('✅ Verificació exitosa!');
+                console.log('➡️ Redirigint a:', data.redirect);
                 
-                showMessage(firebaseSuccess, '¡Login exitoso! Redirigiendo...', true);
+                mostrarMissatge(firebaseSuccess, 'Login exitós! Redirigint...', true);
                 
-                // Redirigir después de 1 segundo
+                // Redirigir després d'1 segon
                 setTimeout(() => {
-                    console.log('🔄 Ejecutando redirección a:', data.redirect);
+                    console.log('🔄 Executant redirecció a:', data.redirect);
                     window.location.href = data.redirect;
                 }, 1000);
             } else {
-                console.log('❌ Verificación falló:', data.error);
+                console.log('❌ Verificació fallida:', data.error);
                 await auth.signOut();
-                showMessage(firebaseError, data.error || 'Error de verificación');
+                mostrarMissatge(firebaseError, data.error || 'Error de verificació');
                 setLoading(false);
             }
         } catch (error) {
-            console.error('❌ ERROR DETALLADO:');
-            console.error('Código:', error.code);
-            console.error('Mensaje:', error.message);
+            console.error('❌ ERROR DETALLAT:');
+            console.error('Codi:', error.code);
+            console.error('Missatge:', error.message);
             
             if (error.stack) {
                 console.error('Stack:', error.stack);
@@ -224,45 +224,45 @@ document.addEventListener('DOMContentLoaded', () => {
             
             setLoading(false);
             
-            let mensaje = 'Error al iniciar sesión';
+            let missatge = 'Error en iniciar sessió';
             
-            // Manejo específico de errores de Firebase
+            // Gestió específica d'errors de Firebase
             if (error.code === 'auth/user-not-found') {
-                mensaje = 'Usuario no encontrado';
+                missatge = 'Usuari no trobat';
             } else if (error.code === 'auth/wrong-password') {
-                mensaje = 'Contraseña incorrecta';
+                missatge = 'Contrasenya incorrecta';
             } else if (error.code === 'auth/invalid-email') {
-                mensaje = 'Email inválido';
+                missatge = 'Email invàlid';
             } else if (error.code === 'auth/too-many-requests') {
-                mensaje = 'Demasiados intentos fallidos. Intenta más tarde';
+                missatge = 'Massa intents fallits. Intenta més tard';
             } else if (error.code === 'auth/invalid-credential') {
-                mensaje = 'Credenciales inválidas. Verifica tu email y contraseña';
+                missatge = 'Credencials invàlides. Verifica el teu email i contrasenya';
             } else if (error.code === 'auth/network-request-failed') {
-                mensaje = 'Error de red. Verifica tu conexión';
+                missatge = 'Error de xarxa. Verifica la teva connexió';
             } else if (error.message.includes('Failed to fetch')) {
-                mensaje = 'Error de conexión con el servidor';
+                missatge = 'Error de connexió amb el servidor';
             }
             
-            showMessage(firebaseError, mensaje);
+            mostrarMissatge(firebaseError, missatge);
         }
     });
     
-    console.log('✅ Evento submit asignado correctamente');
+    console.log('✅ Event submit assignat correctament');
     
-    // Verificar si hay sesión activa al cargar
+    // Verificar si hi ha sessió activa en carregar
     auth.onAuthStateChanged((user) => {
         if (user) {
-            console.log('👤 Usuario ya autenticado:', user.uid);
-            // No hacemos nada, el usuario hará login explícitamente
+            console.log('👤 Usuari ja autenticat:', user.uid);
+            // No fem res, l'usuari farà login explícitament
         } else {
-            console.log('👤 No hay sesión activa');
+            console.log('👤 No hi ha sessió activa');
         }
     });
 });
 </script>
 
 <style>
-/* Tus estilos existentes - sin cambios */
+/* Els teus estils existents - sense canvis */
 .auth-container {
     max-width: 400px;
     margin: 40px auto;

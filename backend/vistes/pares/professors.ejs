@@ -1,6 +1,6 @@
 <div class="dashboard-header">
-    <h1>Profesores Disponibles</h1>
-    <a href="/logout" class="btn btn-secondary">Cerrar sesión</a>
+    <h1>Professors Disponibles</h1>
+    <a href="/logout" class="btn btn-secondary">Tancar sessió</a>
 </div>
 
 <% if (error && error.length > 0) { %>
@@ -11,32 +11,32 @@
     <div class="alerta success"><%= success %></div>
 <% } %>
 
-<div class="profesores-grid">
-    <% if (profesores.length === 0) { %>
-        <div class="no-profesores">
-            <p>No hay profesores registrados en el sistema</p>
+<div class="professors-grid">
+    <% if (professors.length === 0) { %>
+        <div class="no-professors">
+            <p>No hi ha professors registrats al sistema</p>
         </div>
     <% } else { %>
-        <% profesores.forEach(profesor => { %>
-            <div class="profesor-card">
-                <div class="profesor-header">
-                    <h3><%= profesor.nombre %></h3>
-                    <span class="badge"><%= profesor.curso || 'Sin curso' %></span>
+        <% professors.forEach(professor => { %>
+            <div class="professor-card">
+                <div class="professor-header">
+                    <h3><%= professor.nom %></h3>
+                    <span class="badge"><%= professor.curs || 'Sense curs' %></span>
                 </div>
-                <div class="profesor-body">
-                    <p><strong>Email:</strong> <%= profesor.email %></p>
-                    <% if (profesor.telefono) { %>
-                        <p><strong>Teléfono:</strong> <%= profesor.telefono %></p>
+                <div class="professor-body">
+                    <p><strong>Email:</strong> <%= professor.email %></p>
+                    <% if (professor.telefon) { %>
+                        <p><strong>Telèfon:</strong> <%= professor.telefon %></p>
                     <% } %>
-                    <% if (profesor.descripcion) { %>
-                        <p class="descripcion"><%= profesor.descripcion %></p>
+                    <% if (professor.descripcio) { %>
+                        <p class="descripcio"><%= professor.descripcio %></p>
                     <% } %>
-                    <p class="horarios-info">
-                        <strong>Horarios disponibles:</strong> 
-                        <span class="badge-disponibles"><%= profesor.totalHorarios || 0 %></span>
+                    <p class="horaris-info">
+                        <strong>Horaris disponibles:</strong> 
+                        <span class="badge-disponibles"><%= professor.totalHoraris || 0 %></span>
                     </p>
-                    <a href="/padre/reservar/<%= profesor.uid %>" class="btn btn-primary btn-block">
-                        Reservar tutoría
+                    <a href="/pare/reservar/<%= professor.uid %>" class="btn btn-primary btn-block">
+                        Reservar tutoria
                     </a>
                 </div>
             </div>
@@ -56,13 +56,13 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.profesores-grid {
+.professors-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 25px;
 }
 
-.profesor-card {
+.professor-card {
     background: white;
     border-radius: 10px;
     overflow: hidden;
@@ -70,12 +70,12 @@
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.profesor-card:hover {
+.professor-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 20px rgba(0,0,0,0.15);
 }
 
-.profesor-header {
+.professor-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 20px;
@@ -84,7 +84,7 @@
     align-items: center;
 }
 
-.profesor-header h3 {
+.professor-header h3 {
     margin: 0;
     font-size: 1.2rem;
 }
@@ -96,16 +96,16 @@
     font-size: 0.875rem;
 }
 
-.profesor-body {
+.professor-body {
     padding: 20px;
 }
 
-.profesor-body p {
+.professor-body p {
     margin: 10px 0;
     color: #333;
 }
 
-.descripcion {
+.descripcio {
     color: #666;
     font-style: italic;
     padding: 10px;
@@ -113,7 +113,7 @@
     border-radius: 5px;
 }
 
-.horarios-info {
+.horaris-info {
     margin-top: 15px;
     padding-top: 15px;
     border-top: 1px solid #e9ecef;
@@ -185,7 +185,7 @@
     border: 1px solid #c3e6cb;
 }
 
-.no-profesores {
+.no-professors {
     grid-column: 1 / -1;
     text-align: center;
     padding: 60px;

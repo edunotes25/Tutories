@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cancelar Reserva - Sistema de Tutorías</title>
+    <title>Cancel·lar Reserva - Sistema de Tutories</title>
     <style>
         * {
             margin: 0;
@@ -68,7 +68,7 @@
             margin-bottom: 25px;
         }
         
-        .detalle-reserva {
+        .detall-reserva {
             background: #f8f9fa;
             padding: 20px;
             border-radius: 8px;
@@ -76,7 +76,7 @@
             border-left: 4px solid #ffc107;
         }
         
-        .detalle-reserva h2 {
+        .detall-reserva h2 {
             color: #4a90e2;
             font-size: 1.2rem;
             margin-top: 0;
@@ -85,28 +85,28 @@
             border-bottom: 1px solid #dee2e6;
         }
         
-        .detalle-item {
+        .detall-item {
             display: flex;
             padding: 8px 0;
             border-bottom: 1px solid #e9ecef;
         }
         
-        .detalle-item:last-child {
+        .detall-item:last-child {
             border-bottom: none;
         }
         
-        .detalle-label {
+        .detall-etiqueta {
             flex: 0 0 100px;
             font-weight: 600;
             color: #495057;
         }
         
-        .detalle-valor {
+        .detall-valor {
             flex: 1;
             color: #212529;
         }
         
-        .cancelar-acciones {
+        .cancelar-accions {
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -169,7 +169,7 @@
             margin: 0;
         }
         
-        .error-mensaje {
+        .error-missatge {
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
@@ -180,11 +180,11 @@
         }
         
         @media (max-width: 480px) {
-            .detalle-item {
+            .detall-item {
                 flex-direction: column;
             }
             
-            .detalle-label {
+            .detall-etiqueta {
                 flex: none;
                 margin-bottom: 5px;
             }
@@ -200,70 +200,70 @@
         <div class="cancelar-card">
             <div class="cancelar-header">
                 <div class="cancelar-icono">❓</div>
-                <h1>Cancelar reserva</h1>
+                <h1>Cancel·lar reserva</h1>
             </div>
             
             <div class="cancelar-body">
                 <% if (error && error.length > 0) { %>
-                    <div class="error-mensaje"><%= error %></div>
+                    <div class="error-missatge"><%= error %></div>
                 <% } %>
                 
-                <p class="cancelar-intro">¿Estás seguro de que quieres cancelar esta tutoría?</p>
+                <p class="cancelar-intro">Estàs segur que vols cancel·lar aquesta tutoria?</p>
                 
-                <div class="detalle-reserva">
-                    <h2>Detalles de la reserva</h2>
+                <div class="detall-reserva">
+                    <h2>Detalls de la reserva</h2>
                     
-                    <div class="detalle-item">
-                        <span class="detalle-label">Profesor:</span>
-                        <span class="detalle-valor"><%= reserva.profesorNombre || 'No especificado' %></span>
+                    <div class="detall-item">
+                        <span class="detall-etiqueta">Professor:</span>
+                        <span class="detall-valor"><%= reserva.professorNom || 'No especificat' %></span>
                     </div>
                     
-                    <div class="detalle-item">
-                        <span class="detalle-label">Alumno:</span>
-                        <span class="detalle-valor"><%= reserva.nombreAlumno || 'No especificado' %></span>
+                    <div class="detall-item">
+                        <span class="detall-etiqueta">Alumne:</span>
+                        <span class="detall-valor"><%= reserva.nomAlumne || 'No especificat' %></span>
                     </div>
                     
-                    <div class="detalle-item">
-                        <span class="detalle-label">Fecha:</span>
-                        <span class="detalle-valor"><%= new Date(reserva.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+                    <div class="detall-item">
+                        <span class="detall-etiqueta">Data:</span>
+                        <span class="detall-valor"><%= new Date(reserva.data).toLocaleDateString('ca-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
                     </div>
                     
-                    <div class="detalle-item">
-                        <span class="detalle-label">Hora:</span>
-                        <span class="detalle-valor"><%= reserva.hora %></span>
+                    <div class="detall-item">
+                        <span class="detall-etiqueta">Hora:</span>
+                        <span class="detall-valor"><%= reserva.hora %></span>
                     </div>
                     
-                    <div class="detalle-item">
-                        <span class="detalle-label">ID Reserva:</span>
-                        <span class="detalle-valor"><%= reserva.reservaId.substring(0, 8).toUpperCase() %></span>
+                    <div class="detall-item">
+                        <span class="detall-etiqueta">ID Reserva:</span>
+                        <span class="detall-valor"><%= reserva.reservaId.substring(0, 8).toUpperCase() %></span>
                     </div>
                 </div>
                 
-                <div class="cancelar-acciones">
+                <div class="cancelar-accions">
                     <form action="/cancelar/<%= token %>" method="POST" id="formCancelar">
-                        <button type="submit" class="btn btn-danger btn-block" onclick="return confirm('¿Confirmas que quieres cancelar esta tutoría?')">
-                            Sí, cancelar reserva
+                        <button type="submit" class="btn btn-danger btn-block" onclick="return confirm('Confirmes que vols cancel·lar aquesta tutoria?')">
+                            Sí, cancel·lar reserva
                         </button>
                     </form>
                     
-                    <a href="/" class="btn btn-secondary btn-block">No, volver al inicio</a>
+                    <a href="/" class="btn btn-secondary btn-block">No, tornar a l'inici</a>
                 </div>
                 
                 <div class="cancelar-info">
-                    <p><strong>Importante:</strong> Una vez cancelada, no podrás recuperar esta reserva. Si necesitas otra fecha, deberás realizar una nueva reserva.</p>
+                    <p><strong>Important:</strong> Un cop cancel·lada, no podràs recuperar aquesta reserva. Si necessites una altra data, hauràs de fer una nova reserva.</p>
                 </div>
             </div>
         </div>
     </div>
     
     <script>
-        // Prevenir doble envío del formulario
+        // Prevenir doble enviament del formulari
         const form = document.getElementById('formCancelar');
         if (form) {
             form.addEventListener('submit', function() {
                 const btn = this.querySelector('button');
                 btn.disabled = true;
-                btn.textContent = 'Cancelando...';
+                btn.textContent = 'Cancel·lant...';
             });
         }
     </script>

@@ -1,64 +1,63 @@
 <div class="auth-container">
-    <h1>Registro de Profesor</h1>
+    <h1>Registre de Professor</h1>
     
     <% if (error && error.length > 0) { %>
         <div class="alerta error"><%= error %></div>
     <% } %>
     
-    <form action="/api/registro" method="POST" class="auth-form">
+    <form action="/api/registre" method="POST" class="auth-form">
         <div class="form-group">
-            <label for="nombre">Nombre completo *</label>
-            <input type="text" id="nombre" name="nombre" required placeholder="Ej: Ana García López">
+            <label for="nom">Nom complet *</label>
+            <input type="text" id="nom" name="nom" required placeholder="Ex: Ana García López">
         </div>
         
         <div class="form-group">
             <label for="email">Email *</label>
-            <input type="email" id="email" name="email" required placeholder="profesor@colegio.edu">
+            <input type="email" id="email" name="email" required placeholder="professor@colegio.edu">
         </div>
         
         <div class="form-group">
-            <label for="password">Contraseña *</label>
+            <label for="password">Contrasenya *</label>
             <input type="password" id="password" name="password" required minlength="6">
-            <small>Mínimo 6 caracteres</small>
+            <small>Mínim 6 caràcters</small>
         </div>
         
         <div class="form-group">
-            <label for="codigoRegistro">Código de registro *</label>
-            <input type="text" id="codigoRegistro" name="codigoRegistro" required 
-                   placeholder="Introduce el código proporcionado por el centro">
-            <small>Código necesario para registrar profesores: PROF25</small>
+            <label for="codiRegistre">Codi de registre *</label>
+            <input type="text" id="codiRegistre" name="codiRegistre" required 
+                   placeholder="Introdueix el codi proporcionat pel centre">
         </div>
         
         <div class="form-group">
-            <label for="telefono">Teléfono (opcional)</label>
-            <input type="tel" id="telefono" name="telefono" placeholder="600 123 456">
+            <label for="telefon">Telèfon (opcional)</label>
+            <input type="tel" id="telefon" name="telefon" placeholder="600 123 456">
         </div>
         
         <div class="form-group">
-            <label for="curso">Curso/Tutoría que impartes *</label>
-            <input type="text" id="curso" name="curso" required 
-                   placeholder="Ej: 1ºA, 2ºB, 3ºC, 4ºA, etc.">
-            <small>Escribe el curso del que eres tutor (ej: 1ºA, 2ºB, 3ºC...)</small>
+            <label for="curs">Curs/Tutoria que imparteixes *</label>
+            <input type="text" id="curs" name="curs" required 
+                   placeholder="Ex: 1rA, 2nB, 3rC, 4tA, etc.">
+            <small>Escriu el curs del qual ets tutor (ex: 1rA, 2nB, 3rC...)</small>
         </div>
         
         <div class="form-group">
-            <label for="descripcion">Breve descripción (opcional)</label>
-            <textarea id="descripcion" name="descripcion" rows="3" placeholder="Cuéntales a los padres sobre ti..."></textarea>
+            <label for="descripcio">Breu descripció (opcional)</label>
+            <textarea id="descripcio" name="descripcio" rows="3" placeholder="Explica'ls als pares coses sobre tu..."></textarea>
         </div>
         
-        <div class="form-group consentimiento">
-            <input type="checkbox" id="aceptaCondiciones" name="aceptaCondiciones" required>
-            <label for="aceptaCondiciones">
-                He leído y acepto el <a href="/aviso-privacidad" target="_blank">aviso de privacidad</a>
+        <div class="form-group consentiment">
+            <input type="checkbox" id="acceptaCondicions" name="acceptaCondicions" required>
+            <label for="acceptaCondicions">
+                He llegit i accepto l'<a href="/avis-privacitat" target="_blank">avís de privacitat</a>
             </label>
         </div>
         
-        <button type="submit" class="btn btn-primary btn-block">Registrarse</button>
+        <button type="submit" class="btn btn-primary btn-block">Registrar-se</button>
     </form>
     
     <div class="auth-links">
-        <p>¿Ya tienes cuenta? <a href="/login">Inicia sesión</a></p>
-        <p><a href="/">Volver al inicio</a></p>
+        <p>Ja tens compte? <a href="/login">Inicia sessió</a></p>
+        <p><a href="/">Tornar a l'inici</a></p>
     </div>
 </div>
 
@@ -112,13 +111,13 @@
     font-size: 0.875rem;
 }
 
-.consentimiento {
+.consentiment {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.consentimiento input[type="checkbox"] {
+.consentiment input[type="checkbox"] {
     width: auto;
 }
 

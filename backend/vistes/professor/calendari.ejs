@@ -1,8 +1,8 @@
 <div class="dashboard-header">
-    <h1>Calendario de Reservas - <%= usuario.nombre %></h1>
+    <h1>Calendari de Reserves - <%= usuari.nom %></h1>
     <div>
-        <a href="/profesor/dashboard" class="btn btn-secondary">Volver al panel</a>
-        <a href="/logout" class="btn btn-secondary">Cerrar sesión</a>
+        <a href="/professor/dashboard" class="btn btn-secondary">Tornar al panell</a>
+        <a href="/logout" class="btn btn-secondary">Tancar sessió</a>
     </div>
 </div>
 
@@ -14,53 +14,53 @@
     <div class="alerta success"><%= success %></div>
 <% } %>
 
-<div class="calendario-container">
-    <h2>Visualización de reservas</h2>
+<div class="calendari-container">
+    <h2>Visualització de reserves</h2>
     
-    <!-- Leyenda de colores (actualizada) -->
-    <div class="leyenda">
-        <div class="leyenda-item">
-            <span class="color-pendiente"></span>
-            <span>Pendiente/Confirmada</span>
+    <!-- Llegenda de colors (actualitzada) -->
+    <div class="llegenda">
+        <div class="llegenda-item">
+            <span class="color-pendent"></span>
+            <span>Pendent/Confirmada</span>
         </div>
-        <div class="leyenda-item">
+        <div class="llegenda-item">
             <span class="color-completada"></span>
             <span>Completada</span>
         </div>
-        <div class="leyenda-item">
-            <span class="color-cancelada" style="opacity: 0.3; text-decoration: line-through;"></span>
-            <span style="color: #999; text-decoration: line-through;">Cancelada (no visible)</span>
+        <div class="llegenda-item">
+            <span class="color-cancel·lada" style="opacity: 0.3; text-decoration: line-through;"></span>
+            <span style="color: #999; text-decoration: line-through;">Cancel·lada (no visible)</span>
         </div>
     </div>
     
-    <p class="info-importante">
-        <strong>Nota:</strong> Las reservas canceladas no se muestran en el calendario.
+    <p class="info-important">
+        <strong>Nota:</strong> Les reserves cancel·lades no es mostren al calendari.
     </p>
     
-    <!-- Calendario -->
-    <div class="calendario-navegacion">
+    <!-- Calendari -->
+    <div class="calendari-navegacio">
         <button class="btn-nav" id="btnMesAnterior">← Mes anterior</button>
         <span class="mes-actual" id="mesActual"></span>
-        <button class="btn-nav" id="btnMesSiguiente">Mes siguiente →</button>
+        <button class="btn-nav" id="btnMesSeguent">Mes següent →</button>
     </div>
     
-    <div class="calendario-grid" id="calendario">
-        <!-- Se genera dinámicamente con JavaScript -->
+    <div class="calendari-grid" id="calendari">
+        <!-- Es genera dinàmicament amb JavaScript -->
     </div>
 </div>
 
-<!-- Modal para ver detalles de la reserva -->
+<!-- Modal per veure detalls de la reserva -->
 <div id="modalReserva" class="modal" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Detalles de la reserva</h2>
+            <h2>Detalls de la reserva</h2>
             <span class="close">&times;</span>
         </div>
-        <div class="modal-body" id="modalDetalles">
-            <!-- Contenido dinámico -->
+        <div class="modal-body" id="modalDetalls">
+            <!-- Contingut dinàmic -->
         </div>
         <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="document.getElementById('modalReserva').style.display='none'">Cerrar</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('modalReserva').style.display='none'">Tancar</button>
         </div>
     </div>
 </div>
@@ -77,19 +77,19 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.calendario-container {
+.calendari-container {
     background: white;
     padding: 25px;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.calendario-container h2 {
+.calendari-container h2 {
     color: #4a90e2;
     margin-bottom: 20px;
 }
 
-.info-importante {
+.info-important {
     background: #e7f3ff;
     border-left: 4px solid #4a90e2;
     padding: 10px 15px;
@@ -99,8 +99,8 @@
     color: #2c3e50;
 }
 
-/* Leyenda de colores */
-.leyenda {
+/* Llegenda de colors */
+.llegenda {
     display: flex;
     gap: 20px;
     margin-bottom: 20px;
@@ -110,14 +110,14 @@
     flex-wrap: wrap;
 }
 
-.leyenda-item {
+.llegenda-item {
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 0.9rem;
 }
 
-.color-pendiente {
+.color-pendent {
     width: 20px;
     height: 20px;
     background: #4a90e2;
@@ -131,7 +131,7 @@
     border-radius: 3px;
 }
 
-.color-cancelada {
+.color-cancel·lada {
     width: 20px;
     height: 20px;
     background: #dc3545;
@@ -139,7 +139,7 @@
     opacity: 0.3;
 }
 
-.calendario-navegacion {
+.calendari-navegacio {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -166,7 +166,7 @@
     font-size: 1.2rem;
 }
 
-.calendario-grid {
+.calendari-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 5px;
@@ -212,7 +212,7 @@
     text-overflow: ellipsis;
 }
 
-.reserva-mini.pendiente {
+.reserva-mini.pendent {
     background: #4a90e2;
 }
 
@@ -224,14 +224,14 @@
     background: #28a745;
 }
 
-.sin-reservas {
+.sense-reserves {
     font-size: 0.8rem;
     color: #adb5bd;
     text-align: center;
     padding: 5px;
 }
 
-/* Modal con scroll */
+/* Modal amb scroll */
 .modal {
     position: fixed;
     z-index: 1000;
@@ -301,23 +301,23 @@
     color: #f0f0f0;
 }
 
-.modal-detalle-item {
+.modal-detall-item {
     display: flex;
     padding: 12px 0;
     border-bottom: 1px solid #f0f0f0;
 }
 
-.modal-detalle-item:last-child {
+.modal-detall-item:last-child {
     border-bottom: none;
 }
 
-.modal-detalle-label {
+.modal-detall-etiqueta {
     flex: 0 0 120px;
     font-weight: 600;
     color: #495057;
 }
 
-.modal-detalle-valor {
+.modal-detall-valor {
     flex: 1;
     color: #212529;
 }
@@ -369,7 +369,7 @@
 }
 
 @media (max-width: 768px) {
-    .calendario-grid {
+    .calendari-grid {
         grid-template-columns: repeat(7, minmax(40px, 1fr));
     }
     
@@ -393,11 +393,11 @@
         max-height: calc(90vh - 130px);
     }
     
-    .modal-detalle-item {
+    .modal-detall-item {
         flex-direction: column;
     }
     
-    .modal-detalle-label {
+    .modal-detall-etiqueta {
         flex: none;
         margin-bottom: 5px;
     }
@@ -405,30 +405,30 @@
 </style>
 
 <script>
-// Variables globales
-let fechaActual = new Date();
-let reservas = <%- JSON.stringify(todasReservas) %>;
+// Variables globals
+let dataActual = new Date();
+let reserves = <%- JSON.stringify(totesReserves) %>;
 
-console.log('Reservas activas (excluyendo canceladas):', reservas.length);
+console.log('Reserves actives (excloent cancel·lades):', reserves.length);
 
-// Días de la semana en español
-const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+// Dies de la setmana en català
+const diesSetmana = ['Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte', 'Diumenge'];
 
-// Inicializar calendario
+// Inicialitzar calendari
 document.addEventListener('DOMContentLoaded', function() {
-    renderizarCalendario(fechaActual);
+    renderitzarCalendari(dataActual);
     
     document.getElementById('btnMesAnterior').addEventListener('click', function() {
-        fechaActual.setMonth(fechaActual.getMonth() - 1);
-        renderizarCalendario(fechaActual);
+        dataActual.setMonth(dataActual.getMonth() - 1);
+        renderitzarCalendari(dataActual);
     });
     
-    document.getElementById('btnMesSiguiente').addEventListener('click', function() {
-        fechaActual.setMonth(fechaActual.getMonth() + 1);
-        renderizarCalendario(fechaActual);
+    document.getElementById('btnMesSeguent').addEventListener('click', function() {
+        dataActual.setMonth(dataActual.getMonth() + 1);
+        renderitzarCalendari(dataActual);
     });
     
-    // Cerrar modal
+    // Tancar modal
     document.querySelector('.close').addEventListener('click', function() {
         document.getElementById('modalReserva').style.display = 'none';
     });
@@ -440,103 +440,103 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Renderizar calendario
-function renderizarCalendario(fecha) {
-    const calendario = document.getElementById('calendario');
-    if (!calendario) return;
+// Renderitzar calendari
+function renderitzarCalendari(data) {
+    const calendari = document.getElementById('calendari');
+    if (!calendari) return;
     
-    const año = fecha.getFullYear();
-    const mes = fecha.getMonth();
+    const any = data.getFullYear();
+    const mes = data.getMonth();
     
-    // Actualizar título del mes
-    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    document.getElementById('mesActual').textContent = `${meses[mes]} ${año}`;
+    // Actualitzar títol del mes
+    const mesos = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'];
+    document.getElementById('mesActual').textContent = `${mesos[mes]} ${any}`;
     
-    // Primer día del mes
-    const primerDia = new Date(año, mes, 1);
-    const ultimoDia = new Date(año, mes + 1, 0);
+    // Primer dia del mes
+    const primerDia = new Date(any, mes, 1);
+    const ultimDia = new Date(any, mes + 1, 0);
     
-    // Ajustar para que la semana empiece en lunes
-    let diaSemanaInicio = primerDia.getDay();
-    diaSemanaInicio = diaSemanaInicio === 0 ? 6 : diaSemanaInicio - 1;
+    // Ajustar perquè la setmana comenci en dilluns
+    let diaSetmanaInici = primerDia.getDay();
+    diaSetmanaInici = diaSetmanaInici === 0 ? 6 : diaSetmanaInici - 1;
     
     let html = '';
     
-    // Días de la semana
-    diasSemana.forEach(dia => {
+    // Dies de la setmana
+    diesSetmana.forEach(dia => {
         html += `<div class="dia-header">${dia}</div>`;
     });
     
-    // Días vacíos al inicio del mes
-    for (let i = 0; i < diaSemanaInicio; i++) {
-        html += `<div class="dia-celda vacio"></div>`;
+    // Dies buits a l'inici del mes
+    for (let i = 0; i < diaSetmanaInici; i++) {
+        html += `<div class="dia-celda buit"></div>`;
     }
     
-    // Días del mes
-    for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
-        const fechaStr = `${año}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+    // Dies del mes
+    for (let dia = 1; dia <= ultimDia.getDate(); dia++) {
+        const dataStr = `${any}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
         
-        // Filtrar reservas para este día (ya vienen filtradas del servidor)
-        const reservasDia = reservas.filter(r => r.fecha === fechaStr);
+        // Filtrar reserves per a aquest dia (ja vénen filtrades del servidor)
+        const reservesDia = reserves.filter(r => r.data === dataStr);
         
-        html += `<div class="dia-celda" onclick="mostrarReservasDia('${fechaStr}')">`;
+        html += `<div class="dia-celda" onclick="mostrarReservesDia('${dataStr}')">`;
         html += `<div class="dia-numero">${dia}</div>`;
         
-        if (reservasDia.length === 0) {
-            html += `<div class="sin-reservas">-</div>`;
+        if (reservesDia.length === 0) {
+            html += `<div class="sense-reserves">-</div>`;
         } else {
-            // Mostrar hasta 3 reservas por día
-            reservasDia.slice(0, 3).forEach(reserva => {
+            // Mostrar fins a 3 reserves per dia
+            reservesDia.slice(0, 3).forEach(reserva => {
                 let hora = reserva.hora;
-                let estado = reserva.estado;
-                let nombreAlumno = reserva.nombreAlumno ? reserva.nombreAlumno.substring(0, 8) : 'Alumno';
+                let estat = reserva.estat;
+                let nomAlumne = reserva.nomAlumne ? reserva.nomAlumne.substring(0, 8) : 'Alumne';
                 
-                html += `<div class="reserva-mini ${estado}" title="${hora} - ${reserva.padreNombre}">${hora} ${nombreAlumno}</div>`;
+                html += `<div class="reserva-mini ${estat}" title="${hora} - ${reserva.nomPare}">${hora} ${nomAlumne}</div>`;
             });
             
-            if (reservasDia.length > 3) {
-                html += `<div class="reserva-mini" style="background: #6c757d;">+${reservasDia.length - 3} más</div>`;
+            if (reservesDia.length > 3) {
+                html += `<div class="reserva-mini" style="background: #6c757d;">+${reservesDia.length - 3} més</div>`;
             }
         }
         
         html += '</div>';
     }
     
-    calendario.innerHTML = html;
+    calendari.innerHTML = html;
 }
 
-// Mostrar reservas de un día en el modal
-function mostrarReservasDia(fecha) {
-    const reservasDia = reservas.filter(r => r.fecha === fecha);
+// Mostrar reserves d'un dia al modal
+function mostrarReservesDia(data) {
+    const reservesDia = reserves.filter(r => r.data === data);
     
-    if (reservasDia.length === 0) {
-        alert('No hay reservas activas para este día');
+    if (reservesDia.length === 0) {
+        alert('No hi ha reserves actives per a aquest dia');
         return;
     }
     
-    let html = `<p><strong>Fecha:</strong> ${new Date(fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>`;
-    html += `<p><strong>Total reservas activas:</strong> ${reservasDia.length}</p>`;
+    let html = `<p><strong>Data:</strong> ${new Date(data).toLocaleDateString('ca-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>`;
+    html += `<p><strong>Total reserves actives:</strong> ${reservesDia.length}</p>`;
     
-    reservasDia.forEach((reserva, index) => {
-        html += `<div class="reserva-separador">Reserva ${index + 1} - ${reserva.hora} (${reserva.estado})</div>`;
+    reservesDia.forEach((reserva, index) => {
+        html += `<div class="reserva-separador">Reserva ${index + 1} - ${reserva.hora} (${reserva.estat})</div>`;
         
-        html += `<div class="modal-detalle-item"><span class="modal-detalle-label">Estado:</span><span class="modal-detalle-valor"><strong>${reserva.estado}</strong></span></div>`;
-        html += `<div class="modal-detalle-item"><span class="modal-detalle-label">Padre:</span><span class="modal-detalle-valor">${reserva.padreNombre}</span></div>`;
-        html += `<div class="modal-detalle-item"><span class="modal-detalle-label">Email:</span><span class="modal-detalle-valor">${reserva.padreEmail}</span></div>`;
-        html += `<div class="modal-detalle-item"><span class="modal-detalle-label">Alumno:</span><span class="modal-detalle-valor">${reserva.nombreAlumno || 'No especificado'}</span></div>`;
-        if (reserva.padreTelefono) {
-            html += `<div class="modal-detalle-item"><span class="modal-detalle-label">Teléfono:</span><span class="modal-detalle-valor">${reserva.padreTelefono}</span></div>`;
+        html += `<div class="modal-detall-item"><span class="modal-detall-etiqueta">Estat:</span><span class="modal-detall-valor"><strong>${reserva.estat}</strong></span></div>`;
+        html += `<div class="modal-detall-item"><span class="modal-detall-etiqueta">Pare:</span><span class="modal-detall-valor">${reserva.nomPare}</span></div>`;
+        html += `<div class="modal-detall-item"><span class="modal-detall-etiqueta">Email:</span><span class="modal-detall-valor">${reserva.emailPare}</span></div>`;
+        html += `<div class="modal-detall-item"><span class="modal-detall-etiqueta">Alumne:</span><span class="modal-detall-valor">${reserva.nomAlumne || 'No especificat'}</span></div>`;
+        if (reserva.telefonPare) {
+            html += `<div class="modal-detall-item"><span class="modal-detall-etiqueta">Telèfon:</span><span class="modal-detall-valor">${reserva.telefonPare}</span></div>`;
         }
-        if (reserva.comentarios) {
-            html += `<div class="modal-detalle-item"><span class="modal-detalle-label">Comentarios:</span><span class="modal-detalle-valor">${reserva.comentarios}</span></div>`;
+        if (reserva.comentaris) {
+            html += `<div class="modal-detall-item"><span class="modal-detall-etiqueta">Comentaris:</span><span class="modal-detall-valor">${reserva.comentaris}</span></div>`;
         }
-        html += `<div class="modal-detalle-item"><span class="modal-detalle-label">ID Reserva:</span><span class="modal-detalle-valor">${reserva.reservaId.substring(0, 8).toUpperCase()}</span></div>`;
+        html += `<div class="modal-detall-item"><span class="modal-detall-etiqueta">ID Reserva:</span><span class="modal-detall-valor">${reserva.reservaId.substring(0, 8).toUpperCase()}</span></div>`;
     });
     
-    document.getElementById('modalDetalles').innerHTML = html;
+    document.getElementById('modalDetalls').innerHTML = html;
     document.getElementById('modalReserva').style.display = 'block';
     
-    // Scroll automático al inicio del modal
+    // Scroll automàtic a l'inici del modal
     document.querySelector('.modal-body').scrollTop = 0;
 }
 </script>

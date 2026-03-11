@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel del Profesor - Sistema de Tutorías</title>
+    <title>Panell del Professor - Sistema de Tutories</title>
     
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
     
-    <!-- FullCalendar (calendario interactivo) -->
+    <!-- FullCalendar (calendari interactiu) -->
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ca.js'></script>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -25,127 +25,127 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <i class="fas fa-chalkboard-teacher"></i>
-                <h3>Panel Profesor</h3>
+                <h3>Panell Professor</h3>
             </div>
             
-            <div class="profesor-info" id="profesorInfo">
-                <div class="profesor-avatar">
+            <div class="professor-info" id="professorInfo">
+                <div class="professor-avatar">
                     <i class="fas fa-user-circle"></i>
                 </div>
-                <div class="profesor-detalles">
-                    <h4 id="profesorNombre">Cargando...</h4>
-                    <p id="profesorAsignatura">Cargando...</p>
+                <div class="professor-detalls">
+                    <h4 id="professorNom">Carregant...</h4>
+                    <p id="professorAssignatura">Carregant...</p>
                 </div>
             </div>
             
             <nav class="sidebar-nav">
-                <a href="#" class="active" onclick="cambiarSeccion('calendario')">
-                    <i class="fas fa-calendar-alt"></i> Calendario
+                <a href="#" class="active" onclick="canviarSeccio('calendari')">
+                    <i class="fas fa-calendar-alt"></i> Calendari
                 </a>
-                <a href="#" onclick="cambiarSeccion('proximas')">
-                    <i class="fas fa-clock"></i> Próximas tutorías
+                <a href="#" onclick="canviarSeccio('proximes')">
+                    <i class="fas fa-clock"></i> Properes tutories
                 </a>
-                <a href="#" onclick="cambiarSeccion('historial')">
+                <a href="#" onclick="canviarSeccio('historial')">
                     <i class="fas fa-history"></i> Historial
                 </a>
-                <a href="#" onclick="cambiarSeccion('perfil')">
-                    <i class="fas fa-user-cog"></i> Mi perfil
+                <a href="#" onclick="canviarSeccio('perfil')">
+                    <i class="fas fa-user-cog"></i> El meu perfil
                 </a>
             </nav>
             
             <div class="sidebar-footer">
-                <button onclick="cerrarSesion()" class="btn-logout">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                <button onclick="tancarSessio()" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Tancar Sessió
                 </button>
             </div>
         </aside>
 
-        <!-- Contenido principal -->
+        <!-- Contingut principal -->
         <main class="dashboard-main">
-            <!-- Sección Calendario -->
-            <section id="seccionCalendario" class="dashboard-section active">
+            <!-- Secció Calendari -->
+            <section id="seccioCalendari" class="dashboard-section active">
                 <div class="section-header">
-                    <h2><i class="fas fa-calendar-alt"></i> Mi Calendario de Tutorías</h2>
+                    <h2><i class="fas fa-calendar-alt"></i> El Meu Calendari de Tutories</h2>
                     <div class="header-actions">
-                        <button class="btn-refresh" onclick="cargarReservas()">
-                            <i class="fas fa-sync-alt"></i> Actualizar
+                        <button class="btn-refresh" onclick="carregarReserves()">
+                            <i class="fas fa-sync-alt"></i> Actualitzar
                         </button>
                     </div>
                 </div>
                 
-                <div class="calendario-stats">
+                <div class="calendari-stats">
                     <div class="stat-card">
-                        <span class="stat-number" id="totalHoy">0</span>
-                        <span class="stat-label">Tutorías hoy</span>
+                        <span class="stat-number" id="totalAvui">0</span>
+                        <span class="stat-label">Tutories avui</span>
                     </div>
                     <div class="stat-card">
-                        <span class="stat-number" id="totalSemana">0</span>
-                        <span class="stat-label">Esta semana</span>
+                        <span class="stat-number" id="totalSetmana">0</span>
+                        <span class="stat-label">Aquesta setmana</span>
                     </div>
                     <div class="stat-card">
                         <span class="stat-number" id="totalMes">0</span>
-                        <span class="stat-label">Este mes</span>
+                        <span class="stat-label">Aquest mes</span>
                     </div>
                 </div>
                 
-                <div id="calendario"></div>
+                <div id="calendari"></div>
             </section>
 
-            <!-- Sección Próximas Tutorías -->
-            <section id="seccionProximas" class="dashboard-section">
+            <!-- Secció Properes Tutories -->
+            <section id="seccioProximes" class="dashboard-section">
                 <div class="section-header">
-                    <h2><i class="fas fa-clock"></i> Próximas Tutorías</h2>
+                    <h2><i class="fas fa-clock"></i> Properes Tutories</h2>
                 </div>
                 
-                <div class="proximas-lista" id="proximasLista">
+                <div class="proximes-llista" id="proximesLlista">
                     <div class="loader"></div>
                 </div>
             </section>
 
-            <!-- Sección Historial -->
-            <section id="seccionHistorial" class="dashboard-section">
+            <!-- Secció Historial -->
+            <section id="seccioHistorial" class="dashboard-section">
                 <div class="section-header">
-                    <h2><i class="fas fa-history"></i> Historial de Tutorías</h2>
+                    <h2><i class="fas fa-history"></i> Historial de Tutories</h2>
                 </div>
                 
-                <div class="historial-lista" id="historialLista">
+                <div class="historial-llista" id="historialLlista">
                     <div class="loader"></div>
                 </div>
             </section>
 
-            <!-- Sección Perfil -->
-            <section id="seccionPerfil" class="dashboard-section">
+            <!-- Secció Perfil -->
+            <section id="seccioPerfil" class="dashboard-section">
                 <div class="section-header">
-                    <h2><i class="fas fa-user-cog"></i> Mi Perfil</h2>
+                    <h2><i class="fas fa-user-cog"></i> El Meu Perfil</h2>
                 </div>
                 
                 <div class="perfil-container">
                     <div class="perfil-info">
                         <div class="info-group">
-                            <label>Nombre:</label>
-                            <span id="perfilNombre">-</span>
+                            <label>Nom:</label>
+                            <span id="perfilNom">-</span>
                         </div>
                         <div class="info-group">
                             <label>Email:</label>
                             <span id="perfilEmail">-</span>
                         </div>
                         <div class="info-group">
-                            <label>Asignatura:</label>
-                            <span id="perfilAsignatura">-</span>
+                            <label>Assignatura:</label>
+                            <span id="perfilAssignatura">-</span>
                         </div>
                         <div class="info-group">
-                            <label>Total tutorías:</label>
+                            <label>Total tutories:</label>
                             <span id="perfilTotal">0</span>
                         </div>
                     </div>
                     
-                    <div class="perfil-acciones">
-                        <h3>Configuración</h3>
-                        <button onclick="cambiarPassword()" class="btn-config">
-                            <i class="fas fa-key"></i> Cambiar contraseña
+                    <div class="perfil-accions">
+                        <h3>Configuració</h3>
+                        <button onclick="canviarContrasenya()" class="btn-config">
+                            <i class="fas fa-key"></i> Canviar contrasenya
                         </button>
-                        <button onclick="configurarHorario()" class="btn-config">
-                            <i class="fas fa-clock"></i> Configurar horario disponible
+                        <button onclick="configurarHorari()" class="btn-config">
+                            <i class="fas fa-clock"></i> Configurar horari disponible
                         </button>
                     </div>
                 </div>
@@ -153,39 +153,39 @@
         </main>
     </div>
 
-    <!-- Modal para ver detalles de tutoría -->
+    <!-- Modal per veure detalls de tutoria -->
     <div id="modalTutoria" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-calendar-check"></i> Detalles de la tutoría</h3>
-                <button onclick="cerrarModal()" class="close-btn">&times;</button>
+                <h3><i class="fas fa-calendar-check"></i> Detalls de la tutoria</h3>
+                <button onclick="tancarModal()" class="close-btn">&times;</button>
             </div>
             <div class="modal-body" id="modalBody">
-                <!-- Contenido dinámico -->
+                <!-- Contingut dinàmic -->
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" onclick="cerrarModal()">Cerrar</button>
-                <button class="btn-danger" onclick="cancelarTutoria()" id="btnCancelar">Cancelar tutoría</button>
+                <button class="btn-secondary" onclick="tancarModal()">Tancar</button>
+                <button class="btn-danger" onclick="cancelarTutoria()" id="btnCancelar">Cancel·lar tutoria</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Variables globales
-        let calendario;
-        let reservas = [];
-        let profesorActual = null;
+        // Variables globals
+        let calendari;
+        let reserves = [];
+        let professorActual = null;
 
-        // Inicializar dashboard
+        // Inicialitzar dashboard
         document.addEventListener('DOMContentLoaded', async () => {
-            await verificarSesion();
-            inicializarCalendario();
-            cargarReservas();
-            actualizarInfoProfesor();
+            await verificarSessio();
+            inicialitzarCalendari();
+            carregarReserves();
+            actualitzarInfoProfessor();
         });
 
-        // Verificar sesión del profesor
-        async function verificarSesion() {
+        // Verificar sessió del professor
+        async function verificarSessio() {
             try {
                 const token = localStorage.getItem('token');
                 if (!token) {
@@ -193,7 +193,7 @@
                     return;
                 }
 
-                const response = await fetch('/api/auth/verificar-sesion', {
+                const response = await fetch('/api/auth/verificar-sessio', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -204,7 +204,7 @@
                 if (!data.success) {
                     window.location.href = '/login';
                 } else {
-                    profesorActual = data.user;
+                    professorActual = data.user;
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -212,12 +212,12 @@
             }
         }
 
-        // Inicializar calendario
-        function inicializarCalendario() {
-            const calendarEl = document.getElementById('calendario');
+        // Inicialitzar calendari
+        function inicialitzarCalendari() {
+            const calendarEl = document.getElementById('calendari');
             
-            calendario = new FullCalendar.Calendar(calendarEl, {
-                locale: 'es',
+            calendari = new FullCalendar.Calendar(calendarEl, {
+                locale: 'ca',
                 initialView: 'dayGridMonth',
                 headerToolbar: {
                     left: 'prev,next today',
@@ -225,37 +225,37 @@
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
                 buttonText: {
-                    today: 'Hoy',
+                    today: 'Avui',
                     month: 'Mes',
-                    week: 'Semana',
-                    day: 'Día'
+                    week: 'Setmana',
+                    day: 'Dia'
                 },
                 events: [],
                 eventClick: function(info) {
-                    mostrarDetallesTutoria(info.event);
+                    mostrarDetallsTutoria(info.event);
                 },
                 eventDidMount: function(info) {
-                    // Tooltip con información
+                    // Tooltip amb informació
                     info.el.setAttribute('title', 
-                        `${info.event.title}\nHora: ${info.event.start.toLocaleTimeString()}\nPadre: ${info.event.extendedProps.padre}`
+                        `${info.event.title}\nHora: ${info.event.start.toLocaleTimeString()}\nPare: ${info.event.extendedProps.pare}`
                     );
                 },
                 height: 'auto',
-                firstDay: 1, // Lunes como primer día
+                firstDay: 1, // Dilluns com a primer dia
                 slotMinTime: '08:00:00',
                 slotMaxTime: '20:00:00',
                 allDaySlot: false,
-                slotDuration: '00:30:00' // Intervalos de 30 minutos
+                slotDuration: '00:30:00' // Intervals de 30 minuts
             });
             
-            calendario.render();
+            calendari.render();
         }
 
-        // Cargar reservas del profesor
-        async function cargarReservas() {
+        // Carregar reserves del professor
+        async function carregarReserves() {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`/api/reservas/profesor/${profesorActual?.uid}`, {
+                const response = await fetch(`/api/reserves/professor/${professorActual?.uid}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -264,100 +264,100 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    reservas = data.reservas;
-                    actualizarCalendario();
-                    actualizarListas();
-                    actualizarEstadisticas();
+                    reserves = data.reserves;
+                    actualitzarCalendari();
+                    actualitzarLlistes();
+                    actualitzarEstadistiques();
                 }
             } catch (error) {
-                console.error('Error cargando reservas:', error);
+                console.error('Error carregant reserves:', error);
             }
         }
 
-        // Actualizar eventos del calendario
-        function actualizarCalendario() {
-            const events = reservas.map(reserva => ({
+        // Actualitzar events del calendari
+        function actualitzarCalendari() {
+            const events = reserves.map(reserva => ({
                 id: reserva.id,
-                title: `📚 ${reserva.nombreAlumno}`,
-                start: `${reserva.fecha}T${reserva.hora}:00`,
-                end: `${reserva.fecha}T${sumarHora(reserva.hora, 30)}:00`,
-                backgroundColor: getColorPorEstado(reserva),
+                title: `📚 ${reserva.nomAlumne}`,
+                start: `${reserva.data}T${reserva.hora}:00`,
+                end: `${reserva.data}T${sumarHora(reserva.hora, 30)}:00`,
+                backgroundColor: getColorPerEstat(reserva),
                 borderColor: '#4a90e2',
                 textColor: '#ffffff',
                 extendedProps: {
-                    padre: reserva.contacto?.nombre || 'No especificado',
-                    email: reserva.contacto?.email,
-                    telefono: reserva.contacto?.telefono,
-                    alumno: reserva.nombreAlumno
+                    pare: reserva.contacte?.nom || 'No especificat',
+                    email: reserva.contacte?.email,
+                    telefon: reserva.contacte?.telefon,
+                    alumne: reserva.nomAlumne
                 }
             }));
             
-            calendario.removeAllEvents();
-            calendario.addEventSource(events);
+            calendari.removeAllEvents();
+            calendari.addEventSource(events);
         }
 
-        // Sumar minutos a una hora
-        function sumarHora(hora, minutos) {
+        // Sumar minuts a una hora
+        function sumarHora(hora, minuts) {
             const [h, m] = hora.split(':').map(Number);
-            const fecha = new Date();
-            fecha.setHours(h, m + minutos);
-            return `${fecha.getHours().toString().padStart(2,'0')}:${fecha.getMinutes().toString().padStart(2,'0')}`;
+            const data = new Date();
+            data.setHours(h, m + minuts);
+            return `${data.getHours().toString().padStart(2,'0')}:${data.getMinutes().toString().padStart(2,'0')}`;
         }
 
-        // Color según estado/antigüedad
-        function getColorPorEstado(reserva) {
-            const fechaReserva = new Date(reserva.fecha);
-            const hoy = new Date();
+        // Color segons estat/antiguitat
+        function getColorPerEstat(reserva) {
+            const dataReserva = new Date(reserva.data);
+            const avui = new Date();
             
-            if (fechaReserva < hoy) {
-                return '#6c757d'; // Gris (pasada)
+            if (dataReserva < avui) {
+                return '#6c757d'; // Gris (passada)
             }
-            if (fechaReserva.toDateString() === hoy.toDateString()) {
-                return '#28a745'; // Verde (hoy)
+            if (dataReserva.toDateString() === avui.toDateString()) {
+                return '#28a745'; // Verd (avui)
             }
-            return '#4a90e2'; // Azul (futura)
+            return '#4a90e2'; // Blau (futura)
         }
 
-        // Mostrar detalles de tutoría
-        function mostrarDetallesTutoria(event) {
+        // Mostrar detalls de tutoria
+        function mostrarDetallsTutoria(event) {
             const modal = document.getElementById('modalTutoria');
             const modalBody = document.getElementById('modalBody');
             
             modalBody.innerHTML = `
-                <div class="detalle-tutoria">
-                    <p><strong>👤 Alumno:</strong> ${event.extendedProps.alumno}</p>
-                    <p><strong>👪 Padre/Madre:</strong> ${event.extendedProps.padre}</p>
-                    <p><strong>📧 Email contacto:</strong> ${event.extendedProps.email || 'No disponible'}</p>
-                    <p><strong>📞 Teléfono:</strong> ${event.extendedProps.telefono || 'No disponible'}</p>
-                    <p><strong>📅 Fecha:</strong> ${event.start.toLocaleDateString('es-ES')}</p>
-                    <p><strong>⏰ Hora:</strong> ${event.start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</p>
+                <div class="detall-tutoria">
+                    <p><strong>👤 Alumne:</strong> ${event.extendedProps.alumne}</p>
+                    <p><strong>👪 Pare/Mare:</strong> ${event.extendedProps.pare}</p>
+                    <p><strong>📧 Email contacte:</strong> ${event.extendedProps.email || 'No disponible'}</p>
+                    <p><strong>📞 Telèfon:</strong> ${event.extendedProps.telefon || 'No disponible'}</p>
+                    <p><strong>📅 Data:</strong> ${event.start.toLocaleDateString('ca-ES')}</p>
+                    <p><strong>⏰ Hora:</strong> ${event.start.toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit' })}</p>
                     <p><strong>🆔 ID Reserva:</strong> ${event.id}</p>
                 </div>
             `;
             
             modal.style.display = 'block';
             
-            // Guardar ID para cancelar
+            // Guardar ID per cancel·lar
             document.getElementById('btnCancelar').onclick = () => cancelarTutoria(event.id);
         }
 
-        // Cancelar tutoría
+        // Cancel·lar tutoria
         async function cancelarTutoria(id) {
-            const confirmacion = await Swal.fire({
-                title: '¿Cancelar tutoría?',
-                text: 'Esta acción no se puede deshacer',
+            const confirmacio = await Swal.fire({
+                title: 'Cancel·lar tutoria?',
+                text: 'Aquesta acció no es pot desfer',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc3545',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Sí, cancelar',
-                cancelButtonText: 'No, volver'
+                confirmButtonText: 'Sí, cancel·lar',
+                cancelButtonText: 'No, tornar'
             });
             
-            if (confirmacion.isConfirmed) {
+            if (confirmacio.isConfirmed) {
                 try {
                     const token = localStorage.getItem('token');
-                    const response = await fetch(`/api/reservas/cancelar/${id}`, {
+                    const response = await fetch(`/api/reserves/cancelar/${id}`, {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -367,58 +367,58 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        Swal.fire('Cancelada', 'La tutoría ha sido cancelada', 'success');
-                        cargarReservas();
-                        cerrarModal();
+                        Swal.fire('Cancel·lada', 'La tutoria ha estat cancel·lada', 'success');
+                        carregarReserves();
+                        tancarModal();
                     } else {
-                        Swal.fire('Error', 'No se pudo cancelar la tutoría', 'error');
+                        Swal.fire('Error', 'No s\'ha pogut cancel·lar la tutoria', 'error');
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    Swal.fire('Error', 'Error al cancelar', 'error');
+                    Swal.fire('Error', 'Error en cancel·lar', 'error');
                 }
             }
         }
 
-        // Actualizar listas de próximas y historial
-        function actualizarListas() {
-            const hoy = new Date();
-            hoy.setHours(0, 0, 0, 0);
+        // Actualitzar llistes de properes i historial
+        function actualitzarLlistes() {
+            const avui = new Date();
+            avui.setHours(0, 0, 0, 0);
             
-            const proximas = reservas.filter(r => new Date(r.fecha) >= hoy);
-            const historial = reservas.filter(r => new Date(r.fecha) < hoy);
+            const properes = reserves.filter(r => new Date(r.data) >= avui);
+            const historial = reserves.filter(r => new Date(r.data) < avui);
             
-            // Ordenar por fecha
-            proximas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-            historial.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            // Ordenar per data
+            properes.sort((a, b) => new Date(a.data) - new Date(b.data));
+            historial.sort((a, b) => new Date(b.data) - new Date(a.data));
             
-            mostrarProximas(proximas);
+            mostrarProperes(properes);
             mostrarHistorial(historial);
         }
 
-        // Mostrar próximas tutorías
-        function mostrarProximas(proximas) {
-            const container = document.getElementById('proximasLista');
+        // Mostrar properes tutories
+        function mostrarProperes(properes) {
+            const container = document.getElementById('proximesLlista');
             
-            if (proximas.length === 0) {
-                container.innerHTML = '<p class="no-data">No hay tutorías programadas</p>';
+            if (properes.length === 0) {
+                container.innerHTML = '<p class="no-data">No hi ha tutories programades</p>';
                 return;
             }
             
-            container.innerHTML = proximas.map(reserva => `
-                <div class="tutoria-card" onclick="mostrarDetallesTutoriaSimple('${reserva.id}')">
-                    <div class="tutoria-fecha">
-                        <span class="dia">${new Date(reserva.fecha).getDate()}</span>
-                        <span class="mes">${new Date(reserva.fecha).toLocaleString('es-ES', { month: 'short' })}</span>
+            container.innerHTML = properes.map(reserva => `
+                <div class="tutoria-card" onclick="mostrarDetallsTutoriaSimple('${reserva.id}')">
+                    <div class="tutoria-data">
+                        <span class="dia">${new Date(reserva.data).getDate()}</span>
+                        <span class="mes">${new Date(reserva.data).toLocaleString('ca-ES', { month: 'short' })}</span>
                     </div>
                     <div class="tutoria-info">
-                        <h4>${reserva.nombreAlumno}</h4>
+                        <h4>${reserva.nomAlumne}</h4>
                         <p><i class="fas fa-clock"></i> ${reserva.hora}</p>
-                        <p><i class="fas fa-user"></i> ${reserva.contacto?.nombre}</p>
+                        <p><i class="fas fa-user"></i> ${reserva.contacte?.nom}</p>
                     </div>
-                    <div class="tutoria-estado">
-                        <span class="badge ${new Date(reserva.fecha).toDateString() === new Date().toDateString() ? 'hoy' : ''}">
-                            ${new Date(reserva.fecha).toDateString() === new Date().toDateString() ? 'Hoy' : ''}
+                    <div class="tutoria-estat">
+                        <span class="badge ${new Date(reserva.data).toDateString() === new Date().toDateString() ? 'avui' : ''}">
+                            ${new Date(reserva.data).toDateString() === new Date().toDateString() ? 'Avui' : ''}
                         </span>
                     </div>
                 </div>
@@ -427,155 +427,155 @@
 
         // Mostrar historial
         function mostrarHistorial(historial) {
-            const container = document.getElementById('historialLista');
+            const container = document.getElementById('historialLlista');
             
             if (historial.length === 0) {
-                container.innerHTML = '<p class="no-data">No hay tutorías pasadas</p>';
+                container.innerHTML = '<p class="no-data">No hi ha tutories passades</p>';
                 return;
             }
             
             container.innerHTML = historial.map(reserva => `
-                <div class="tutoria-card historial" onclick="mostrarDetallesTutoriaSimple('${reserva.id}')">
-                    <div class="tutoria-fecha">
-                        <span class="dia">${new Date(reserva.fecha).getDate()}</span>
-                        <span class="mes">${new Date(reserva.fecha).toLocaleString('es-ES', { month: 'short' })}</span>
+                <div class="tutoria-card historial" onclick="mostrarDetallsTutoriaSimple('${reserva.id}')">
+                    <div class="tutoria-data">
+                        <span class="dia">${new Date(reserva.data).getDate()}</span>
+                        <span class="mes">${new Date(reserva.data).toLocaleString('ca-ES', { month: 'short' })}</span>
                     </div>
                     <div class="tutoria-info">
-                        <h4>${reserva.nombreAlumno}</h4>
+                        <h4>${reserva.nomAlumne}</h4>
                         <p><i class="fas fa-clock"></i> ${reserva.hora}</p>
-                        <p><i class="fas fa-user"></i> ${reserva.contacto?.nombre}</p>
+                        <p><i class="fas fa-user"></i> ${reserva.contacte?.nom}</p>
                     </div>
-                    <div class="tutoria-estado">
-                        <span class="badge pasada">Completada</span>
+                    <div class="tutoria-estat">
+                        <span class="badge passada">Completada</span>
                     </div>
                 </div>
             `).join('');
         }
 
-        // Mostrar detalles desde lista
-        function mostrarDetallesTutoriaSimple(id) {
-            const reserva = reservas.find(r => r.id === id);
+        // Mostrar detalls des de llista
+        function mostrarDetallsTutoriaSimple(id) {
+            const reserva = reserves.find(r => r.id === id);
             if (!reserva) return;
             
-            // Crear evento simulado para el modal
-            const evento = {
+            // Crear event simulat per al modal
+            const event = {
                 id: reserva.id,
-                title: reserva.nombreAlumno,
-                start: new Date(`${reserva.fecha}T${reserva.hora}`),
+                title: reserva.nomAlumne,
+                start: new Date(`${reserva.data}T${reserva.hora}`),
                 extendedProps: {
-                    alumno: reserva.nombreAlumno,
-                    padre: reserva.contacto?.nombre,
-                    email: reserva.contacto?.email,
-                    telefono: reserva.contacto?.telefono
+                    alumne: reserva.nomAlumne,
+                    pare: reserva.contacte?.nom,
+                    email: reserva.contacte?.email,
+                    telefon: reserva.contacte?.telefon
                 }
             };
             
-            mostrarDetallesTutoria({...evento, start: evento.start});
+            mostrarDetallsTutoria({...event, start: event.start});
         }
 
-        // Actualizar estadísticas
-        function actualizarEstadisticas() {
-            const hoy = new Date();
-            hoy.setHours(0, 0, 0, 0);
+        // Actualitzar estadístiques
+        function actualitzarEstadistiques() {
+            const avui = new Date();
+            avui.setHours(0, 0, 0, 0);
             
-            const finSemana = new Date(hoy);
-            finSemana.setDate(hoy.getDate() + 7);
+            const fiSetmana = new Date(avui);
+            fiSetmana.setDate(avui.getDate() + 7);
             
-            const finMes = new Date(hoy);
-            finMes.setMonth(hoy.getMonth() + 1);
+            const fiMes = new Date(avui);
+            fiMes.setMonth(avui.getMonth() + 1);
             
-            const totalHoy = reservas.filter(r => new Date(r.fecha).toDateString() === hoy.toDateString()).length;
-            const totalSemana = reservas.filter(r => {
-                const fecha = new Date(r.fecha);
-                return fecha >= hoy && fecha <= finSemana;
+            const totalAvui = reserves.filter(r => new Date(r.data).toDateString() === avui.toDateString()).length;
+            const totalSetmana = reserves.filter(r => {
+                const data = new Date(r.data);
+                return data >= avui && data <= fiSetmana;
             }).length;
-            const totalMes = reservas.filter(r => {
-                const fecha = new Date(r.fecha);
-                return fecha >= hoy && fecha <= finMes;
+            const totalMes = reserves.filter(r => {
+                const data = new Date(r.data);
+                return data >= avui && data <= fiMes;
             }).length;
             
-            document.getElementById('totalHoy').textContent = totalHoy;
-            document.getElementById('totalSemana').textContent = totalSemana;
+            document.getElementById('totalAvui').textContent = totalAvui;
+            document.getElementById('totalSetmana').textContent = totalSetmana;
             document.getElementById('totalMes').textContent = totalMes;
-            document.getElementById('perfilTotal').textContent = reservas.length;
+            document.getElementById('perfilTotal').textContent = reserves.length;
         }
 
-        // Actualizar información del profesor
-        function actualizarInfoProfesor() {
-            if (profesorActual) {
-                document.getElementById('profesorNombre').textContent = profesorActual.nombre;
-                document.getElementById('profesorAsignatura').textContent = profesorActual.asignatura;
-                document.getElementById('perfilNombre').textContent = profesorActual.nombre;
-                document.getElementById('perfilEmail').textContent = profesorActual.email;
-                document.getElementById('perfilAsignatura').textContent = profesorActual.asignatura;
+        // Actualitzar informació del professor
+        function actualitzarInfoProfessor() {
+            if (professorActual) {
+                document.getElementById('professorNom').textContent = professorActual.nom;
+                document.getElementById('professorAssignatura').textContent = professorActual.assignatura;
+                document.getElementById('perfilNom').textContent = professorActual.nom;
+                document.getElementById('perfilEmail').textContent = professorActual.email;
+                document.getElementById('perfilAssignatura').textContent = professorActual.assignatura;
             }
         }
 
-        // Cambiar sección
-        function cambiarSeccion(seccion) {
+        // Canviar secció
+        function canviarSeccio(seccio) {
             document.querySelectorAll('.sidebar-nav a').forEach(link => link.classList.remove('active'));
             document.querySelectorAll('.dashboard-section').forEach(section => section.classList.remove('active'));
             
-            document.querySelector(`[onclick="cambiarSeccion('${seccion}')"]`).classList.add('active');
-            document.getElementById(`seccion${seccion.charAt(0).toUpperCase() + seccion.slice(1)}`).classList.add('active');
+            document.querySelector(`[onclick="canviarSeccio('${seccio}')"]`).classList.add('active');
+            document.getElementById(`seccio${seccio.charAt(0).toUpperCase() + seccio.slice(1)}`).classList.add('active');
             
-            if (seccion === 'calendario') {
-                setTimeout(() => calendario.updateSize(), 100);
+            if (seccio === 'calendari') {
+                setTimeout(() => calendari.updateSize(), 100);
             }
         }
 
-        // Cerrar modal
-        function cerrarModal() {
+        // Tancar modal
+        function tancarModal() {
             document.getElementById('modalTutoria').style.display = 'none';
         }
 
-        // Cerrar sesión
-        async function cerrarSesion() {
-            const confirmacion = await Swal.fire({
-                title: '¿Cerrar sesión?',
-                text: 'Volverás a la página de login',
+        // Tancar sessió
+        async function tancarSessio() {
+            const confirmacio = await Swal.fire({
+                title: 'Tancar sessió?',
+                text: 'Tornaràs a la pàgina de login',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#4a90e2',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Sí, salir',
-                cancelButtonText: 'Cancelar'
+                confirmButtonText: 'Sí, sortir',
+                cancelButtonText: 'Cancel·lar'
             });
             
-            if (confirmacion.isConfirmed) {
+            if (confirmacio.isConfirmed) {
                 localStorage.removeItem('token');
                 window.location.href = '/login';
             }
         }
 
-        // Cambiar contraseña
-        function cambiarPassword() {
+        // Canviar contrasenya
+        function canviarContrasenya() {
             Swal.fire({
-                title: 'Cambiar contraseña',
+                title: 'Canviar contrasenya',
                 html: `
-                    <input type="password" id="passActual" class="swal2-input" placeholder="Contraseña actual">
-                    <input type="password" id="passNueva" class="swal2-input" placeholder="Nueva contraseña">
-                    <input type="password" id="passConfirmar" class="swal2-input" placeholder="Confirmar contraseña">
+                    <input type="password" id="passActual" class="swal2-input" placeholder="Contrasenya actual">
+                    <input type="password" id="passNova" class="swal2-input" placeholder="Nova contrasenya">
+                    <input type="password" id="passConfirmar" class="swal2-input" placeholder="Confirmar contrasenya">
                 `,
-                confirmButtonText: 'Cambiar',
+                confirmButtonText: 'Canviar',
                 showCancelButton: true,
                 preConfirm: () => {
-                    // Aquí iría la lógica para cambiar contraseña
-                    Swal.fire('Éxito', 'Contraseña cambiada correctamente', 'success');
+                    // Aquí aniria la lògica per canviar contrasenya
+                    Swal.fire('Èxit', 'Contrasenya canviada correctament', 'success');
                 }
             });
         }
 
-        // Configurar horario (placeholder)
-        function configurarHorario() {
+        // Configurar horari (placeholder)
+        function configurarHorari() {
             Swal.fire({
-                title: 'Configurar horario',
-                text: 'Funcionalidad en desarrollo',
+                title: 'Configurar horari',
+                text: 'Funcionalitat en desenvolupament',
                 icon: 'info'
             });
         }
 
-        // Cerrar modal al hacer clic fuera
+        // Tancar modal en fer clic fora
         window.onclick = function(event) {
             const modal = document.getElementById('modalTutoria');
             if (event.target === modal) {
@@ -585,8 +585,8 @@
     </script>
 
     <style>
-        /* Estilos adicionales para el calendario y dashboard */
-        .calendario-stats {
+        /* Estils addicionals per al calendari i dashboard */
+        .calendari-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 20px;
@@ -613,7 +613,7 @@
             font-size: 0.9rem;
         }
         
-        #calendario {
+        #calendari {
             background: white;
             padding: 20px;
             border-radius: 10px;
@@ -643,19 +643,19 @@
             opacity: 0.8;
         }
         
-        .tutoria-fecha {
+        .tutoria-data {
             text-align: center;
             min-width: 60px;
         }
         
-        .tutoria-fecha .dia {
+        .tutoria-data .dia {
             font-size: 1.5rem;
             font-weight: bold;
             color: #4a90e2;
             display: block;
         }
         
-        .tutoria-fecha .mes {
+        .tutoria-data .mes {
             font-size: 0.8rem;
             color: #6c757d;
             text-transform: uppercase;
@@ -689,19 +689,19 @@
             color: white;
         }
         
-        .badge.hoy {
+        .badge.avui {
             background: #28a745;
         }
         
-        .badge.pasada {
+        .badge.passada {
             background: #6c757d;
         }
         
-        .detalle-tutoria {
+        .detall-tutoria {
             padding: 20px;
         }
         
-        .detalle-tutoria p {
+        .detall-tutoria p {
             margin: 10px 0;
             font-size: 1rem;
         }
@@ -762,7 +762,7 @@
             color: #333;
         }
         
-        .perfil-acciones {
+        .perfil-accions {
             background: white;
             padding: 30px;
             border-radius: 10px;
@@ -801,7 +801,7 @@
                 text-align: center;
             }
             
-            .tutoria-fecha {
+            .tutoria-data {
                 margin-bottom: 10px;
             }
         }

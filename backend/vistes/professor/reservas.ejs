@@ -1,8 +1,8 @@
 <div class="dashboard-header">
-    <h1>Mis Reservas</h1>
+    <h1>Les Meves Reserves</h1>
     <div>
-        <a href="/profesor/dashboard" class="btn btn-secondary">Volver al panel</a>
-        <a href="/logout" class="btn btn-secondary">Cerrar sesión</a>
+        <a href="/professor/dashboard" class="btn btn-secondary">Tornar al panell</a>
+        <a href="/logout" class="btn btn-secondary">Tancar sessió</a>
     </div>
 </div>
 
@@ -14,43 +14,43 @@
     <div class="alerta success"><%= success %></div>
 <% } %>
 
-<div class="reservas-tabs">
-    <button class="tab-btn active" onclick="mostrarTab('pendientes')">Pendientes (<%= reservasPendientes.length %>)</button>
-    <button class="tab-btn" onclick="mostrarTab('historial')">Historial (<%= reservasHistorial.length %>)</button>
+<div class="reserves-tabs">
+    <button class="tab-btn active" onclick="mostrarTab('pendents')">Pendents (<%= reservesPendents.length %>)</button>
+    <button class="tab-btn" onclick="mostrarTab('historial')">Historial (<%= reservesHistorial.length %>)</button>
 </div>
 
-<div id="pendientes" class="tab-content active">
-    <h2>Reservas Pendientes</h2>
+<div id="pendents" class="tab-content active">
+    <h2>Reserves Pendents</h2>
     
-    <% if (reservasPendientes.length === 0) { %>
-        <p class="text-center">No tienes reservas pendientes</p>
+    <% if (reservesPendents.length === 0) { %>
+        <p class="text-center">No tens reserves pendents</p>
     <% } else { %>
-        <div class="reservas-grid">
-            <% reservasPendientes.forEach(reserva => { %>
+        <div class="reserves-grid">
+            <% reservesPendents.forEach(reserva => { %>
                 <div class="reserva-card">
                     <div class="reserva-header">
-                        <span class="fecha"><%= new Date(reserva.fecha).toLocaleDateString('es-ES') %></span>
+                        <span class="data"><%= new Date(reserva.data).toLocaleDateString('ca-ES') %></span>
                         <span class="hora"><%= reserva.hora %></span>
-                        <span class="estado <%= reserva.estado %>"><%= reserva.estado %></span>
+                        <span class="estat <%= reserva.estat %>"><%= reserva.estat %></span>
                     </div>
                     <div class="reserva-body">
-                        <p><strong>Padre/Madre:</strong> <%= reserva.padreNombre %></p>
-                        <p><strong>Email:</strong> <%= reserva.padreEmail %></p>
-                        <% if (reserva.padreTelefono) { %>
-                            <p><strong>Teléfono:</strong> <%= reserva.padreTelefono %></p>
+                        <p><strong>Pare/Mare:</strong> <%= reserva.nomPare %></p>
+                        <p><strong>Email:</strong> <%= reserva.emailPare %></p>
+                        <% if (reserva.telefonPare) { %>
+                            <p><strong>Telèfon:</strong> <%= reserva.telefonPare %></p>
                         <% } %>
-                        <% if (reserva.comentarios) { %>
-                            <p><strong>Comentarios:</strong> <%= reserva.comentarios %></p>
+                        <% if (reserva.comentaris) { %>
+                            <p><strong>Comentaris:</strong> <%= reserva.comentaris %></p>
                         <% } %>
                     </div>
-                    <div class="reserva-acciones">
-                        <form action="/profesor/reservas/estado/<%= reserva.reservaId %>" method="POST" style="display: inline;">
-                            <input type="hidden" name="estado" value="completada">
-                            <button type="submit" class="btn btn-success btn-small" onclick="return confirm('¿Marcar esta reserva como completada?')">✓ Completada</button>
+                    <div class="reserva-accions">
+                        <form action="/professor/reserves/estat/<%= reserva.reservaId %>" method="POST" style="display: inline;">
+                            <input type="hidden" name="estat" value="completada">
+                            <button type="submit" class="btn btn-success btn-small" onclick="return confirm('Marcar aquesta reserva com a completada?')">✓ Completada</button>
                         </form>
-                        <form action="/profesor/reservas/estado/<%= reserva.reservaId %>" method="POST" style="display: inline;">
-                            <input type="hidden" name="estado" value="cancelada">
-                            <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('¿Cancelar esta reserva?')">✗ Cancelar</button>
+                        <form action="/professor/reserves/estat/<%= reserva.reservaId %>" method="POST" style="display: inline;">
+                            <input type="hidden" name="estat" value="cancel·lada">
+                            <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('Cancel·lar aquesta reserva?')">✗ Cancel·lar</button>
                         </form>
                     </div>
                 </div>
@@ -60,22 +60,22 @@
 </div>
 
 <div id="historial" class="tab-content">
-    <h2>Historial de Reservas</h2>
+    <h2>Historial de Reserves</h2>
     
-    <% if (reservasHistorial.length === 0) { %>
-        <p class="text-center">No hay reservas en el historial</p>
+    <% if (reservesHistorial.length === 0) { %>
+        <p class="text-center">No hi ha reserves a l'historial</p>
     <% } else { %>
-        <div class="reservas-grid">
-            <% reservasHistorial.forEach(reserva => { %>
+        <div class="reserves-grid">
+            <% reservesHistorial.forEach(reserva => { %>
                 <div class="reserva-card historial">
                     <div class="reserva-header">
-                        <span class="fecha"><%= new Date(reserva.fecha).toLocaleDateString('es-ES') %></span>
+                        <span class="data"><%= new Date(reserva.data).toLocaleDateString('ca-ES') %></span>
                         <span class="hora"><%= reserva.hora %></span>
-                        <span class="estado <%= reserva.estado %>"><%= reserva.estado %></span>
+                        <span class="estat <%= reserva.estat %>"><%= reserva.estat %></span>
                     </div>
                     <div class="reserva-body">
-                        <p><strong>Padre/Madre:</strong> <%= reserva.padreNombre %></p>
-                        <p><strong>Email:</strong> <%= reserva.padreEmail %></p>
+                        <p><strong>Pare/Mare:</strong> <%= reserva.nomPare %></p>
+                        <p><strong>Email:</strong> <%= reserva.emailPare %></p>
                     </div>
                 </div>
             <% }) %>
@@ -95,7 +95,7 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.reservas-tabs {
+.reserves-tabs {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
@@ -124,7 +124,7 @@
     display: block;
 }
 
-.reservas-grid {
+.reserves-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 20px;
@@ -150,7 +150,7 @@
     align-items: center;
 }
 
-.reserva-header .fecha {
+.reserva-header .data {
     font-weight: 600;
 }
 
@@ -161,29 +161,29 @@
     font-size: 0.9rem;
 }
 
-.reserva-header .estado {
+.reserva-header .estat {
     padding: 3px 8px;
     border-radius: 12px;
     font-size: 0.8rem;
     text-transform: uppercase;
 }
 
-.reserva-header .estado.pendiente {
+.reserva-header .estat.pendent {
     background: #ffc107;
     color: #333;
 }
 
-.reserva-header .estado.confirmada {
+.reserva-header .estat.confirmada {
     background: #28a745;
     color: white;
 }
 
-.reserva-header .estado.cancelada {
+.reserva-header .estat.cancel·lada {
     background: #dc3545;
     color: white;
 }
 
-.reserva-header .estado.completada {
+.reserva-header .estat.completada {
     background: #6c757d;
     color: white;
 }
@@ -197,7 +197,7 @@
     font-size: 0.95rem;
 }
 
-.reserva-acciones {
+.reserva-accions {
     padding: 15px;
     background: #f8f9fa;
     display: flex;
@@ -276,20 +276,20 @@
 
 <script>
 function mostrarTab(tab) {
-    // Ocultar todos los tabs
+    // Amagar tots els tabs
     document.querySelectorAll('.tab-content').forEach(el => {
         el.classList.remove('active');
     });
     
-    // Desactivar todos los botones
+    // Desactivar tots els botons
     document.querySelectorAll('.tab-btn').forEach(el => {
         el.classList.remove('active');
     });
     
-    // Mostrar el tab seleccionado
+    // Mostrar el tab seleccionat
     document.getElementById(tab).classList.add('active');
     
-    // Activar el botón correspondiente
+    // Activar el botó corresponent
     event.target.classList.add('active');
 }
 </script>

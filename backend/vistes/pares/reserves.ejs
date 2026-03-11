@@ -1,0 +1,622 @@
+<div class="dashboard-header">
+    <h1>Reservar tutoria amb <%= professor.nom %></h1>
+    <div>
+        <a href="/pare/professors" class="btn btn-secondary">← Tornar a professors</a>
+        <a href="/logout" class="btn btn-secondary">Tancar sessió</a>
+    </div>
+</div>
+
+<% if (error && error.length > 0) { %>
+    <div class="alerta error"><%= error %></div>
+<% } %>
+
+<% if (success && success.length > 0) { %>
+    <div class="alerta success"><%= success %></div>
+<% } %>
+
+<div class="professor-info">
+    <div class="info-card">
+        <h2>Informació del professor</h2>
+        <p><strong>Nom:</strong> <%= professor.nom %></p>
+        <p><strong>Email:</strong> <%= professor.email %></p>
+        <p><strong>Curs que imparteix:</strong> <%= professor.curs || 'No especificat' %></p>
+        <% if (professor.descripcio) { %>
+            <p><strong>Descripció:</strong> <%= professor.descripcio %></p>
+        <% } %>
+    </div>
+</div>
+
+<div class="alumne-info">
+    <div class="info-card">
+        <h2>Dades de l'alumne</h2>
+        <p><strong>Nom de l'alumne:</strong> <span id="nomAlumneDisplay"><%= usuari.nomAlumne || 'No especificat' %></span></p>
+    </div>
+</div>
+
+<div class="reserves-container">
+    <h2>Selecciona data i hora</h2>
+    
+    <!-- Llegenda de colors -->
+    <div class="llegenda">
+        <div class="llegenda-item">
+            <span class="color-disponible"></span>
+            <span>Disponible</span>
+        </div>
+        <div class="llegenda-item">
+            <span class="color-reservada"></span>
+            <span>Reservada</span>
+        </div>
+        <div class="llegenda-item">
+            <span class="color-seleccionada"></span>
+            <span>Seleccionada</span>
+        </div>
+    </div>
+    
+    <!-- Calendari de selecció de data -->
+    <div class="calendari-container">
+        <div class="calendari-navegacio">
+            <button class="btn-nav" id="btnSetmanaAnterior">← Setmana anterior</button>
+            <span class="setmana-actual" id="setmanaActual"></span>
+            <button class="btn-nav" id="btnSetmanaSeguent">Setmana següent →</button>
+        </div>
+        
+        <div class="calendari-grid" id="calendari">
+            <!-- Es genera dinàmicament amb JavaScript -->
+        </div>
+    </div>
+    
+    <!-- Formulari de reserva (ocult fins seleccionar hora) -->
+    <div class="formulari-reserva" id="formulariReserva" style="display: none;">
+        <h3>Confirma les dades de la reserva</h3>
+        
+        <form id="formReserva">
+            <input type="hidden" name="professorId" value="<%= professor.uid %>">
+            <input type="hidden" name="data" id="dataInput">
+            <input type="hidden" name="hora" id="horaInput">
+            
+            <div class="form-group">
+                <label for="nomPare">El teu nom (pare/mare)</label>
+                <input type="text" id="nomPare" name="nomPare" readonly 
+                       value="<%= usuari.nom || '' %>">
+            </div>
+            
+            <div class="form-group">
+                <label for="nomAlumne">Nom de l'alumne</label>
+                <input type="text" id="nomAlumne" name="nomAlumne" readonly 
+                       value="<%= usuari.nomAlumne || '' %>">
+            </div>
+            
+            <div class="form-group">
+                <label for="emailPare">El teu email</label>
+                <input type="email" id="emailPare" name="emailPare" readonly 
+                       value="<%= usuari.email || '' %>">
+            </div>
+            
+            <div class="form-group">
+                <label for="telefon">Telèfon de contacte</label>
+                <input type="tel" id="telefon" name="telefon" 
+                       value="<%= usuari.telefon || '' %>" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label for="comentaris">Comentaris (opcional)</label>
+                <textarea id="comentaris" name="comentaris" rows="3" 
+                          placeholder="Alguna cosa que vulguis comentar al professor?"></textarea>
+            </div>
+            
+            <div class="form-group consentiment">
+                <input type="checkbox" id="acceptaCondicions" required>
+                <label for="acceptaCondicions">
+                    He llegit i accepto l'<a href="/avis-privacitat" target="_blank">avís de privacitat</a>
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Confirmar reserva</button>
+        </form>
+        
+        <div id="missatgeAlerta" class="alerta" style="display: none;"></div>
+    </div>
+    
+    <!-- Informació de la reserva seleccionada -->
+    <div class="reserva-seleccionada" id="reservaSeleccionada" style="display: none;">
+        <h3>Reserva seleccionada</h3>
+        <p><strong>Data:</strong> <span id="dataSeleccionada"></span></p>
+        <p><strong>Hora:</strong> <span id="horaSeleccionada"></span></p>
+        <p><strong>Alumne:</strong> <span id="alumneSeleccionat"><%= usuari.nomAlumne || '' %></span></p>
+    </div>
+</div>
+
+<style>
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.professor-info, .alumne-info {
+    margin-bottom: 30px;
+}
+
+.info-card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.info-card h2 {
+    color: #4a90e2;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.info-card p {
+    margin: 10px 0;
+    font-size: 1rem;
+}
+
+.reserves-container {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.reserves-container h2 {
+    color: #4a90e2;
+    margin-bottom: 20px;
+}
+
+/* Llegenda de colors */
+.llegenda {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+}
+
+.llegenda-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.color-disponible {
+    width: 20px;
+    height: 20px;
+    background: #e9ecef;
+    border-radius: 3px;
+}
+
+.color-reservada {
+    width: 20px;
+    height: 20px;
+    background: #dc3545;
+    border-radius: 3px;
+}
+
+.color-seleccionada {
+    width: 20px;
+    height: 20px;
+    background: #28a745;
+    border-radius: 3px;
+}
+
+.calendari-container {
+    margin-bottom: 30px;
+}
+
+.calendari-navegacio {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.btn-nav {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-nav:hover {
+    background: #4a90e2;
+    color: white;
+}
+
+.setmana-actual {
+    font-weight: 600;
+    color: #4a90e2;
+}
+
+.calendari-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.dia-header {
+    text-align: center;
+    font-weight: 600;
+    padding: 10px;
+    background: #4a90e2;
+    color: white;
+    border-radius: 5px;
+}
+
+.dia-celda {
+    border: 1px solid #e9ecef;
+    min-height: 100px;
+    padding: 8px;
+    background: white;
+    border-radius: 5px;
+}
+
+.dia-numero {
+    font-weight: 600;
+    color: #4a90e2;
+    margin-bottom: 5px;
+}
+
+.hora-item {
+    font-size: 0.85rem;
+    padding: 4px;
+    margin: 2px 0;
+    background: #e9ecef;
+    border-radius: 3px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.hora-item:hover:not(.reservada) {
+    background: #4a90e2;
+    color: white;
+}
+
+/* Horas reservadas en ROJO */
+.hora-item.reservada {
+    background: #dc3545 !important;
+    color: white !important;
+    cursor: not-allowed !important;
+    opacity: 0.8;
+    text-decoration: line-through;
+}
+
+/* Hora seleccionada en VERDE */
+.hora-item.seleccionada {
+    background: #28a745 !important;
+    color: white !important;
+}
+
+.formulari-reserva {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+}
+
+.formulari-reserva h3 {
+    color: #4a90e2;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.form-group input[readonly] {
+    background: #e9ecef;
+    cursor: not-allowed;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74,144,226,0.1);
+}
+
+.consentiment {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.consentiment input[type="checkbox"] {
+    width: auto;
+}
+
+.reserva-seleccionada {
+    margin-top: 20px;
+    padding: 15px;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    color: #155724;
+}
+
+.reserva-seleccionada h3 {
+    margin-bottom: 10px;
+    color: #155724;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: #4a90e2;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #357abd;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+.alerta {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.alerta.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alerta.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+</style>
+
+<script>
+// Variables globals
+let dataSeleccionada = null;
+let horaSeleccionada = null;
+let setmanaActual = new Date();
+
+// Dades d'horaris i reserves des del servidor
+const horarisProfessor = <%- JSON.stringify(horaris) %>;
+const reservesExistents = <%- JSON.stringify(reserves) %>;
+const professorId = '<%= professor.uid %>';
+
+console.log('=== DADES REBUDES ===');
+console.log('Horaris:', horarisProfessor);
+console.log('Reserves:', reservesExistents);
+
+// Dies de la setmana en català
+const diesSetmana = ['Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte', 'Diumenge'];
+
+// Inicialitzar calendari
+document.addEventListener('DOMContentLoaded', function() {
+    renderitzarCalendari(setmanaActual);
+    
+    // Event listeners per als botons
+    document.getElementById('btnSetmanaAnterior').addEventListener('click', function() {
+        canviarSetmana(-1);
+    });
+    
+    document.getElementById('btnSetmanaSeguent').addEventListener('click', function() {
+        canviarSetmana(1);
+    });
+    
+    // Event listener per al formulari
+    document.getElementById('formReserva').addEventListener('submit', function(e) {
+        e.preventDefault();
+        processarReserva();
+    });
+});
+
+// Canviar setmana
+function canviarSetmana(direccio) {
+    setmanaActual.setDate(setmanaActual.getDate() + (direccio * 7));
+    renderitzarCalendari(setmanaActual);
+}
+
+// Renderitzar calendari
+function renderitzarCalendari(data) {
+    const calendari = document.getElementById('calendari');
+    if (!calendari) return;
+    
+    const iniciSetmana = new Date(data);
+    iniciSetmana.setDate(data.getDate() - data.getDay() + 1); // Començar en dilluns
+    
+    let html = '';
+    
+    // Dies de la setmana
+    diesSetmana.forEach(dia => {
+        html += `<div class="dia-header">${dia}</div>`;
+    });
+    
+    // Generar dies
+    for (let i = 0; i < 7; i++) {
+        const dia = new Date(iniciSetmana);
+        dia.setDate(iniciSetmana.getDate() + i);
+        
+        const dataStr = dia.toISOString().split('T')[0];
+        const diaMes = dia.getDate();
+        const diaSetmanaIdx = dia.getDay(); // 0 = diumenge, 1 = dilluns, ...
+        
+        // Ajustar perquè dilluns sigui 1, dimarts 2, etc.
+        let diaSetmanaAjustat = diaSetmanaIdx === 0 ? 7 : diaSetmanaIdx;
+        
+        html += `<div class="dia-celda" data-data="${dataStr}">`;
+        html += `<div class="dia-numero">${diaMes}</div>`;
+        
+        // Filtrar horaris per a aquest dia de la setmana
+        const horarisDia = horarisProfessor.filter(h => h.diaSetmana === diaSetmanaAjustat);
+        
+        // Ordenar hores
+        const horesOrdenades = horarisDia.map(h => h.hora).sort();
+        
+        if (horesOrdenades.length === 0) {
+            html += `<div class="sense-horaris">-</div>`;
+        } else {
+            horesOrdenades.forEach(hora => {
+                // Verificar si aquesta hora ja està reservada
+                const reservada = reservesExistents.some(r => 
+                    r.data === dataStr && r.hora === hora && r.estat !== 'cancel·lada'
+                );
+                
+                // Aplicar classe reservada si correspon (es veurà en VERMELL)
+                const classe = `hora-item ${reservada ? 'reservada' : ''}`;
+                
+                // Si està reservada, no es pot seleccionar
+                const onclick = reservada ? '' : `seleccionarHorari('${dataStr}', '${hora}')`;
+                
+                html += `<div class="${classe}" onclick="${onclick}">${hora}</div>`;
+            });
+        }
+        
+        html += '</div>';
+    }
+    
+    calendari.innerHTML = html;
+    
+    // Actualitzar text de setmana
+    const setmanaActualEl = document.getElementById('setmanaActual');
+    if (setmanaActualEl) {
+        const fiSetmana = new Date(iniciSetmana);
+        fiSetmana.setDate(iniciSetmana.getDate() + 6);
+        
+        setmanaActualEl.textContent = `${iniciSetmana.toLocaleDateString('ca-ES')} - ${fiSetmana.toLocaleDateString('ca-ES')}`;
+    }
+}
+
+// Seleccionar horari
+function seleccionarHorari(data, hora) {
+    dataSeleccionada = data;
+    horaSeleccionada = hora;
+    
+    // Actualitzar UI - treure selecció anterior
+    document.querySelectorAll('.hora-item').forEach(el => {
+        el.classList.remove('seleccionada');
+    });
+    
+    // Marcar l'hora seleccionada
+    event.target.classList.add('seleccionada');
+    
+    // Mostrar formulari i reserva seleccionada
+    document.getElementById('formulariReserva').style.display = 'block';
+    document.getElementById('reservaSeleccionada').style.display = 'block';
+    document.getElementById('dataSeleccionada').textContent = new Date(data).toLocaleDateString('ca-ES');
+    document.getElementById('horaSeleccionada').textContent = hora;
+    
+    // Actualitzar camps ocults
+    document.getElementById('dataInput').value = data;
+    document.getElementById('horaInput').value = hora;
+}
+
+// Processar reserva
+function processarReserva() {
+    // Validar consentiment
+    if (!document.getElementById('acceptaCondicions').checked) {
+        mostrarAlerta('Has d\'acceptar l\'avís de privacitat', 'error');
+        return;
+    }
+    
+    // Validar que hi ha una hora seleccionada
+    if (!dataSeleccionada || !horaSeleccionada) {
+        mostrarAlerta('Si us plau, selecciona una data i hora', 'error');
+        return;
+    }
+    
+    // Recollir dades del formulari
+    const formData = new FormData(document.getElementById('formReserva'));
+    const data = Object.fromEntries(formData.entries());
+    
+    // Mostrar missatge de càrrega
+    mostrarAlerta('Processant reserva...', 'info');
+    
+    // Enviar reserva
+    fetch('/api/pare/reservar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarAlerta('Reserva confirmada! Redirigint...', 'success');
+            setTimeout(() => {
+                window.location.href = `/confirmacio/${data.reservaId}`;
+            }, 2000);
+        } else {
+            mostrarAlerta(data.error || 'Error en crear la reserva', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarAlerta('Error en processar la reserva', 'error');
+    });
+}
+
+// Mostrar alerta
+function mostrarAlerta(missatge, tipus) {
+    const alerta = document.getElementById('missatgeAlerta');
+    alerta.textContent = missatge;
+    alerta.className = `alerta ${tipus}`;
+    alerta.style.display = 'block';
+    
+    // Ocultar després de 5 segons
+    setTimeout(() => {
+        alerta.style.display = 'none';
+    }, 5000);
+}
+</script>

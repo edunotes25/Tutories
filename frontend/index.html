@@ -1,171 +1,171 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Tutorías - Colegio Público</title>
+    <title>Sistema de Tutories - Col·legi Públic</title>
     
-    <!-- Meta tags de seguridad y privacidad -->
-    <meta name="description" content="Sistema seguro de reserva de tutorías para colegios públicos - Cumple RGPD">
+    <!-- Meta tags de seguretat i privacitat -->
+    <meta name="description" content="Sistema segur de reserva de tutories per a col·legis públics - Compleix RGPD">
     <meta name="robots" content="noindex, nofollow">
     
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
     
-    <!-- Font Awesome para iconos -->
+    <!-- Font Awesome per a icones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- Flatpickr para calendario -->
+    <!-- Flatpickr per a calendari -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>
-    <!-- Barra de privacidad RGPD -->
+    <!-- Barra de privacitat RGPD -->
     <div class="rgpd-banner" id="rgpdBanner">
         <div class="rgpd-content">
             <i class="fas fa-shield-alt"></i>
-            <p>Este sitio web cumple con el RGPD. Solo almacenamos los datos necesarios para gestionar tu reserva durante 24 horas.</p>
-            <button class="btn-rgpd" onclick="aceptarRGPD()">Entendido</button>
+            <p>Aquest lloc web compleix amb el RGPD. Només emmagatzemem les dades necessàries per gestionar la teva reserva durant 24 hores.</p>
+            <button class="btn-rgpd" onclick="acceptarRGPD()">D'acord</button>
         </div>
     </div>
 
     <div class="container">
-        <!-- Encabezado -->
+        <!-- Capçalera -->
         <header class="header">
-            <h1><i class="fas fa-calendar-alt"></i> Sistema de Tutorías</h1>
-            <p class="subtitle">Reserva tu cita con los profesores de forma segura</p>
+            <h1><i class="fas fa-calendar-alt"></i> Sistema de Tutories</h1>
+            <p class="subtitle">Reserva la teva cita amb els professors de forma segura</p>
         </header>
 
-        <!-- Formulario principal -->
+        <!-- Formulari principal -->
         <div class="form-container">
             <form id="reservaForm">
-                <!-- Paso 1: Datos del padre -->
+                <!-- Pas 1: Dades del pare/mare -->
                 <section class="form-section">
-                    <h2><i class="fas fa-user"></i> Tus datos</h2>
-                    <p class="info-text">Estos datos se usarán solo para confirmar la reserva y serán eliminados tras 24h</p>
+                    <h2><i class="fas fa-user"></i> Les teves dades</h2>
+                    <p class="info-text">Aquestes dades s'utilitzaran només per confirmar la reserva i seran eliminades després de 24h</p>
                     
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="nombre">Nombre completo *</label>
-                            <input type="text" id="nombre" name="nombre" required 
-                                   placeholder="Ej: María González"
+                            <label for="nom">Nom complet *</label>
+                            <input type="text" id="nom" name="nom" required 
+                                   placeholder="Ex: Maria González"
                                    minlength="2" maxlength="50">
                         </div>
 
                         <div class="form-group">
                             <label for="email">Email *</label>
                             <input type="email" id="email" name="email" required 
-                                   placeholder="ejemplo@email.com">
+                                   placeholder="exemple@email.com">
                         </div>
 
                         <div class="form-group">
-                            <label for="telefono">Teléfono (opcional)</label>
-                            <input type="tel" id="telefono" name="telefono" 
+                            <label for="telefon">Telèfon (opcional)</label>
+                            <input type="tel" id="telefon" name="telefon" 
                                    placeholder="612 345 678"
                                    pattern="[0-9]{9}">
                         </div>
 
                         <div class="form-group">
-                            <label for="nombreAlumno">Nombre del alumno *</label>
-                            <input type="text" id="nombreAlumno" name="nombreAlumno" required 
-                                   placeholder="Nombre del estudiante"
+                            <label for="nomAlumne">Nom de l'alumne *</label>
+                            <input type="text" id="nomAlumne" name="nomAlumne" required 
+                                   placeholder="Nom de l'estudiant"
                                    minlength="2" maxlength="50">
                         </div>
                     </div>
                 </section>
 
-                <!-- Paso 2: Selección de profesor -->
+                <!-- Pas 2: Selecció de professor -->
                 <section class="form-section">
-                    <h2><i class="fas fa-chalkboard-teacher"></i> Selecciona el profesor</h2>
+                    <h2><i class="fas fa-chalkboard-teacher"></i> Selecciona el professor</h2>
                     
                     <div class="form-group">
-                        <label for="profesor">Profesor *</label>
-                        <select id="profesor" name="profesor" required>
-                            <option value="">Selecciona un profesor</option>
+                        <label for="professor">Professor *</label>
+                        <select id="professor" name="professor" required>
+                            <option value="">Selecciona un professor</option>
                         </select>
                     </div>
                 </section>
 
-                <!-- Paso 3: Selección de fecha y hora -->
-                <section class="form-section" id="horarioSection" style="display: none;">
-                    <h2><i class="fas fa-clock"></i> Selecciona fecha y hora</h2>
+                <!-- Pas 3: Selecció de data i hora -->
+                <section class="form-section" id="horariSection" style="display: none;">
+                    <h2><i class="fas fa-clock"></i> Selecciona data i hora</h2>
                     
                     <div class="form-group">
-                        <label for="fecha">Fecha *</label>
-                        <input type="text" id="fecha" name="fecha" placeholder="Selecciona una fecha">
+                        <label for="data">Data *</label>
+                        <input type="text" id="data" name="data" placeholder="Selecciona una data">
                     </div>
 
-                    <div class="horas-disponibles" id="horasContainer">
-                        <p class="info-text">Selecciona primero una fecha para ver las horas disponibles</p>
+                    <div class="hores-disponibles" id="horesContainer">
+                        <p class="info-text">Selecciona primer una data per veure les hores disponibles</p>
                     </div>
                 </section>
 
-                <!-- Paso 4: Consentimiento RGPD -->
+                <!-- Pas 4: Consentiment RGPD -->
                 <section class="form-section">
-                    <h2><i class="fas fa-lock"></i> Privacidad y protección de datos</h2>
+                    <h2><i class="fas fa-lock"></i> Privacitat i protecció de dades</h2>
                     
-                    <div class="consentimiento-box">
-                        <p><strong>INFORMACIÓN BÁSICA SOBRE PROTECCIÓN DE DATOS</strong></p>
-                        <p><strong>Responsable:</strong> Colegio Público</p>
-                        <p><strong>Finalidad:</strong> Gestionar la reserva de tutorías</p>
-                        <p><strong>Legitimación:</strong> Consentimiento del interesado</p>
-                        <p><strong>Destinatarios:</strong> No se cederán datos a terceros</p>
-                        <p><strong>Plazo de conservación:</strong> Los datos se conservarán únicamente durante 24 horas para gestionar la reserva</p>
-                        <p><strong>Derechos:</strong> Acceso, rectificación, supresión, limitación, oposición y portabilidad</p>
+                    <div class="consentiment-box">
+                        <p><strong>INFORMACIÓ BÀSICA SOBRE PROTECCIÓ DE DADES</strong></p>
+                        <p><strong>Responsable:</strong> Col·legi Públic</p>
+                        <p><strong>Finalitat:</strong> Gestionar la reserva de tutories</p>
+                        <p><strong>Legitimació:</strong> Consentiment de l'interessat</p>
+                        <p><strong>Destinataris:</strong> No es cediran dades a tercers</p>
+                        <p><strong>Termini de conservació:</strong> Les dades es conservaran únicament durant 24 hores per gestionar la reserva</p>
+                        <p><strong>Drets:</strong> Accés, rectificació, supressió, limitació, oposició i portabilitat</p>
                         
                         <div class="checkbox-group">
                             <label class="checkbox-label">
-                                <input type="checkbox" id="consentimiento" name="consentimiento" required>
-                                <span>He leído y acepto el tratamiento de mis datos personales para gestionar esta reserva *</span>
+                                <input type="checkbox" id="consentiment" name="consentiment" required>
+                                <span>He llegit i accepto el tractament de les meves dades personals per gestionar aquesta reserva *</span>
                             </label>
                         </div>
                         
-                        <p class="small-text">Puede consultar la información adicional y detallada sobre protección de datos en el centro educativo.</p>
+                        <p class="small-text">Pots consultar la informació addicional i detallada sobre protecció de dades al centre educatiu.</p>
                     </div>
                 </section>
 
-                <!-- Botones de acción -->
+                <!-- Botons d'acció -->
                 <div class="form-actions">
                     <button type="submit" class="btn-primary" id="btnReservar" disabled>
                         <i class="fas fa-check"></i> Confirmar reserva
                     </button>
-                    <button type="button" class="btn-secondary" onclick="limpiarFormulario()">
-                        <i class="fas fa-undo"></i> Limpiar formulario
+                    <button type="button" class="btn-secondary" onclick="netejarFormulari()">
+                        <i class="fas fa-undo"></i> Netejar formulari
                     </button>
                 </div>
             </form>
         </div>
 
-        <!-- Modal de confirmación -->
-        <div id="confirmacionModal" class="modal">
+        <!-- Modal de confirmació -->
+        <div id="confirmacioModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2><i class="fas fa-check-circle"></i> Reserva confirmada</h2>
                 </div>
                 <div class="modal-body" id="modalBody">
-                    <!-- Contenido dinámico -->
+                    <!-- Contingut dinàmic -->
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-primary" onclick="cerrarModal()">
-                        <i class="fas fa-check"></i> Aceptar
+                    <button class="btn-primary" onclick="tancarModal()">
+                        <i class="fas fa-check"></i> Acceptar
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Footer con info legal -->
+        <!-- Footer amb info legal -->
         <footer class="footer">
             <div class="legal-links">
-                <a href="#" onclick="mostrarAvisoLegal()">Aviso Legal</a>
-                <a href="#" onclick="mostrarPrivacidad()">Política de Privacidad</a>
+                <a href="#" onclick="mostrarAvísLegal()">Avís Legal</a>
+                <a href="#" onclick="mostrarPrivacitat()">Política de Privacitat</a>
                 <a href="#" onclick="mostrarCookies()">Cookies</a>
             </div>
-            <p class="copyright">© 2024 Colegio Público - Sistema de Tutorías. Cumple con RGPD.</p>
+            <p class="copyright">© 2024 Col·legi Públic - Sistema de Tutories. Compleix amb RGPD.</p>
         </footer>
     </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ca.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="script.js"></script>
 </body>

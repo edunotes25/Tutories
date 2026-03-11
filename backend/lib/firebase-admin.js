@@ -50,10 +50,10 @@ db.settings({
 
 // Colecciones
 const COLLECTIONS = {
-  USUARIOS: 'usuarios',
-  PROFESORES: 'profesores',
-  HORARIOS: 'horarios',
-  RESERVAS: 'reservas',
+  USUARIS: 'usuarios',
+  PROFESSORS: 'profesores',
+  HORARIS: 'horarios',
+  RESERVES: 'reservas',
   CONFIG: 'config'
 };
 

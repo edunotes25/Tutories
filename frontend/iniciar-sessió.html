@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Profesores - Sistema de Tutorías</title>
+    <title>Accés Professors - Sistema de Tutories</title>
     
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
@@ -273,106 +273,106 @@
     <div class="login-container">
         <div class="login-box">
             <div class="badge">
-                <i class="fas fa-shield-alt"></i> Acceso Privado
+                <i class="fas fa-shield-alt"></i> Accés Privat
             </div>
 
             <div class="login-header">
                 <i class="fas fa-chalkboard-teacher"></i>
-                <h2>Profesores</h2>
-                <p>Accede a tu panel de tutorías</p>
+                <h2>Professors</h2>
+                <p>Accedeix al teu panell de tutories</p>
             </div>
 
             <!-- Tabs -->
             <div class="login-tabs">
-                <button class="tab-btn active" onclick="cambiarTab('login')">
-                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                <button class="tab-btn active" onclick="canviarTab('login')">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sessió
                 </button>
-                <button class="tab-btn" onclick="cambiarTab('registro')">
-                    <i class="fas fa-user-plus"></i> Registrarse
+                <button class="tab-btn" onclick="canviarTab('registre')">
+                    <i class="fas fa-user-plus"></i> Registrar-se
                 </button>
             </div>
 
             <!-- Alert container -->
             <div id="alertContainer" class="alert"></div>
 
-            <!-- Formulario Login -->
+            <!-- Formulari Login -->
             <form id="loginForm" class="login-form active" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" id="loginEmail" required placeholder="tu.email@colegio.es">
+                    <input type="email" id="loginEmail" required placeholder="el.teu.email@colegi.es">
                 </div>
 
                 <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Contraseña</label>
+                    <label><i class="fas fa-lock"></i> Contrasenya</label>
                     <input type="password" id="loginPassword" required placeholder="••••••••">
                 </div>
 
                 <button type="submit" class="btn-login">
-                    <i class="fas fa-sign-in-alt"></i> Acceder
+                    <i class="fas fa-sign-in-alt"></i> Accedir
                 </button>
 
                 <div class="login-footer">
-                    <a href="#" onclick="recuperarPassword()">¿Olvidaste tu contraseña?</a>
+                    <a href="#" onclick="recuperarContrasenya()">Has oblidat la teva contrasenya?</a>
                 </div>
             </form>
 
-            <!-- Formulario Registro -->
-            <form id="registroForm" class="login-form" onsubmit="handleRegistro(event)">
+            <!-- Formulari Registre -->
+            <form id="registreForm" class="login-form" onsubmit="handleRegistre(event)">
                 <div class="form-group">
-                    <label><i class="fas fa-user"></i> Nombre completo</label>
-                    <input type="text" id="regNombre" required placeholder="María García">
+                    <label><i class="fas fa-user"></i> Nom complet</label>
+                    <input type="text" id="regNom" required placeholder="Maria García">
                 </div>
 
                 <div class="form-group">
                     <label><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" id="regEmail" required placeholder="maria@colegio.es">
+                    <input type="email" id="regEmail" required placeholder="maria@colegi.es">
                 </div>
 
                 <div class="form-group">
-                    <label><i class="fas fa-book"></i> Asignatura</label>
-                    <select id="regAsignatura" required>
-                        <option value="">Selecciona tu asignatura</option>
-                        <option value="Matemáticas">Matemáticas</option>
-                        <option value="Lengua">Lengua</option>
-                        <option value="Inglés">Inglés</option>
-                        <option value="Ciencias">Ciencias</option>
-                        <option value="Historia">Historia</option>
+                    <label><i class="fas fa-book"></i> Assignatura</label>
+                    <select id="regAssignatura" required>
+                        <option value="">Selecciona la teva assignatura</option>
+                        <option value="Matemàtiques">Matemàtiques</option>
+                        <option value="Llengua">Llengua</option>
+                        <option value="Anglès">Anglès</option>
+                        <option value="Ciències">Ciències</option>
+                        <option value="Història">Història</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Contraseña</label>
-                    <input type="password" id="regPassword" required placeholder="Mínimo 8 caracteres">
+                    <label><i class="fas fa-lock"></i> Contrasenya</label>
+                    <input type="password" id="regPassword" required placeholder="Mínim 8 caràcters">
                     <div class="password-hint">
-                        <i class="fas fa-info-circle"></i> Mínimo 8 caracteres
+                        <i class="fas fa-info-circle"></i> Mínim 8 caràcters
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label><i class="fas fa-key"></i> Código de registro</label>
-                    <input type="password" id="regCodigo" required placeholder="Código del centro">
+                    <label><i class="fas fa-key"></i> Codi de registre</label>
+                    <input type="password" id="regCodi" required placeholder="Codi del centre">
                 </div>
 
                 <div class="form-group checkbox">
-                    <input type="checkbox" id="regAcepto" required>
-                    <label>Acepto los términos y condiciones</label>
+                    <input type="checkbox" id="regAccepto" required>
+                    <label>Accepto els termes i condicions</label>
                 </div>
 
                 <button type="submit" class="btn-login">
-                    <i class="fas fa-user-plus"></i> Registrarse
+                    <i class="fas fa-user-plus"></i> Registrar-se
                 </button>
             </form>
 
             <div class="login-back">
                 <a href="/">
-                    <i class="fas fa-arrow-left"></i> Volver al inicio
+                    <i class="fas fa-arrow-left"></i> Tornar a l'inici
                 </a>
             </div>
         </div>
     </div>
 
     <script>
-        function cambiarTab(tab) {
+        function canviarTab(tab) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.login-form').forEach(form => form.classList.remove('active'));
             
@@ -381,14 +381,14 @@
                 document.getElementById('loginForm').classList.add('active');
             } else {
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
-                document.getElementById('registroForm').classList.add('active');
+                document.getElementById('registreForm').classList.add('active');
             }
         }
 
-        function mostrarAlerta(mensaje, tipo) {
+        function mostrarAlerta(missatge, tipus) {
             const alert = document.getElementById('alertContainer');
-            alert.className = `alert ${tipo}`;
-            alert.innerHTML = `<i class="fas fa-${tipo === 'error' ? 'exclamation-circle' : 'check-circle'}"></i> ${mensaje}`;
+            alert.className = `alert ${tipus}`;
+            alert.innerHTML = `<i class="fas fa-${tipus === 'error' ? 'exclamation-circle' : 'check-circle'}"></i> ${missatge}`;
             
             setTimeout(() => {
                 alert.style.display = 'none';
@@ -414,31 +414,31 @@
                     localStorage.setItem('token', data.token);
                     window.location.href = '/dashboard';
                 } else {
-                    mostrarAlerta(data.error || 'Error al iniciar sesión', 'error');
+                    mostrarAlerta(data.error || 'Error en iniciar sessió', 'error');
                 }
             } catch (error) {
-                mostrarAlerta('Error de conexión', 'error');
+                mostrarAlerta('Error de connexió', 'error');
             }
         }
 
-        async function handleRegistro(e) {
+        async function handleRegistre(e) {
             e.preventDefault();
             
-            if (!document.getElementById('regAcepto').checked) {
-                mostrarAlerta('Debes aceptar los términos', 'error');
+            if (!document.getElementById('regAccepto').checked) {
+                mostrarAlerta('Has d\'acceptar els termes', 'error');
                 return;
             }
             
             const userData = {
-                nombre: document.getElementById('regNombre').value,
+                nom: document.getElementById('regNom').value,
                 email: document.getElementById('regEmail').value,
                 password: document.getElementById('regPassword').value,
-                asignatura: document.getElementById('regAsignatura').value,
-                codigoRegistro: document.getElementById('regCodigo').value
+                assignatura: document.getElementById('regAssignatura').value,
+                codiRegistre: document.getElementById('regCodi').value
             };
             
             try {
-                const response = await fetch('/api/auth/registro-profesor', {
+                const response = await fetch('/api/auth/registre-professor', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(userData)
@@ -447,20 +447,20 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    mostrarAlerta('Registro exitoso. Ya puedes iniciar sesión.', 'success');
-                    setTimeout(() => cambiarTab('login'), 2000);
+                    mostrarAlerta('Registre exitós. Ja pots iniciar sessió.', 'success');
+                    setTimeout(() => canviarTab('login'), 2000);
                 } else {
-                    mostrarAlerta(data.error || 'Error en el registro', 'error');
+                    mostrarAlerta(data.error || 'Error en el registre', 'error');
                 }
             } catch (error) {
-                mostrarAlerta('Error de conexión', 'error');
+                mostrarAlerta('Error de connexió', 'error');
             }
         }
 
-        function recuperarPassword() {
-            const email = prompt('Introduce tu email:');
+        function recuperarContrasenya() {
+            const email = prompt('Introdueix el teu email:');
             if (email) {
-                mostrarAlerta('Email de recuperación enviado', 'success');
+                mostrarAlerta('Email de recuperació enviat', 'success');
             }
         }
     </script>

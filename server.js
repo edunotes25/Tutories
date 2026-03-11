@@ -1,13 +1,14 @@
-// PON ESTO AL PRINCIPIO DE server.js, DESPUÉS DE REQUIRE('dotenv').config()
+require('dotenv').config();
+// POSA AIXÒ AL PRINCIPI DE server.js, DESPRÉS DE REQUIRE('dotenv').config()
 console.log('=== DEBUG ENV VARS ===');
-console.log('FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID ? '✓ presente' : '✗ faltante');
-console.log('FIREBASE_CLIENT_EMAIL:', process.env.FIREBASE_CLIENT_EMAIL ? '✓ presente' : '✗ faltante');
-console.log('FIREBASE_PRIVATE_KEY:', process.env.FIREBASE_PRIVATE_KEY ? '✓ presente' : '✗ faltante');
-console.log('NEXT_PUBLIC_FIREBASE_API_KEY:', process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? '✓ presente' : '✗ faltante');
-console.log('NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:', process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ? '✓ presente' : '✗ faltante');
-console.log('NEXT_PUBLIC_FIREBASE_PROJECT_ID:', process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ? '✓ presente' : '✗ faltante');
-console.log('REGISTRO_PROFESOR_CODE:', process.env.REGISTRO_PROFESOR_CODE ? '✓ presente' : '✗ faltante');
-console.log('SESSION_SECRET:', process.env.SESSION_SECRET ? '✓ presente' : '✗ faltante');
+console.log('FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID ? '✓ present' : '✗ faltant');
+console.log('FIREBASE_CLIENT_EMAIL:', process.env.FIREBASE_CLIENT_EMAIL ? '✓ present' : '✗ faltant');
+console.log('FIREBASE_PRIVATE_KEY:', process.env.FIREBASE_PRIVATE_KEY ? '✓ present' : '✗ faltant');
+console.log('NEXT_PUBLIC_FIREBASE_API_KEY:', process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? '✓ present' : '✗ faltant');
+console.log('NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:', process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ? '✓ present' : '✗ faltant');
+console.log('NEXT_PUBLIC_FIREBASE_PROJECT_ID:', process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ? '✓ present' : '✗ faltant');
+console.log('REGISTRE_PROFESSOR_CODI:', process.env.REGISTRE_PROFESSOR_CODI ? '✓ present' : '✗ faltant');
+console.log('SESSION_SECRET:', process.env.SESSION_SECRET ? '✓ present' : '✗ faltant');
 
 const express = require('express');
 const path = require('path');
@@ -21,16 +22,15 @@ const { v4: uuidv4 } = require('uuid');
 const axios = require('axios');
 require('dotenv').config();
 
-// Importar configuración de Firebase
+// Importar configuració de Firebase
 const { db, auth, COLLECTIONS } = require('./backend/lib/firebase-admin.js');
-
-// Importar rutas de autenticación
-const authRoutes = require('./backend/routes/auth');
+// Importar rutes d'autenticació
+const authRoutes = require('./backend/rutes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuración de seguridad
+// Configuració de seguretat
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -45,31 +45,31 @@ app.use(helmet({
     },
 }));
 
-// Limitador de peticiones
-const limiter = rateLimit({
+// Limitador de peticions
+const limitador = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
-    message: 'Demasiadas peticiones desde esta IP'
+    missatge: 'Massa peticions des d\'aquesta IP'
 });
-app.use('/api/', limiter);
+app.use('/api/', limitador);
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-// IMPORTANTE: Configurar trust proxy para Vercel
-// Esto permite que las cookies funcionen correctamente detrás del proxy de Vercel
+// IMPORTANT: Configurar trust proxy per a Vercel
+// Això permet que les cookies funcionin correctament darrere del proxy de Vercel
 app.set('trust proxy', 1);
 
-// Configuración de sesiones - VERSIÓN CORREGIDA (SIN DOMAIN)
+// Configuració de sessions - VERSIÓ CORREGIDA (SENSE DOMINI)
 if (process.env.NODE_ENV === 'production') {
-    console.log('🔧 Configurando sesiones para producción (Vercel)');
+    console.log('🔧 Configurant sessions per a producció (Vercel)');
     app.use(session({
-        secret: process.env.SESSION_SECRET || 'clave-secreta-temporal',
+        secret: process.env.SESSION_SECRET || 'clau-secreta-temporal',
         resave: false,
         saveUninitialized: false,
-        name: 'tutorias.sid',
+        name: 'tutories.sid',
         cookie: { 
             secure: true,
             maxAge: 1000 * 60 * 60 * 24,
@@ -80,10 +80,10 @@ if (process.env.NODE_ENV === 'production') {
     }));
 } else {
     app.use(session({
-        secret: process.env.SESSION_SECRET || 'clave-secreta-temporal',
+        secret: process.env.SESSION_SECRET || 'clau-secreta-temporal',
         resave: false,
         saveUninitialized: true,
-        name: 'tutorias.sid',
+        name: 'tutories.sid',
         cookie: { 
             secure: false,
             maxAge: 1000 * 60 * 60 * 24,
@@ -96,34 +96,34 @@ if (process.env.NODE_ENV === 'production') {
 
 app.use(flash());
 
-// Middleware para logging de sesiones
+// Middleware per a logging de sessions
 app.use((req, res, next) => {
     console.log(`🌐 [${new Date().toISOString()}] ${req.method} ${req.path}`);
     console.log(`🍪 Cookies:`, req.cookies);
-    console.log(`🆔 Session ID:`, req.session.id);
-    console.log(`👤 Usuario en sesión:`, req.session.usuario ? 'SÍ' : 'NO');
-    if (req.session.usuario) {
-        console.log(`   Email: ${req.session.usuario.email}`);
-        console.log(`   Tipo: ${req.session.usuario.tipo}`);
+    console.log(`🆔 ID de Sessió:`, req.session.id);
+    console.log(`👤 Usuari en sessió:`, req.session.usuari ? 'SÍ' : 'NO');
+    if (req.session.usuari) {
+        console.log(`   Email: ${req.session.usuari.email}`);
+        console.log(`   Tipus: ${req.session.usuari.tipus}`);
     }
     next();
 });
 
-// Configuración de vistas
+// Configuració de vistes
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'backend/views'));
+app.set('views', path.join(__dirname, 'backend/vistes'));
 app.use(expressLayouts);
 app.set('layout', 'layout');
 
-// Archivos estáticos
+// Arxius estàtics
 app.use(express.static(path.join(__dirname, 'backend/public')));
 
-// Middleware para pasar variables de entorno a las vistas
+// Middleware per passar variables d'entorn a les vistes
 app.use((req, res, next) => {
-    res.locals.usuario = req.session.usuario || null;
+    res.locals.usuari = req.session.usuari || null;
     res.locals.error = req.flash('error');
     res.locals.success = req.flash('success');
-    res.locals.consentimientoCookies = req.cookies.consentimiento || false;
+    res.locals.consentimentCookies = req.cookies.consentiment || false;
     res.locals.env = {
         NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
         NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -135,99 +135,99 @@ app.use((req, res, next) => {
     next();
 });
 
-// ============ RUTAS DE AUTENTICACIÓN ============
+// ============ RUTES D'AUTENTICACIÓ ============
 app.use('/auth', authRoutes);
 
-// Middleware de autenticación MEJORADO con logs
+// Middleware d'autenticació MILLORAT amb logs
 const authMiddleware = (req, res, next) => {
     console.log('='.repeat(50));
-    console.log('🔐 MIDDLEWARE DE AUTENTICACIÓN');
+    console.log('🔐 MIDDLEWARE D\'AUTENTICACIÓ');
     console.log('🕒 Timestamp:', new Date().toISOString());
     console.log('🍪 Cookies:', req.cookies);
-    console.log('🆔 Session ID:', req.session.id);
-    console.log('👤 Session usuario:', req.session.usuario ? 'PRESENTE' : 'VACÍO');
+    console.log('🆔 ID de Sessió:', req.session.id);
+    console.log('👤 Session usuari:', req.session.usuari ? 'PRESENT' : 'BUIDA');
     
-    if (req.session.usuario) {
-        console.log('✅ Usuario autenticado:', req.session.usuario.email);
-        console.log('👤 Tipo:', req.session.usuario.tipo);
-        console.log('➡️ Continuando a la ruta...');
+    if (req.session.usuari) {
+        console.log('✅ Usuari autenticat:', req.session.usuari.email);
+        console.log('👤 Tipus:', req.session.usuari.tipus);
+        console.log('➡️ Continuant a la ruta...');
         console.log('='.repeat(50));
         return next();
     }
     
-    console.log('❌ No hay usuario en sesión');
-    console.log('📦 Contenido de req.session:', req.session);
+    console.log('❌ No hi ha usuari en sessió');
+    console.log('📦 Contingut de req.session:', req.session);
     console.log('🔍 Headers:', req.headers);
-    console.log('➡️ Redirigiendo a /login');
+    console.log('➡️ Redirigint a /iniciar-sessio');
     console.log('='.repeat(50));
     
-    req.flash('error', 'Por favor, inicia sesión primero');
-    return res.redirect('/login');
+    req.flash('error', 'Si us plau, inicia sessió primer');
+    return res.redirect('/iniciar-sessio');
 };
 
-const profesorMiddleware = (req, res, next) => {
-    if (!req.session.usuario || req.session.usuario.tipo !== 'profesor') {
-        console.log('❌ Acceso no autorizado a ruta de profesor. Usuario:', req.session.usuario);
-        req.flash('error', 'Acceso no autorizado');
+const professorMiddleware = (req, res, next) => {
+    if (!req.session.usuari || req.session.usuari.tipus !== 'professor') {
+        console.log('❌ Accés no autoritzat a ruta de professor. Usuari:', req.session.usuari);
+        req.flash('error', 'Accés no autoritzat');
         return res.redirect('/');
     }
     next();
 };
 
-// ============ RUTA DE DEPURACIÓN ============
-app.get('/debug-session', (req, res) => {
-    console.log('🔍 DEBUG SESSION');
-    console.log('Session ID:', req.session.id);
-    console.log('Session usuario:', req.session.usuario);
+// ============ RUTA DE DEPURACIÓ ============
+app.get('/debug-sessio', (req, res) => {
+    console.log('🔍 DEBUG SESSIÓ');
+    console.log('ID de Sessió:', req.session.id);
+    console.log('Sessió usuari:', req.session.usuari);
     console.log('Cookies:', req.cookies);
     
     res.json({
         sessionId: req.session.id,
-        session: req.session,
-        usuario: req.session.usuario || null,
+        sessio: req.session,
+        usuari: req.session.usuari || null,
         cookies: req.cookies,
         headers: req.headers
     });
 });
 
-// ============ RUTAS PÚBLICAS ============
+// ============ RUTES PÚBLIQUES ============
 
 app.get('/', (req, res) => {
     res.render('index', { 
-        titulo: 'Bienvenido - Sistema de Tutorías'
+        titol: 'Benvingut - Sistema de Tutories'
     });
 });
 
-app.get('/login', (req, res) => {
-    if (req.session.usuario) {
-        return res.redirect(req.session.usuario.tipo === 'profesor' ? '/profesor/dashboard' : '/padre/profesores');
+app.get('/iniciar-sessio', (req, res) => {
+    if (req.session.usuari) {
+        return res.redirect(req.session.usuari.tipus === 'professor' ? '/professor/panell' : '/pare/professors');
     }
-    res.render('login', { 
-        titulo: 'Iniciar Sesión',
+    res.render('iniciar-sessio', { 
+        titol: 'Iniciar Sessió',
         error: null,
         success: null
     });
 });
 
-app.get('/registro', (req, res) => {
-    res.render('registro', { titulo: 'Registro de Profesor' });
+app.get('/registre', (req, res) => {
+    res.render('registre', { titol: 'Registre de Professor' });
 });
 
-app.get('/registro-padre', (req, res) => {
-    res.render('registro-padre', { titulo: 'Registro de Padre/Madre' });
+app.get('/registre-pare', (req, res) => {
+    res.render('registre-pare', { titol: 'Registre de Pare/Mare' });
 });
 
-app.get('/aviso-privacidad', (req, res) => {
-    res.render('aviso-privacidad', {
-        titulo: 'Aviso de Privacidad - RGPD'
+app.get('/avis-privacitat', (req, res) => {
+    res.render('avis-privacitat', {
+        titol: 'Avís de Privacitat - RGPD'
     });
 });
 
-app.post('/consentimiento', (req, res) => {
-    const { aceptar } = req.body;
+app.post('/consentiment', (req, res) => {
+    const { acceptar } = req.body;
     
-    if (aceptar === 'true') {
-        res.cookie('consentimiento', 'true', {
+    if (acceptar === 'true') {
+        res.cookie('consentiment', 'true', {
             maxAge: 30 * 24 * 60 * 60 * 1000,
             httpOnly: true,
             sameSite: 'lax'
@@ -236,22 +236,37 @@ app.post('/consentimiento', (req, res) => {
     
     res.redirect('/');
 });
+// Redireccions per compatibilitat (rutes antigues en castellà)
+app.get('/login', (req, res) => {
+    res.redirect('/iniciar-sessio');
+});
 
-// ============ API DE AUTENTICACIÓN ============
+app.get('/logout', (req, res) => {
+    res.redirect('/tancar-sessio');
+});
+
+app.get('/registro', (req, res) => {
+    res.redirect('/registre');
+});
+
+app.get('/registro-padre', (req, res) => {
+    res.redirect('/registre-pare');
+});
+// ============ API D'AUTENTICACIÓ ============
 
 /**
- * LOGIN DE USUARIOS (PADRES Y PROFESORES)
+ * INICI DE SESSIÓ D'USUARIS (PARES I PROFESSORS)
  */
-app.post('/login', async (req, res) => {
-    const { email, password, tipo } = req.body;
+app.post('/iniciar-sessio', async (req, res) => {
+    const { email, password, tipus } = req.body;
     
     try {
-        console.log('🔐 Intento de login:', { email, tipo });
+        console.log('🔐 Intent d\'inici de sessió:', { email, tipus });
         
         if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
-            console.error('❌ NEXT_PUBLIC_FIREBASE_API_KEY no está configurada');
-            req.flash('error', 'Error de configuración del servidor');
-            return res.redirect('/login?tipo=' + tipo);
+            console.error('❌ NEXT_PUBLIC_FIREBASE_API_KEY no està configurada');
+            req.flash('error', 'Error de configuració del servidor');
+            return res.redirect('/iniciar-sessio?tipus=' + tipus);
         }
         
         try {
@@ -265,59 +280,59 @@ app.post('/login', async (req, res) => {
             );
             
             const { localId, idToken } = response.data;
-            console.log('✅ Credenciales verificadas en Firebase Auth:', localId);
+            console.log('✅ Credencials verificades a Firebase Auth:', localId);
             
-            const userSnapshot = await db.collection(COLLECTIONS.USUARIOS)
+            const userSnapshot = await db.collection(COLLECTIONS.USUARIS)
                 .where('email', '==', email)
-                .where('tipo', '==', tipo)
+                .where('tipus', '==', tipus)
                 .limit(1)
                 .get();
             
             if (userSnapshot.empty) {
-                console.log('❌ Usuario no encontrado en Firestore');
-                req.flash('error', 'Credenciales incorrectas');
-                return res.redirect('/login?tipo=' + tipo);
+                console.log('❌ Usuari no trobat a Firestore');
+                req.flash('error', 'Credencials incorrectes');
+                return res.redirect('/iniciar-sessio?tipus=' + tipus);
             }
             
             const userDoc = userSnapshot.docs[0];
             const userData = userDoc.data();
             
             if (userData.uid !== localId) {
-                console.log('❌ Discrepancia en UID entre Auth y Firestore');
-                req.flash('error', 'Error en la configuración de la cuenta');
-                return res.redirect('/login?tipo=' + tipo);
+                console.log('❌ Discrepància en UID entre Auth i Firestore');
+                req.flash('error', 'Error en la configuració del compte');
+                return res.redirect('/iniciar-sessio?tipus=' + tipus);
             }
             
-            req.session.usuario = {
+            req.session.usuari = {
                 uid: userData.uid,
-                nombre: userData.nombre,
-                nombreAlumno: userData.nombreAlumno || '',
+                nom: userData.nom,
+                nomAlumne: userData.nomAlumne || '',
                 email: userData.email,
-                tipo: userData.tipo,
-                telefono: userData.telefono,
-                curso: userData.curso,
+                tipus: userData.tipus,
+                telefon: userData.telefon,
+                curs: userData.curs,
                 idToken: idToken
             };
             
             req.session.save((err) => {
                 if (err) {
-                    console.error('❌ Error guardando sesión:', err);
-                    req.flash('error', 'Error al iniciar sesión');
-                    return res.redirect('/login?tipo=' + tipo);
+                    console.error('❌ Error guardant sessió:', err);
+                    req.flash('error', 'Error en iniciar sessió');
+                    return res.redirect('/iniciar-sessio?tipus=' + tipus);
                 }
                 
-                console.log('✅ Sesión guardada correctamente');
-                console.log('✅ Login exitoso:', userData.nombre);
+                console.log('✅ Sessió guardada correctament');
+                console.log('✅ Inici de sessió exitós:', userData.nom);
                 
-                const destino = userData.tipo === 'profesor' ? '/profesor/dashboard' : '/padre/profesores';
-                console.log('➡️ Redirigiendo a:', destino);
-                res.redirect(destino);
+                const desti = userData.tipus === 'professor' ? '/professor/panell' : '/pare/professors';
+                console.log('➡️ Redirigint a:', desti);
+                res.redirect(desti);
             });
             
         } catch (axiosError) {
             console.error('❌ Error de Firebase Auth:', axiosError.response?.data || axiosError.message);
             
-            let errorMessage = 'Email o contraseña incorrectos';
+            let missatgeError = 'Email o contrasenya incorrectes';
             
             if (axiosError.response?.data?.error?.message) {
                 const firebaseError = axiosError.response.data.error.message;
@@ -325,691 +340,691 @@ app.post('/login', async (req, res) => {
                     case 'EMAIL_NOT_FOUND':
                     case 'INVALID_PASSWORD':
                     case 'INVALID_LOGIN_CREDENTIALS':
-                        errorMessage = 'Email o contraseña incorrectos';
+                        missatgeError = 'Email o contrasenya incorrectes';
                         break;
                     case 'USER_DISABLED':
-                        errorMessage = 'Esta cuenta ha sido deshabilitada';
+                        missatgeError = 'Aquest compte ha estat deshabilitat';
                         break;
                     case 'TOO_MANY_ATTEMPTS_TRY_LATER':
-                        errorMessage = 'Demasiados intentos fallidos. Intenta más tarde';
+                        missatgeError = 'Massa intents fallits. Intenta més tard';
                         break;
                     default:
-                        errorMessage = 'Error al iniciar sesión: ' + firebaseError;
+                        missatgeError = 'Error en iniciar sessió: ' + firebaseError;
                 }
             }
             
-            req.flash('error', errorMessage);
-            return res.redirect('/login?tipo=' + tipo);
+            req.flash('error', missatgeError);
+            return res.redirect('/iniciar-sessio?tipus=' + tipus);
         }
         
     } catch (error) {
-        console.error('❌ Error inesperado en login:', error);
-        req.flash('error', 'Error al iniciar sesión');
-        res.redirect('/login?tipo=' + tipo);
+        console.error('❌ Error inesperat en inici de sessió:', error);
+        req.flash('error', 'Error en iniciar sessió');
+        res.redirect('/iniciar-sessio?tipus=' + tipus);
     }
 });
 
 /**
- * REGISTRO DE PROFESORES
+ * REGISTRE DE PROFESSORS
  */
-app.post('/api/registro', async (req, res) => {
-    console.log('📝 Datos recibidos en registro profesor:', req.body);
+app.post('/api/registre', async (req, res) => {
+    console.log('📝 Dades rebudes en registre professor:', req.body);
     
-    const { nombre, email, password, telefono, curso, descripcion, codigoRegistro } = req.body;
+    const { nom, email, password, telefon, curs, descripcio, codiRegistre } = req.body;
     
     try {
-        if (!codigoRegistro || codigoRegistro !== process.env.REGISTRO_PROFESOR_CODE) {
-            console.log('❌ Código incorrecto:', codigoRegistro);
-            req.flash('error', 'Código de registro incorrecto');
-            return res.redirect('/registro');
+        if (!codiRegistre || codiRegistre !== process.env.REGISTRE_PROFESSOR_CODI) {
+            console.log('❌ Codi incorrecte:', codiRegistre);
+            req.flash('error', 'Codi de registre incorrecte');
+            return res.redirect('/registre');
         }
         
-        const userSnapshot = await db.collection(COLLECTIONS.USUARIOS)
+        const userSnapshot = await db.collection(COLLECTIONS.USUARIS)
             .where('email', '==', email)
             .get();
         
         if (!userSnapshot.empty) {
-            req.flash('error', 'El email ya está registrado');
-            return res.redirect('/registro');
+            req.flash('error', 'L\'email ja està registrat');
+            return res.redirect('/registre');
         }
         
         const userRecord = await auth.createUser({
             email: email,
             password: password,
-            displayName: nombre
+            displayName: nom
         });
         
-        console.log('✅ Usuario profesor creado en Auth:', userRecord.uid);
+        console.log('✅ Usuari professor creat a Auth:', userRecord.uid);
         
-        await db.collection(COLLECTIONS.USUARIOS).doc(userRecord.uid).set({
+        await db.collection(COLLECTIONS.USUARIS).doc(userRecord.uid).set({
             uid: userRecord.uid,
-            nombre: nombre,
+            nom: nom,
             email: email,
-            tipo: 'profesor',
-            telefono: telefono || '',
-            curso: curso || '',
-            descripcion: descripcion || '',
+            tipus: 'professor',
+            telefon: telefon || '',
+            curs: curs || '',
+            descripcio: descripcio || '',
             createdAt: new Date().toISOString(),
-            activo: true
+            actiu: true
         });
         
-        console.log('✅ Datos de profesor guardados en Firestore');
+        console.log('✅ Dades de professor guardades a Firestore');
         
-        req.flash('success', 'Registro completado. Ya puedes iniciar sesión');
-        res.redirect('/login?tipo=profesor');
+        req.flash('success', 'Registre completat. Ja pots iniciar sessió');
+        res.redirect('/iniciar-sessio?tipus=professor');
         
     } catch (error) {
-        console.error('❌ Error en registro profesor:', error);
+        console.error('❌ Error en registre professor:', error);
         
         if (error.code === 'auth/email-already-exists') {
-            req.flash('error', 'El email ya está registrado');
+            req.flash('error', 'L\'email ja està registrat');
         } else {
-            req.flash('error', 'Error en el registro: ' + error.message);
+            req.flash('error', 'Error en el registre: ' + error.message);
         }
         
-        res.redirect('/registro');
+        res.redirect('/registre');
     }
 });
 
 /**
- * REGISTRO DE PADRES
+ * REGISTRE DE PARES
  */
-app.post('/api/registro-padre', async (req, res) => {
-    console.log('📝 Datos recibidos en registro padre:', req.body);
+app.post('/api/registre-pare', async (req, res) => {
+    console.log('📝 Dades rebudes en registre pare:', req.body);
     
-    const { nombre, nombreAlumno, email, password, telefono } = req.body;
+    const { nom, nomAlumne, email, password, telefon } = req.body;
     
     try {
-        console.log('1️⃣ Verificando si el email ya existe...');
-        const userSnapshot = await db.collection(COLLECTIONS.USUARIOS)
+        console.log('1️⃣ Verificant si l\'email ja existeix...');
+        const userSnapshot = await db.collection(COLLECTIONS.USUARIS)
             .where('email', '==', email)
             .get();
         
         if (!userSnapshot.empty) {
-            console.log('❌ Email ya registrado');
-            req.flash('error', 'El email ya está registrado');
-            return res.redirect('/registro-padre');
+            console.log('❌ Email ja registrat');
+            req.flash('error', 'L\'email ja està registrat');
+            return res.redirect('/registre-pare');
         }
         console.log('✅ Email disponible');
         
-        console.log('2️⃣ Creando usuario en Firebase Auth...');
+        console.log('2️⃣ Creant usuari a Firebase Auth...');
         console.log('   Email:', email);
-        console.log('   Password length:', password.length);
+        console.log('   Longitud contrasenya:', password.length);
         
         let userRecord;
         try {
             userRecord = await auth.createUser({
                 email: email,
                 password: password,
-                displayName: nombre
+                displayName: nom
             });
-            console.log('✅ Usuario padre creado en Auth. UID:', userRecord.uid);
+            console.log('✅ Usuari pare creat a Auth. UID:', userRecord.uid);
         } catch (authError) {
-            console.error('❌ Error en Firebase Auth:', authError);
-            console.error('Código:', authError.code);
-            console.error('Mensaje:', authError.message);
-            req.flash('error', 'Error en autenticación: ' + authError.message);
-            return res.redirect('/registro-padre');
+            console.error('❌ Error a Firebase Auth:', authError);
+            console.error('Codi:', authError.code);
+            console.error('Missatge:', authError.message);
+            req.flash('error', 'Error en autenticació: ' + authError.message);
+            return res.redirect('/registre-pare');
         }
         
-        console.log('3️⃣ Guardando datos en Firestore...');
-        console.log('   Colección:', COLLECTIONS.USUARIOS);
-        console.log('   Documento ID:', userRecord.uid);
+        console.log('3️⃣ Guardant dades a Firestore...');
+        console.log('   Col·lecció:', COLLECTIONS.USUARIS);
+        console.log('   Document ID:', userRecord.uid);
         
         try {
-            await db.collection(COLLECTIONS.USUARIOS).doc(userRecord.uid).set({
+            await db.collection(COLLECTIONS.USUARIS).doc(userRecord.uid).set({
                 uid: userRecord.uid,
-                nombre: nombre,
-                nombreAlumno: nombreAlumno || '',
+                nom: nom,
+                nomAlumne: nomAlumne || '',
                 email: email,
-                tipo: 'padre',
-                telefono: telefono || '',
+                tipus: 'pare',
+                telefon: telefon || '',
                 createdAt: new Date().toISOString(),
-                activo: true
+                actiu: true
             });
-            console.log('✅ Datos de padre guardados en Firestore');
+            console.log('✅ Dades de pare guardades a Firestore');
         } catch (firestoreError) {
-            console.error('❌ Error en Firestore:', firestoreError);
+            console.error('❌ Error a Firestore:', firestoreError);
             try {
                 await auth.deleteUser(userRecord.uid);
-                console.log('✅ Usuario de Auth eliminado por consistencia');
+                console.log('✅ Usuari de Auth eliminat per consistència');
             } catch (deleteError) {
-                console.error('❌ No se pudo eliminar el usuario de Auth:', deleteError);
+                console.error('❌ No s\'ha pogut eliminar l\'usuari de Auth:', deleteError);
             }
-            req.flash('error', 'Error al guardar datos del usuario');
-            return res.redirect('/registro-padre');
+            req.flash('error', 'Error al guardar dades de l\'usuari');
+            return res.redirect('/registre-pare');
         }
         
-        console.log('4️⃣ Registro completado con éxito');
-        req.flash('success', 'Registro completado. Ya puedes iniciar sesión');
-        console.log('5️⃣ Redirigiendo a /login?tipo=padre');
-        res.redirect('/login?tipo=padre');
+        console.log('4️⃣ Registre completat amb èxit');
+        req.flash('success', 'Registre completat. Ja pots iniciar sessió');
+        console.log('5️⃣ Redirigint a /iniciar-sessio?tipus=pare');
+        res.redirect('/iniciar-sessio?tipus=pare');
         
     } catch (error) {
-        console.error('❌ Error general en registro padre:', error);
+        console.error('❌ Error general en registre pare:', error);
         console.error('Stack:', error.stack);
-        req.flash('error', 'Error en el registro: ' + error.message);
-        res.redirect('/registro-padre');
+        req.flash('error', 'Error en el registre: ' + error.message);
+        res.redirect('/registre-pare');
     }
 });
 
-app.get('/logout', (req, res) => {
+app.get('/tancar-sessio', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
-            console.error('❌ Error al destruir sesión:', err);
+            console.error('❌ Error en destruir sessió:', err);
         }
         res.redirect('/');
     });
 });
 
-// ============ RUTAS DE PROFESOR ============
+// ============ RUTES DE PROFESSOR ============
 
-app.get('/profesor/dashboard', authMiddleware, profesorMiddleware, async (req, res) => {
+app.get('/professor/panell', authMiddleware, professorMiddleware, async (req, res) => {
     try {
-        const profesorId = req.session.usuario.uid;        
-        console.log('📊 Cargando dashboard para profesor:', profesorId);
+        const professorId = req.session.usuari.uid;        
+        console.log('📊 Carregant panell per a professor:', professorId);
         
-        const reservasSnapshot = await db.collection(COLLECTIONS.RESERVAS)
-            .where('profesorId', '==', profesorId)
-            .where('estado', '==', 'pendiente')
-            .orderBy('fecha')
+        const reservesSnapshot = await db.collection(COLLECTIONS.RESERVES)
+            .where('professorId', '==', professorId)
+            .where('estat', '==', 'pendent')
+            .orderBy('data')
             .orderBy('hora')
             .get();
         
-        const reservas = [];
-        reservasSnapshot.forEach(doc => {
-            reservas.push({ id: doc.id, ...doc.data() });
+        const reserves = [];
+        reservesSnapshot.forEach(doc => {
+            reserves.push({ id: doc.id, ...doc.data() });
         });
         
-        const horariosSnapshot = await db.collection(COLLECTIONS.HORARIOS)
-            .where('profesorId', '==', profesorId)
-            .where('activo', '==', true)
+        const horarisSnapshot = await db.collection(COLLECTIONS.HORARIS)
+            .where('professorId', '==', professorId)
+            .where('actiu', '==', true)
             .get();
         
-        const horarios = [];
-        horariosSnapshot.forEach(doc => {
-            horarios.push({ id: doc.id, ...doc.data() });
+        const horaris = [];
+        horarisSnapshot.forEach(doc => {
+            horaris.push({ id: doc.id, ...doc.data() });
         });
         
-        console.log('📊 Dashboard profesor - Reservas:', reservas.length, 'Horarios:', horarios.length);
+        console.log('📊 Panell professor - Reserves:', reserves.length, 'Horaris:', horaris.length);
         
-        res.render('profesor/dashboard', {
-            titulo: 'Panel del Profesor',
-            reservas: reservas,
-            horarios: horarios
+        res.render('professor/panell', {
+            titol: 'Panell del Professor',
+            reserves: reserves,
+            horaris: horaris
         });
         
     } catch (error) {
-        console.error('❌ Error en dashboard profesor:', error);
-        req.flash('error', 'Error al cargar el dashboard');
+        console.error('❌ Error en panell professor:', error);
+        req.flash('error', 'Error en carregar el panell');
         res.redirect('/');
     }
 });
 
-app.get('/profesor/horarios', authMiddleware, profesorMiddleware, async (req, res) => {
+app.get('/professor/horaris', authMiddleware, professorMiddleware, async (req, res) => {
     try {
-        const profesorId = req.session.usuario.uid;        
-        console.log('📅 Cargando horarios para profesor:', profesorId);
+        const professorId = req.session.usuari.uid;        
+        console.log('📅 Carregant horaris per a professor:', professorId);
         
-        const horariosSnapshot = await db.collection(COLLECTIONS.HORARIOS)
-            .where('profesorId', '==', profesorId)
+        const horarisSnapshot = await db.collection(COLLECTIONS.HORARIS)
+            .where('professorId', '==', professorId)
             .get();
         
-        const horarios = [];
-        horariosSnapshot.forEach(doc => {
-            horarios.push({ id: doc.id, ...doc.data() });
+        const horaris = [];
+        horarisSnapshot.forEach(doc => {
+            horaris.push({ id: doc.id, ...doc.data() });
         });
         
-        console.log('✅ Encontrados', horarios.length, 'horarios');
+        console.log('✅ Trobats', horaris.length, 'horaris');
         
-        res.render('profesor/horarios', {
-            titulo: 'Gestionar Horarios',
-            horarios: horarios
+        res.render('professor/horaris', {
+            titol: 'Gestionar Horaris',
+            horaris: horaris
         });
         
     } catch (error) {
-        console.error('❌ Error al cargar horarios:', error);
-        req.flash('error', 'Error al cargar horarios');
-        res.redirect('/profesor/dashboard');
+        console.error('❌ Error en carregar horaris:', error);
+        req.flash('error', 'Error en carregar horaris');
+        res.redirect('/professor/panell');
     }
 });
 
-// ============ RUTA CORREGIDA PARA AGREGAR HORARIOS CON VALIDACIÓN ============
-app.post('/profesor/horarios/agregar', authMiddleware, profesorMiddleware, async (req, res) => {
-    const { dia_semana, hora } = req.body;
-    const profesorId = req.session.usuario.uid;
+// ============ RUTA CORREGIDA PER AFEGIR HORARIS AMB VALIDACIÓ ============
+app.post('/professor/horaris/afegir', authMiddleware, professorMiddleware, async (req, res) => {
+    const { dia_setmana, hora } = req.body;
+    const professorId = req.session.usuari.uid;
     
-    // Validar que la hora tenga formato correcto (HH:MM)
+    // Validar que l'hora tingui format correcte (HH:MM)
     const horaRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
     if (!hora || !horaRegex.test(hora)) {
-        console.log('❌ Formato de hora inválido:', hora);
-        req.flash('error', 'Formato de hora inválido. Use HH:MM (ej: 14:30, 09:00)');
-        return res.redirect('/profesor/horarios');
+        console.log('❌ Format d\'hora invàlid:', hora);
+        req.flash('error', 'Format d\'hora invàlid. Utilitza HH:MM (ex: 14:30, 09:00)');
+        return res.redirect('/professor/horaris');
     }
     
     try {
-        await db.collection(COLLECTIONS.HORARIOS).add({
-            profesorId: profesorId,
-            diaSemana: parseInt(dia_semana),
+        await db.collection(COLLECTIONS.HORARIS).add({
+            professorId: professorId,
+            diaSetmana: parseInt(dia_setmana),
             hora: hora,
-            activo: true,
+            actiu: true,
             createdAt: new Date().toISOString()
         });
         
-        req.flash('success', 'Horario agregado correctamente');
+        req.flash('success', 'Horari afegit correctament');
         
     } catch (error) {
-        console.error('❌ Error al agregar horario:', error);
-        req.flash('error', 'Error al agregar horario');
+        console.error('❌ Error en afegir horari:', error);
+        req.flash('error', 'Error en afegir horari');
     }
     
-    res.redirect('/profesor/horarios');
+    res.redirect('/professor/horaris');
 });
 
-app.post('/profesor/horarios/eliminar/:id', authMiddleware, profesorMiddleware, async (req, res) => {
-    const horarioId = req.params.id;
-    const profesorId = req.session.usuario.uid;    
+app.post('/professor/horaris/eliminar/:id', authMiddleware, professorMiddleware, async (req, res) => {
+    const horariId = req.params.id;
+    const professorId = req.session.usuari.uid;    
     try {
-        const horarioDoc = await db.collection(COLLECTIONS.HORARIOS).doc(horarioId).get();
+        const horariDoc = await db.collection(COLLECTIONS.HORARIS).doc(horariId).get();
         
-        if (!horarioDoc.exists || horarioDoc.data().profesorId !== profesorId) {
-            req.flash('error', 'No tienes permiso para eliminar este horario');
-            return res.redirect('/profesor/horarios');
+        if (!horariDoc.exists || horariDoc.data().professorId !== professorId) {
+            req.flash('error', 'No tens permís per eliminar aquest horari');
+            return res.redirect('/professor/horaris');
         }
         
-        await db.collection(COLLECTIONS.HORARIOS).doc(horarioId).delete();
-        req.flash('success', 'Horario eliminado correctamente');
+        await db.collection(COLLECTIONS.HORARIS).doc(horariId).delete();
+        req.flash('success', 'Horari eliminat correctament');
         
     } catch (error) {
-        console.error('❌ Error al eliminar horario:', error);
-        req.flash('error', 'Error al eliminar horario');
+        console.error('❌ Error en eliminar horari:', error);
+        req.flash('error', 'Error en eliminar horari');
     }
     
-    res.redirect('/profesor/horarios');
+    res.redirect('/professor/horaris');
 });
 
-// ============ RUTA DE CALENDARIO PARA PROFESOR ============
-app.get('/profesor/calendario', authMiddleware, profesorMiddleware, async (req, res) => {
+// ============ RUTA DE CALENDARI PER A PROFESSOR ============
+app.get('/professor/calendari', authMiddleware, professorMiddleware, async (req, res) => {
     try {
-        const profesorId = req.session.usuario.uid;        
-        console.log('📅 Cargando calendario para profesor:', profesorId);
+        const professorId = req.session.usuari.uid;        
+        console.log('📅 Carregant calendari per a professor:', professorId);
         
-        const reservasSnapshot = await db.collection(COLLECTIONS.RESERVAS)
-            .where('profesorId', '==', profesorId)
-            .orderBy('fecha', 'desc')
+        const reservesSnapshot = await db.collection(COLLECTIONS.RESERVES)
+            .where('professorId', '==', professorId)
+            .orderBy('data', 'desc')
             .orderBy('hora', 'desc')
             .get();
         
-        const reservas = [];
-        reservasSnapshot.forEach(doc => {
+        const reserves = [];
+        reservesSnapshot.forEach(doc => {
             const data = doc.data();
-            if (data.estado !== 'cancelada') {
-                reservas.push({ id: doc.id, ...data });
+            if (data.estat !== 'cancel·lada') {
+                reserves.push({ id: doc.id, ...data });
             }
         });
         
-        console.log(`✅ Calendario: mostrando ${reservas.length} reservas (excluyendo canceladas)`);
+        console.log(`✅ Calendari: mostrant ${reserves.length} reserves (excloent cancel·lades)`);
         
-        res.render('profesor/calendario', {
-            titulo: 'Calendario de Reservas',
-            todasReservas: reservas
+        res.render('professor/calendari', {
+            titol: 'Calendari de Reserves',
+            totesReserves: reserves
         });
         
     } catch (error) {
-        console.error('❌ Error al cargar calendario:', error);
-        req.flash('error', 'Error al cargar el calendario');
-        res.redirect('/profesor/dashboard');
+        console.error('❌ Error en carregar calendari:', error);
+        req.flash('error', 'Error en carregar el calendari');
+        res.redirect('/professor/panell');
     }
 });
 
-// ============ RUTAS DE RESERVAS DE PROFESOR ============
+// ============ RUTES DE RESERVES DE PROFESSOR ============
 
-app.get('/profesor/reservas', authMiddleware, profesorMiddleware, async (req, res) => {
+app.get('/professor/reserves', authMiddleware, professorMiddleware, async (req, res) => {
     try {
-        const profesorId = req.session.usuario.uid;        
-        console.log('📋 Cargando todas las reservas para profesor:', profesorId);
+        const professorId = req.session.usuari.uid;        
+        console.log('📋 Carregant totes les reserves per a professor:', professorId);
         
-        const reservasSnapshot = await db.collection(COLLECTIONS.RESERVAS)
-            .where('profesorId', '==', profesorId)
-            .orderBy('fecha', 'desc')
+        const reservesSnapshot = await db.collection(COLLECTIONS.RESERVES)
+            .where('professorId', '==', professorId)
+            .orderBy('data', 'desc')
             .orderBy('hora', 'desc')
             .get();
         
-        const reservas = [];
-        reservasSnapshot.forEach(doc => {
-            reservas.push({ id: doc.id, ...doc.data() });
+        const reserves = [];
+        reservesSnapshot.forEach(doc => {
+            reserves.push({ id: doc.id, ...doc.data() });
         });
         
-        console.log(`✅ Encontradas ${reservas.length} reservas totales`);
+        console.log(`✅ Trobades ${reserves.length} reserves totals`);
         
-        const reservasPendientes = reservas.filter(r => r.estado === 'pendiente' || r.estado === 'confirmada');
-        const reservasHistorial = reservas.filter(r => r.estado === 'cancelada' || r.estado === 'completada');
+        const reservesPendents = reserves.filter(r => r.estat === 'pendent' || r.estat === 'confirmada');
+        const reservesHistorial = reserves.filter(r => r.estat === 'cancel·lada' || r.estat === 'completada');
         
-        res.render('profesor/reservas', {
-            titulo: 'Mis Reservas',
-            reservasPendientes: reservasPendientes,
-            reservasHistorial: reservasHistorial,
-            todasReservas: reservas
+        res.render('professor/reserves', {
+            titol: 'Les Meves Reserves',
+            reservesPendents: reservesPendents,
+            reservesHistorial: reservesHistorial,
+            totesReserves: reserves
         });
         
     } catch (error) {
-        console.error('❌ Error al cargar reservas:', error);
-        req.flash('error', 'Error al cargar las reservas');
-        res.redirect('/profesor/dashboard');
+        console.error('❌ Error en carregar reserves:', error);
+        req.flash('error', 'Error en carregar les reserves');
+        res.redirect('/professor/panell');
     }
 });
 
-app.post('/profesor/reservas/estado/:reservaId', authMiddleware, profesorMiddleware, async (req, res) => {
+app.post('/professor/reserves/estat/:reservaId', authMiddleware, professorMiddleware, async (req, res) => {
     const reservaId = req.params.reservaId;
-    const { estado } = req.body;
-    const profesorId = req.session.usuario.uid;    
+    const { estat } = req.body;
+    const professorId = req.session.usuari.uid;    
     try {
-        console.log(`🔄 Cambiando estado de reserva ${reservaId} a ${estado}`);
+        console.log(`🔄 Canviant estat de reserva ${reservaId} a ${estat}`);
         
-        const reservaDoc = await db.collection(COLLECTIONS.RESERVAS).doc(reservaId).get();
+        const reservaDoc = await db.collection(COLLECTIONS.RESERVES).doc(reservaId).get();
         
         if (!reservaDoc.exists) {
-            req.flash('error', 'Reserva no encontrada');
-            return res.redirect('/profesor/reservas');
+            req.flash('error', 'Reserva no trobada');
+            return res.redirect('/professor/reserves');
         }
         
         const reservaData = reservaDoc.data();
         
-        if (reservaData.profesorId !== profesorId) {
-            req.flash('error', 'No tienes permiso para modificar esta reserva');
-            return res.redirect('/profesor/reservas');
+        if (reservaData.professorId !== professorId) {
+            req.flash('error', 'No tens permís per modificar aquesta reserva');
+            return res.redirect('/professor/reserves');
         }
         
-        const estadoAnterior = reservaData.estado;
+        const estatAnterior = reservaData.estat;
         
-        await db.collection(COLLECTIONS.RESERVAS).doc(reservaId).update({
-            estado: estado,
-            fechaActualizacion: new Date().toISOString()
+        await db.collection(COLLECTIONS.RESERVES).doc(reservaId).update({
+            estat: estat,
+            dataActualitzacio: new Date().toISOString()
         });
         
-        if (estado === 'cancelada' && estadoAnterior !== 'cancelada') {
+        if (estat === 'cancel·lada' && estatAnterior !== 'cancel·lada') {
             try {
-                const { enviarCancelacionPadre } = require('./backend/services/emailService');
+                const { enviarCancelacioPare } = require('./backend/serveis/emailService');
                 
-                const profesorDoc = await db.collection(COLLECTIONS.USUARIOS).doc(profesorId).get();
-                const profesor = profesorDoc.data();
+                const professorDoc = await db.collection(COLLECTIONS.USUARIS).doc(professorId).get();
+                const professor = professorDoc.data();
                 
-                reservaData.profesorNombre = profesor.nombre;
+                reservaData.professorNom = professor.nom;
                 
-                await enviarCancelacionPadre(reservaData, profesor);
-                console.log('✅ Email de cancelación enviado al padre');
+                await enviarCancelacioPare(reservaData, professor);
+                console.log('✅ Email de cancel·lació enviat al pare');
             } catch (emailError) {
-                console.error('❌ Error al enviar email de cancelación:', emailError);
+                console.error('❌ Error en enviar email de cancel·lació:', emailError);
             }
         }
         
-        req.flash('success', `Reserva ${estado === 'completada' ? 'marcada como completada' : 'cancelada'} correctamente`);
-        res.redirect('/profesor/reservas');
+        req.flash('success', `Reserva ${estat === 'completada' ? 'marcada com a completada' : 'cancel·lada'} correctament`);
+        res.redirect('/professor/reserves');
         
     } catch (error) {
-        console.error('❌ Error al actualizar reserva:', error);
-        req.flash('error', 'Error al actualizar la reserva');
-        res.redirect('/profesor/reservas');
+        console.error('❌ Error en actualitzar reserva:', error);
+        req.flash('error', 'Error en actualitzar la reserva');
+        res.redirect('/professor/reserves');
     }
 });
 
-// ============ RUTAS DE PADRE ============
+// ============ RUTES DE PARE ============
 
-app.get('/padre/profesores', authMiddleware, async (req, res) => {
-    if (req.session.usuario.tipo !== 'padre') {
-        console.log('❌ Usuario no es padre, redirigiendo a dashboard de profesor');
-        return res.redirect('/profesor/dashboard');
+app.get('/pare/professors', authMiddleware, async (req, res) => {
+    if (req.session.usuari.tipus !== 'pare') {
+        console.log('❌ Usuari no és pare, redirigint a panell de professor');
+        return res.redirect('/professor/panell');
     }
     
     try {
-        console.log('👪 Cargando lista de profesores para padre');
+        console.log('👪 Carregant llista de professors per a pare');
         
-        const profesoresSnapshot = await db.collection(COLLECTIONS.USUARIOS)
-            .where('tipo', '==', 'profesor')
-            .where('activo', '==', true)
+        const professorsSnapshot = await db.collection(COLLECTIONS.USUARIS)
+            .where('tipus', '==', 'professor')
+            .where('actiu', '==', true)
             .get();
         
-        const profesores = [];
+        const professors = [];
         
-        for (const doc of profesoresSnapshot.docs) {
-            const profesor = doc.data();
+        for (const doc of professorsSnapshot.docs) {
+            const professor = doc.data();
             
-            const horariosSnapshot = await db.collection(COLLECTIONS.HORARIOS)
-                .where('profesorId', '==', profesor.uid)
-                .where('activo', '==', true)
+            const horarisSnapshot = await db.collection(COLLECTIONS.HORARIS)
+                .where('professorId', '==', professor.uid)
+                .where('actiu', '==', true)
                 .get();
             
-            profesores.push({
+            professors.push({
                 id: doc.id,
-                ...profesor,
-                totalHorarios: horariosSnapshot.size || 0
+                ...professor,
+                totalHoraris: horarisSnapshot.size || 0
             });
         }
         
-        console.log('✅ Encontrados', profesores.length, 'profesores');
+        console.log('✅ Trobats', professors.length, 'professors');
         
-        res.render('padre/profesores', {
-            titulo: 'Profesores Disponibles',
-            profesores: profesores
+        res.render('pare/professors', {
+            titol: 'Professors Disponibles',
+            professors: professors
         });
         
     } catch (error) {
-        console.error('❌ Error al cargar profesores:', error);
-        req.flash('error', 'Error al cargar profesores');
+        console.error('❌ Error en carregar professors:', error);
+        req.flash('error', 'Error en carregar professors');
         res.redirect('/');
     }
 });
 
-app.get('/padre/reservar/:profesorId', authMiddleware, async (req, res) => {
-    const profesorId = req.params.profesorId;
+app.get('/pare/reservar/:professorId', authMiddleware, async (req, res) => {
+    const professorId = req.params.professorId;
     
-    console.log('🔍 Accediendo a reserva con profesorId:', profesorId);
-    console.log('👤 Usuario actual:', req.session.usuario);
+    console.log('🔍 Accedint a reserva amb professorId:', professorId);
+    console.log('👤 Usuari actual:', req.session.usuari);
     
     try {
-        if (req.session.usuario.tipo !== 'padre') {
-            console.log('❌ Usuario no es padre, es:', req.session.usuario.tipo);
-            req.flash('error', 'Acceso no autorizado');
+        if (req.session.usuari.tipus !== 'pare') {
+            console.log('❌ Usuari no és pare, és:', req.session.usuari.tipus);
+            req.flash('error', 'Accés no autoritzat');
             return res.redirect('/');
         }
         
-        if (!profesorId) {
-            console.log('❌ profesorId vacío');
-            req.flash('error', 'ID de profesor no válido');
-            return res.redirect('/padre/profesores');
+        if (!professorId) {
+            console.log('❌ professorId buit');
+            req.flash('error', 'ID de professor no vàlid');
+            return res.redirect('/pare/professors');
         }
         
-        console.log('📚 Buscando profesor en Firestore con ID:', profesorId);
+        console.log('📚 Cercant professor a Firestore amb ID:', professorId);
         
-        const profesorDoc = await db.collection(COLLECTIONS.USUARIOS).doc(profesorId).get();
+        const professorDoc = await db.collection(COLLECTIONS.USUARIS).doc(professorId).get();
         
-        if (!profesorDoc.exists) {
-            console.log('❌ Profesor no encontrado en Firestore');
-            req.flash('error', 'Profesor no encontrado');
-            return res.redirect('/padre/profesores');
+        if (!professorDoc.exists) {
+            console.log('❌ Professor no trobat a Firestore');
+            req.flash('error', 'Professor no trobat');
+            return res.redirect('/pare/professors');
         }
         
-        const profesorData = profesorDoc.data();
-        console.log('✅ Profesor encontrado:', profesorData.nombre);
+        const professorData = professorDoc.data();
+        console.log('✅ Professor trobat:', professorData.nom);
         
-        if (profesorData.tipo !== 'profesor') {
-            console.log('❌ El usuario no es profesor, es:', profesorData.tipo);
-            req.flash('error', 'El usuario seleccionado no es un profesor');
-            return res.redirect('/padre/profesores');
+        if (professorData.tipus !== 'professor') {
+            console.log('❌ L\'usuari no és professor, és:', professorData.tipus);
+            req.flash('error', 'L\'usuari seleccionat no és un professor');
+            return res.redirect('/pare/professors');
         }
         
-        const profesor = { id: profesorDoc.id, ...profesorData };
+        const professor = { id: professorDoc.id, ...professorData };
         
-        console.log('📅 Buscando horarios del profesor...');
-        const horariosSnapshot = await db.collection(COLLECTIONS.HORARIOS)
-            .where('profesorId', '==', profesorId)
-            .where('activo', '==', true)
+        console.log('📅 Cercant horaris del professor...');
+        const horarisSnapshot = await db.collection(COLLECTIONS.HORARIS)
+            .where('professorId', '==', professorId)
+            .where('actiu', '==', true)
             .get();
         
-        const horarios = [];
-        horariosSnapshot.forEach(doc => {
-            horarios.push({ id: doc.id, ...doc.data() });
+        const horaris = [];
+        horarisSnapshot.forEach(doc => {
+            horaris.push({ id: doc.id, ...doc.data() });
         });
-        console.log(`✅ Encontrados ${horarios.length} horarios`);
+        console.log(`✅ Trobats ${horaris.length} horaris`);
         
-        console.log('📖 Buscando TODAS las reservas existentes...');
-        const reservasSnapshot = await db.collection(COLLECTIONS.RESERVAS)
-            .where('profesorId', '==', profesorId)
-            .where('estado', 'in', ['pendiente', 'confirmada'])
+        console.log('📖 Cercant TOTES les reserves existents...');
+        const reservesSnapshot = await db.collection(COLLECTIONS.RESERVES)
+            .where('professorId', '==', professorId)
+            .where('estat', 'in', ['pendent', 'confirmada'])
             .get();
         
-        const reservas = [];
-        reservasSnapshot.forEach(doc => {
+        const reserves = [];
+        reservesSnapshot.forEach(doc => {
             const data = doc.data();
-            reservas.push({
-                fecha: data.fecha,
+            reserves.push({
+                data: data.data,
                 hora: data.hora,
-                estado: data.estado
+                estat: data.estat
             });
         });
         
-        console.log(`✅ Encontradas ${reservas.length} reservas:`, reservas);
+        console.log(`✅ Trobades ${reserves.length} reserves:`, reserves);
         
-        console.log('🎨 Renderizando vista padre/reservas');
-        res.render('padre/reservas', {
-            titulo: `Reservar con ${profesor.nombre}`,
-            profesor: profesor,
-            horarios: horarios,
-            reservas: reservas
+        console.log('🎨 Renderitzant vista pare/reserves');
+        res.render('pare/reserves', {
+            titol: `Reservar amb ${professor.nom}`,
+            professor: professor,
+            horaris: horaris,
+            reserves: reserves
         });
         
     } catch (error) {
-        console.error('❌ Error detallado:', error);
+        console.error('❌ Error detallat:', error);
         console.error('❌ Stack trace:', error.stack);
-        req.flash('error', 'Error al cargar la página de reserva: ' + error.message);
-        res.redirect('/padre/profesores');
+        req.flash('error', 'Error en carregar la pàgina de reserva: ' + error.message);
+        res.redirect('/pare/professors');
     }
 });
 
-app.post('/api/padre/reservar', authMiddleware, async (req, res) => {
-    const { profesorId, fecha, hora, nombrePadre, nombreAlumno, emailPadre, telefono, comentarios } = req.body;
+app.post('/api/pare/reservar', authMiddleware, async (req, res) => {
+    const { professorId, data, hora, nomPare, nomAlumne, emailPare, telefon, comentaris } = req.body;
     const reservaId = uuidv4();
-    const tokenAcceso = uuidv4();
+    const tokenAcces = uuidv4();
     
     try {
-        const reservasSnapshot = await db.collection(COLLECTIONS.RESERVAS)
-            .where('profesorId', '==', profesorId)
-            .where('fecha', '==', fecha)
+        const reservesSnapshot = await db.collection(COLLECTIONS.RESERVES)
+            .where('professorId', '==', professorId)
+            .where('data', '==', data)
             .where('hora', '==', hora)
-            .where('estado', 'in', ['pendiente', 'confirmada'])
+            .where('estat', 'in', ['pendent', 'confirmada'])
             .limit(1)
             .get();
         
-        if (!reservasSnapshot.empty) {
-            return res.json({ error: 'Horario no disponible' });
+        if (!reservesSnapshot.empty) {
+            return res.json({ error: 'Horari no disponible' });
         }
         
-        await db.collection(COLLECTIONS.RESERVAS).doc(reservaId).set({
+        await db.collection(COLLECTIONS.RESERVES).doc(reservaId).set({
             reservaId: reservaId,
-            profesorId: profesorId,
-            padreId: req.session.usuario?.uid || null,
-            padreNombre: nombrePadre,
-            nombreAlumno: nombreAlumno || '',
-            padreEmail: emailPadre,
-            padreTelefono: telefono || '',
-            fecha: fecha,
+            professorId: professorId,
+            pareId: req.session.usuari?.uid || null,
+            nomPare: nomPare,
+            nomAlumne: nomAlumne || '',
+            emailPare: emailPare,
+            telefonPare: telefon || '',
+            data: data,
             hora: hora,
-            comentarios: comentarios || '',
-            estado: 'pendiente',
-            tokenAcceso: tokenAcceso,
-            fechaReserva: new Date().toISOString()
+            comentaris: comentaris || '',
+            estat: 'pendent',
+            tokenAcces: tokenAcces,
+            dataReserva: new Date().toISOString()
         });
         
         try {
-            const { enviarConfirmacion } = require('./backend/services/emailService');
+            const { enviarConfirmacio } = require('./backend/serveis/emailService');
             
-            const profesorDoc = await db.collection(COLLECTIONS.USUARIOS).doc(profesorId).get();
-            const profesor = profesorDoc.data();
+            const professorDoc = await db.collection(COLLECTIONS.USUARIS).doc(professorId).get();
+            const professor = professorDoc.data();
             
             const reservaData = {
                 reservaId: reservaId,
-                padreNombre: nombrePadre,
-                padreEmail: emailPadre,
-                nombreAlumno: nombreAlumno || '',
-                fecha: fecha,
+                nomPare: nomPare,
+                emailPare: emailPare,
+                nomAlumne: nomAlumne || '',
+                data: data,
                 hora: hora,
-                comentarios: comentarios || '',
-                tokenAcceso: tokenAcceso
+                comentaris: comentaris || '',
+                tokenAcces: tokenAcces
             };
             
-            await enviarConfirmacion(reservaData, profesor);
-            console.log('✅ Email de confirmación enviado al padre');
+            await enviarConfirmacio(reservaData, professor);
+            console.log('✅ Email de confirmació enviat al pare');
         } catch (emailError) {
-            console.error('❌ Error al enviar email de confirmación:', emailError);
+            console.error('❌ Error en enviar email de confirmació:', emailError);
         }
         
         res.json({
             success: true,
             reservaId: reservaId,
-            mensaje: 'Reserva confirmada'
+            missatge: 'Reserva confirmada'
         });
         
     } catch (error) {
         console.error('Error:', error);
-        res.json({ error: 'Error al crear la reserva' });
+        res.json({ error: 'Error en crear la reserva' });
     }
 });
 
-app.get('/confirmacion/:reservaId', authMiddleware, async (req, res) => {
+app.get('/confirmacio/:reservaId', authMiddleware, async (req, res) => {
     const reservaId = req.params.reservaId;
     
     try {
-        const reservaDoc = await db.collection(COLLECTIONS.RESERVAS).doc(reservaId).get();
+        const reservaDoc = await db.collection(COLLECTIONS.RESERVES).doc(reservaId).get();
         
         if (!reservaDoc.exists) {
-            req.flash('error', 'Reserva no encontrada');
-            return res.redirect('/padre/profesores');
+            req.flash('error', 'Reserva no trobada');
+            return res.redirect('/pare/professors');
         }
         
         const reserva = reservaDoc.data();
         
-        const profesorDoc = await db.collection(COLLECTIONS.USUARIOS).doc(reserva.profesorId).get();
-        const profesor = profesorDoc.data();
+        const professorDoc = await db.collection(COLLECTIONS.USUARIS).doc(reserva.professorId).get();
+        const professor = professorDoc.data();
         
-        reserva.profesorNombre = profesor.nombre;
+        reserva.professorNom = professor.nom;
         
-        res.render('padre/confirmacion', {
-            titulo: 'Reserva Confirmada',
+        res.render('pare/confirmacio', {
+            titol: 'Reserva Confirmada',
             reserva: reserva
         });
         
     } catch (error) {
         console.error('Error:', error);
-        req.flash('error', 'Error al cargar la confirmación');
-        res.redirect('/padre/profesores');
+        req.flash('error', 'Error en carregar la confirmació');
+        res.redirect('/pare/professors');
     }
 });
 
-// ============ RUTAS DE CANCELACIÓN ============
+// ============ RUTES DE CANCEL·LACIÓ ============
 
 app.get('/cancelar/:token', async (req, res) => {
     const token = req.params.token;
     
     try {
-        const reservasSnapshot = await db.collection(COLLECTIONS.RESERVAS)
-            .where('tokenAcceso', '==', token)
+        const reservesSnapshot = await db.collection(COLLECTIONS.RESERVES)
+            .where('tokenAcces', '==', token)
             .limit(1)
             .get();
         
-        if (reservasSnapshot.empty) {
-            return res.send('Enlace no válido o reserva ya cancelada');
+        if (reservesSnapshot.empty) {
+            return res.send('Enllaç no vàlid o reserva ja cancel·lada');
         }
         
-        const reservaDoc = reservasSnapshot.docs[0];
+        const reservaDoc = reservesSnapshot.docs[0];
         const reserva = reservaDoc.data();
         
-        const profesorDoc = await db.collection(COLLECTIONS.USUARIOS).doc(reserva.profesorId).get();
-        const profesor = profesorDoc.data();
+        const professorDoc = await db.collection(COLLECTIONS.USUARIS).doc(reserva.professorId).get();
+        const professor = professorDoc.data();
         
-        reserva.profesorNombre = profesor.nombre;
+        reserva.professorNom = professor.nom;
         
         res.render('cancelar', {
-            titulo: 'Cancelar Reserva',
+            titol: 'Cancel·lar Reserva',
             reserva: reserva,
             token: token,
             reservaId: reservaDoc.id
@@ -1017,7 +1032,7 @@ app.get('/cancelar/:token', async (req, res) => {
         
     } catch (error) {
         console.error('Error:', error);
-        res.send('Error al procesar la solicitud');
+        res.send('Error en processar la sol·licitud');
     }
 });
 
@@ -1025,55 +1040,55 @@ app.post('/cancelar/:token', async (req, res) => {
     const token = req.params.token;
     
     try {
-        const reservasSnapshot = await db.collection(COLLECTIONS.RESERVAS)
-            .where('tokenAcceso', '==', token)
+        const reservesSnapshot = await db.collection(COLLECTIONS.RESERVES)
+            .where('tokenAcces', '==', token)
             .limit(1)
             .get();
         
-        if (reservasSnapshot.empty) {
-            return res.send('Enlace no válido');
+        if (reservesSnapshot.empty) {
+            return res.send('Enllaç no vàlid');
         }
         
-        const reservaDoc = reservasSnapshot.docs[0];
+        const reservaDoc = reservesSnapshot.docs[0];
         const reservaData = reservaDoc.data();
         
-        const estadoAnterior = reservaData.estado;
+        const estatAnterior = reservaData.estat;
         
-        await db.collection(COLLECTIONS.RESERVAS).doc(reservaDoc.id).update({
-            estado: 'cancelada',
-            fechaCancelacion: new Date().toISOString()
+        await db.collection(COLLECTIONS.RESERVES).doc(reservaDoc.id).update({
+            estat: 'cancel·lada',
+            dataCancelacio: new Date().toISOString()
         });
         
-        if (estadoAnterior !== 'cancelada') {
+        if (estatAnterior !== 'cancel·lada') {
             try {
-                const profesorDoc = await db.collection(COLLECTIONS.USUARIOS).doc(reservaData.profesorId).get();
-                const profesor = profesorDoc.data();
+                const professorDoc = await db.collection(COLLECTIONS.USUARIS).doc(reservaData.professorId).get();
+                const professor = professorDoc.data();
                 
-                const padre = {
-                    nombre: reservaData.padreNombre,
-                    email: reservaData.padreEmail,
-                    telefono: reservaData.padreTelefono || 'No especificado'
+                const pare = {
+                    nom: reservaData.nomPare,
+                    email: reservaData.emailPare,
+                    telefon: reservaData.telefonPare || 'No especificat'
                 };
                 
-                reservaData.profesorNombre = profesor.nombre;
+                reservaData.professorNom = professor.nom;
                 
-                const { enviarCancelacionPadre, enviarNotificacionProfesor } = require('./backend/services/emailService');
+                const { enviarCancelacioPare, enviarNotificacioProfessor } = require('./backend/serveis/emailService');
                 
-                await enviarCancelacionPadre(reservaData, profesor);
-                console.log('✅ Email de confirmación de cancelación enviado al padre');
+                await enviarCancelacioPare(reservaData, professor);
+                console.log('✅ Email de confirmació de cancel·lació enviat al pare');
                 
-                await enviarNotificacionProfesor(reservaData, profesor, padre);
-                console.log('✅ Notificación de cancelación enviada al profesor');
+                await enviarNotificacioProfessor(reservaData, professor, pare);
+                console.log('✅ Notificació de cancel·lació enviada al professor');
                 
             } catch (emailError) {
-                console.error('❌ Error al enviar emails:', emailError);
+                console.error('❌ Error en enviar emails:', emailError);
             }
         }
         
         res.send(`
             <html>
             <head>
-                <title>Reserva Cancelada</title>
+                <title>Reserva Cancel·lada</title>
                 <style>
                     body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
                     .container { max-width: 500px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -1084,11 +1099,11 @@ app.post('/cancelar/:token', async (req, res) => {
             </head>
             <body>
                 <div class="container">
-                    <h1>✓ Reserva cancelada</h1>
-                    <p>La reserva ha sido cancelada correctamente.</p>
-                    <p>Hemos enviado un email de confirmación a <strong>${reservaData.padreEmail}</strong></p>
-                    <p>También hemos notificado al profesor.</p>
-                    <a href="/" class="btn">Volver al inicio</a>
+                    <h1>✓ Reserva cancel·lada</h1>
+                    <p>La reserva ha estat cancel·lada correctament.</p>
+                    <p>Hem enviat un email de confirmació a <strong>${reservaData.emailPare}</strong></p>
+                    <p>També hem notificat al professor.</p>
+                    <a href="/" class="btn">Tornar a l'inici</a>
                 </div>
             </body>
             </html>
@@ -1096,18 +1111,18 @@ app.post('/cancelar/:token', async (req, res) => {
         
     } catch (error) {
         console.error('Error:', error);
-        res.send('Error al cancelar la reserva');
+        res.send('Error en cancel·lar la reserva');
     }
 });
 
-// ============ EXPORTAR PARA VERCEL ============
+// ============ EXPORTAR PER A VERCEL ============
 if (process.env.NODE_ENV === 'production') {
   module.exports = app;
 } else {
   app.listen(PORT, () => {
-    console.log(`✅ Servidor funcionando en http://localhost:${PORT}`);
-    console.log(`🔥 Conectado a Firebase Project: ${process.env.FIREBASE_PROJECT_ID || 'no configurado'}`);
-    console.log(`🔑 Código de registro de profesores configurado: ${process.env.REGISTRO_PROFESOR_CODE ? 'SÍ' : 'NO'}`);
+    console.log(`✅ Servidor funcionant a http://localhost:${PORT}`);
+    console.log(`🔥 Connectat a Firebase Project: ${process.env.FIREBASE_PROJECT_ID || 'no configurat'}`);
+    console.log(`🔑 Codi de registre de professors configurat: ${process.env.REGISTRE_PROFESSOR_CODI ? 'SÍ' : 'NO'}`);
     console.log(`🔑 API Key de Firebase configurada: ${process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? 'SÍ' : 'NO'}`);
   });
 }

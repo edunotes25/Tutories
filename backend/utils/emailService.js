@@ -1,16 +1,16 @@
-// Enviar notificación al profesor específico
-async enviarNotificacionProfesor({ profesorEmail, nombreAlumno, fecha, hora, nombrePadre, emailPadre, telefonoPadre }) {
+// Enviar notificació al professor específic
+async function enviarNotificacioProfessor({ professorEmail, nomAlumne, data, hora, nomPare, emailPare, telefonPare }) {
     const mailOptions = {
-        from: `"Sistema de Tutorías" <${process.env.EMAIL_FROM}>`,
-        to: profesorEmail, // ← AHORA VA AL CORREO DEL PROFESOR
-        subject: `📅 Nueva tutoría - ${nombreAlumno}`,
-        html: this.generarEmailProfesor(profesorEmail, nombreAlumno, fecha, hora, nombrePadre, emailPadre, telefonoPadre)
+        from: `"Sistema de Tutories" <${process.env.EMAIL_FROM}>`,
+        to: professorEmail, // ← ARA VA AL CORREU DEL PROFESSOR
+        subject: `📅 Nova tutoria - ${nomAlumne}`,
+        html: this.generarEmailProfessor(professorEmail, nomAlumne, data, hora, nomPare, emailPare, telefonPare)
     };
 
     try {
         await this.transporter.sendMail(mailOptions);
-        console.log(`📧 Notificación enviada a profesor: ${profesorEmail}`);
+        console.log(`📧 Notificació enviada a professor: ${professorEmail}`);
     } catch (error) {
-        console.error('Error enviando notificación al profesor:', error);
+        console.error('Error enviant notificació al professor:', error);
     }
 }

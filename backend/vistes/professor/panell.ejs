@@ -1,6 +1,6 @@
 <div class="dashboard-header">
-    <h1>Panel del Profesor - <%= usuario.nombre %></h1>
-    <a href="/logout" class="btn btn-secondary">Cerrar sesión</a>
+    <h1>Panell del Professor - <%= usuari.nom %></h1>
+    <a href="/logout" class="btn btn-secondary">Tancar sessió</a>
 </div>
 
 <% if (error && error.length > 0) { %>
@@ -13,46 +13,46 @@
 
 <div class="dashboard-grid">
     <div class="dashboard-card">
-        <h2>Mis datos</h2>
+        <h2>Les meves dades</h2>
         <div class="perfil-info">
-            <p><strong>Nombre:</strong> <%= usuario.nombre %></p>
-            <p><strong>Email:</strong> <%= usuario.email %></p>
-            <p><strong>Teléfono:</strong> <%= usuario.telefono || 'No especificado' %></p>
-            <p><strong>Curso:</strong> <%= usuario.curso || 'No especificado' %></p>
+            <p><strong>Nom:</strong> <%= usuari.nom %></p>
+            <p><strong>Email:</strong> <%= usuari.email %></p>
+            <p><strong>Telèfon:</strong> <%= usuari.telefon || 'No especificat' %></p>
+            <p><strong>Curs:</strong> <%= usuari.curs || 'No especificat' %></p>
         </div>
     </div>
     
     <div class="dashboard-card">
-        <h2>Acciones rápidas</h2>
-        <div class="acciones">
-            <a href="/profesor/horarios" class="btn btn-primary btn-block">Gestionar horarios</a>
-            <a href="/profesor/calendario" class="btn btn-success btn-block">Ver calendario de reservas</a>
-            <a href="/profesor/reservas" class="btn btn-secondary btn-block">Ver todas mis reservas</a>
+        <h2>Accions ràpides</h2>
+        <div class="accions">
+            <a href="/professor/horaris" class="btn btn-primary btn-block">Gestionar horaris</a>
+            <a href="/professor/calendari" class="btn btn-success btn-block">Veure calendari de reserves</a>
+            <a href="/professor/reserves" class="btn btn-secondary btn-block">Veure totes les meves reserves</a>
         </div>
     </div>
 </div>
 
 <div class="dashboard-card" style="margin-top: 30px;">
-    <h2>Próximas reservas</h2>
+    <h2>Properes reserves</h2>
     
-    <% if (reservas.length === 0) { %>
-        <p class="text-center">No tienes reservas pendientes</p>
+    <% if (reserves.length === 0) { %>
+        <p class="text-center">No tens reserves pendents</p>
     <% } else { %>
-        <div class="reservas-lista">
-            <% reservas.forEach(reserva => { %>
+        <div class="reserves-llista">
+            <% reserves.forEach(reserva => { %>
                 <div class="reserva-item">
-                    <div class="reserva-fecha">
-                        <strong><%= new Date(reserva.fecha).toLocaleDateString('es-ES') %></strong> - <%= reserva.hora %>
+                    <div class="reserva-data">
+                        <strong><%= new Date(reserva.data).toLocaleDateString('ca-ES') %></strong> - <%= reserva.hora %>
                     </div>
-                    <div class="reserva-padre">
-                        <p><strong>Padre/Madre:</strong> <%= reserva.padreNombre %></p>
-                        <p><strong>Alumno:</strong> <%= reserva.nombreAlumno || 'No especificado' %></p>
-                        <p><strong>Email:</strong> <%= reserva.padreEmail %></p>
-                        <% if (reserva.padreTelefono) { %>
-                            <p><strong>Teléfono:</strong> <%= reserva.padreTelefono %></p>
+                    <div class="reserva-pare">
+                        <p><strong>Pare/Mare:</strong> <%= reserva.nomPare %></p>
+                        <p><strong>Alumne:</strong> <%= reserva.nomAlumne || 'No especificat' %></p>
+                        <p><strong>Email:</strong> <%= reserva.emailPare %></p>
+                        <% if (reserva.telefonPare) { %>
+                            <p><strong>Telèfon:</strong> <%= reserva.telefonPare %></p>
                         <% } %>
-                        <% if (reserva.comentarios) { %>
-                            <p><strong>Comentarios:</strong> <%= reserva.comentarios %></p>
+                        <% if (reserva.comentaris) { %>
+                            <p><strong>Comentaris:</strong> <%= reserva.comentaris %></p>
                         <% } %>
                     </div>
                 </div>
@@ -105,7 +105,7 @@
     border-bottom: 1px solid #f0f0f0;
 }
 
-.acciones {
+.accions {
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -118,7 +118,7 @@
     padding: 12px;
 }
 
-.reservas-lista {
+.reserves-llista {
     max-height: 400px;
     overflow-y: auto;
 }
@@ -134,7 +134,7 @@
     background: #f9f9f9;
 }
 
-.reserva-fecha {
+.reserva-data {
     background: #4a90e2;
     color: white;
     padding: 5px 10px;
@@ -143,7 +143,7 @@
     font-size: 0.9rem;
 }
 
-.reserva-padre p {
+.reserva-pare p {
     margin: 5px 0;
     font-size: 0.9rem;
 }

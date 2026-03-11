@@ -1,0 +1,50 @@
+<div class="confirmacio-container">
+    <div class="confirmacio-icona">✓</div>
+    
+    <h1>Reserva confirmada!</h1>
+    
+    <div class="confirmacio-detalls">
+        <h2>Detalls de la tutoria</h2>
+        
+        <div class="detall-item">
+            <span class="detall-etiqueta">Professor:</span>
+            <span class="detall-valor"><%= reserva.professorNom %></span>
+        </div>
+        
+        <div class="detall-item">
+            <span class="detall-etiqueta">Data:</span>
+            <span class="detall-valor"><%= new Date(reserva.data).toLocaleDateString('ca-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+        </div>
+        
+        <div class="detall-item">
+            <span class="detall-etiqueta">Hora:</span>
+            <span class="detall-valor"><%= reserva.hora %></span>
+        </div>
+        
+        <div class="detall-item">
+            <span class="detall-etiqueta">ID Reserva:</span>
+            <span class="detall-valor"><%= reserva.id.substring(0, 8).toUpperCase() %></span>
+        </div>
+    </div>
+    
+    <div class="confirmacio-accions">
+        <p>Hem enviat un correu electrònic de confirmació a <strong><%= reserva.emailPare %></strong> amb un PDF adjunt.</p>
+        
+        <div class="botons-accio">
+            <button onclick="window.print()" class="btn btn-secondary">
+                🖨️ Imprimir confirmació
+            </button>
+            <a href="/" class="btn btn-primary">
+                Tornar a l'inici
+            </a>
+        </div>
+    </div>
+    
+    <div class="info-rgpd">
+        <p>
+            <strong>Important (RGPD):</strong> Les seves dades seran eliminades automàticament del nostre sistema 
+            després de 24 hores després de la tutoria. Si vol cancel·lar la reserva, pot fer-ho des de l'enllaç 
+            inclòs al correu electrònic de confirmació.
+        </p>
+    </div>
+</div>
